@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-10-31 22:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-10-31 23:10:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3036,7 +3036,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-10-31 22:50:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-10-31 23:10:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -24723,19 +24723,36 @@ function _anyRgba(str) {
   } catch (e) {}
   if (_anyRgbaCache.size > 400) _anyRgbaCache.clear(); _anyRgbaCache.set(str, out); return out;
 }
+// FX BUTTON STATE CHANGES WITHOUT FLICKER, per direct report (FX → EN: the glow/background came in while the glyph was still the
+// old colour; → DL / → FX: the glyph showed one colour, then jumped to another a moment later). The contrast fix used to run on a
+// 400ms timer, measuring against the background MID-fade, with the old state's inline colour still on. Now it runs the instant a
+// button's class changes (before the next paint), measured on an invisible copy with no transitions — i.e. against the state's
+// FINAL background — so the glyph lands on its final colour in the same frame as everything else.
+function _fxGlyphFixOne(b) {
+  if (!b || !b.isConnected) return;
+  if (b.closest('.row-muted')) { if (b._gfKey) { b.style.removeProperty('color'); b._gfKey = null; } return; }
+  const key = b.className + '|' + [...document.body.classList].filter(c => c !== 'glow-pause' && c !== 'pattern-swap' && c !== 'low-contrast-rows').sort().join(' ') + '|' + (document.documentElement.getAttribute('style') || '').replace(/--[\w-]*-dur:[^;]*;?/g, ''); // (beat-to-beat classes / timing vars left out — they don't change the button's colours)
+  if (b._gfKey === key) return; b._gfKey = key;
+  let bgS = null, fgS = null;
+  try {
+    const pr = b.cloneNode(true); pr.removeAttribute('id'); pr.style.removeProperty('color');
+    pr.style.setProperty('transition', 'none', 'important'); pr.style.setProperty('animation', 'none', 'important');
+    pr.style.setProperty('position', 'absolute', 'important'); pr.style.setProperty('visibility', 'hidden', 'important'); pr.style.setProperty('pointer-events', 'none', 'important');
+    pr.setAttribute('aria-hidden', 'true'); b.parentNode.insertBefore(pr, b);
+    const cs = getComputedStyle(pr); bgS = cs.backgroundColor; fgS = cs.color; pr.remove();
+  } catch (e) { return; }
+  const bgA = _anyRgba(bgS), fgA = _anyRgba(fgS);
+  if (!bgA || bgA[3] < 0.3 || !fgA) { b.style.removeProperty('color'); return; } // see-through button: nothing to measure against
+  const bg = bgA.slice(0, 3), fg = fgA.slice(0, 3);
+  if (_contrast(fg, bg) >= 4.5) { b.style.removeProperty('color'); return; }
+  const [h, sat] = _rgbHsl(fg), dark = _relLum(bg) > 0.18; let l = _rgbHsl(fg)[2], c = fg;
+  for (let i = 0; i < 50 && _contrast(c, bg) < 4.5; i++) { l = dark ? Math.max(0, l - 0.02) : Math.min(1, l + 0.02); c = _hslRgb(h, sat, l); if (l <= 0 || l >= 1) break; }
+  b.style.setProperty('color', `rgb(${c[0]},${c[1]},${c[2]})`, 'important');
+}
 function _fxGlyphFix() {
-  const bc = document.body.className;
   document.querySelectorAll('.fx-btn').forEach(b => {
-    if (b.closest('.row-muted')) { if (b._gfKey) { b.style.removeProperty('color'); b._gfKey = null; } return; }
-    const cs = getComputedStyle(b), bgS = cs.backgroundColor, key = b.className + '|' + bgS + '|' + bc;
-    if (b._gfKey === key) return; b._gfKey = key;
-    b.style.removeProperty('color'); // read the glyph's own colour (same frame — nothing paints in between)
-    const bgA = _anyRgba(bgS); if (!bgA || bgA[3] < 0.3) return; // see-through button: nothing to measure against
-    const bg = bgA.slice(0, 3), fgA = _anyRgba(getComputedStyle(b).color); if (!fgA) return; const fg = fgA.slice(0, 3);
-    if (_contrast(fg, bg) >= 4.5) return;
-    const [h, sat] = _rgbHsl(fg), dark = _relLum(bg) > 0.18; let l = _rgbHsl(fg)[2], c = fg;
-    for (let i = 0; i < 50 && _contrast(c, bg) < 4.5; i++) { l = dark ? Math.max(0, l - 0.02) : Math.min(1, l + 0.02); c = _hslRgb(h, sat, l); if (l <= 0 || l >= 1) break; }
-    b.style.setProperty('color', `rgb(${c[0]},${c[1]},${c[2]})`, 'important');
+    if (!b._gfObs) { b._gfObs = new MutationObserver(() => _fxGlyphFixOne(b)); b._gfObs.observe(b, { attributes: true, attributeFilter: ['class'] }); } // class change → fixed before the next paint
+    _fxGlyphFixOne(b);
   });
 }
 setInterval(() => { try { if (!document.hidden) _fxGlyphFix(); } catch (e) {} }, 400);
