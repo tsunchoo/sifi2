@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-10-31 04:25:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-10-31 22:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2614,6 +2614,7 @@ html body.modify .track-row { display: none !important; }
 /* MODIFY SLIM NOTE ROWS, per direct request: under each track's buttons, an 8px non-clickable strip of its notes (the ones
    actually sounding — the pad's mutes / additions included) as plain rectangles, at the NOTE MARKERS OPACITY */
 .mod-note-row { display: none; }
+html body.modify.modify-square .mod-note-row { display: none !important; } /* SQUARE mode (logo drag from MODIFY), per direct request: no note-marker rows — just the track name + vol slider rows under a square graph */
 html body.modify { --simple-fader-width: 0px !important; --vol-tip-h: 0% !important; } /* MODIFY: the vol FADER (width + height) at 0, per direct request — the meters alone */
 html body.modify .mod-note-row { display: block; width: 100vw; margin-left: calc(50% - 50vw); /* the FULL screen width — the track list itself sits 4px in from each edge, per direct report */ height: calc(16px + 40px / 6); /* 16px + an equal share of the graph's freed top/bottom margins, per direct request */ pointer-events: none; opacity: var(--modify-notes-op, 0.4); }
 /* (MODIFY's forced transparent song-name background removed, per direct request — it keeps whatever the mode before it had) */
@@ -3035,7 +3036,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-10-31 04:25:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-10-31 22:50:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8394,7 +8395,7 @@ function _modifyMeasure() {
   let h = 0; document.querySelectorAll('.track-row').forEach(r => { const rr = r.getBoundingClientRect(); if (rr.height) h += rr.height + 4; }); // + the 4px gap under each
   if (had) b.classList.add('modify');
   document.documentElement.style.setProperty('--modify-extra', Math.round(h) + 'px');
-  const W = document.documentElement.clientWidth || innerWidth; document.documentElement.style.setProperty('--modify-pad-h', Math.round(6 * ((W - 40) / 16)) + 'px'); // 6 square rows of a 16-wide grid — no empty margin above / below the EQ any more (given to the slim note rows), per direct request
+  const W = document.documentElement.clientWidth || innerWidth; document.documentElement.style.setProperty('--modify-pad-h', (b.classList.contains('modify-square') ? Math.round(W) : Math.round(6 * ((W - 40) / 16))) + 'px'); // SQUARE mode: the graph as tall as it is wide, per direct request // 6 square rows of a 16-wide grid — no empty margin above / below the EQ any more (given to the slim note rows), per direct request
 }
 // the slim rows are drawn here (~15fps while MODIFY is on): one rectangle per sounding note, 2px apart, full row height
 window._modifyRowColours = true; // true = each track's own colour (DEFAULT now — grayscale OFF, per direct request), false = grey — SETTINGS toggle
@@ -8426,6 +8427,7 @@ function _setModify(on, quiet) {
   if (on === b.classList.contains('modify')) return;
   if (on) _modifyMeasure();
   b.classList.toggle('modify', on);
+  if (!on) b.classList.remove('modify-square');
   _modifyVolBanger(on);
   // EQ OPACITY 60% in MODIFY by default, per direct request — whatever it was comes back on leaving
   try { if (on) { if (window._eqOpBeforeModify === undefined) window._eqOpBeforeModify = window._nameEqOpacity; setNameEqOpacity(60); } else if (window._eqOpBeforeModify !== undefined) { const v = window._eqOpBeforeModify; window._eqOpBeforeModify = undefined; setNameEqOpacity(v); } } catch (e) {}
@@ -24262,7 +24264,12 @@ function setTonalPercBalance(v) {
     const toggleLive = window._toggleLiveMode = () => {
       playUiSound('tinyclick');
       const b = document.body;
+      if (b.classList.contains('modify') && !b.classList.contains('modify-square')) { // MODIFY → SQUARE (a 3rd main mode), per direct request
+        b.classList.add('modify-square'); try { _modifyMeasure(); } catch (e) {}
+        _showNotice('SQUARE MODE'); return;
+      }
       if (b.classList.contains('modify') || b.classList.contains('live-layout')) {
+        b.classList.remove('modify-square');
         b.classList.remove('live-layout'); // (first — so leaving doesn't put LIVE's hidden tape back)
         try { _setModify(false, true); } catch (e) {}
         try { const m = _RAINBOW_CYCLE[window._rainbowIdx], h = m && m.sliders && m.sliders.volFillHeightSlider; if (h) { setVolFillHeightPct(h); const sl = document.getElementById('volFillHeightSlider'); if (sl) sl.value = h; } } catch (e) {} // the display mode's own fill height (if it changed mode while in MODIFY)
@@ -28007,7 +28014,7 @@ function snapshotDisplay() {
   // where you tapped, so shared parts describe MODIFY when you're in MODIFY); LIVE left out while it's hidden.
   const MOD = () => document.body.classList.contains('modify');
   const H = [
-    ['#siFiTitle', 'Si•Fi LOGO', 'Tap to toggle the 8-bit mix. Drag DOWN to switch between the two main modes, MAIN and MODIFY. Hold for a short description of Si•Fi.'],
+    ['#siFiTitle', 'Si•Fi LOGO', 'Tap to toggle the 8-bit mix. Drag DOWN to step through the main modes: MAIN, MODIFY, SQUARE, then back to MAIN. Hold for a short description of Si•Fi.'],
     ['#_helpBtn', 'HELP MODE - click anything to see what it does', ''],
     ['#_hamBtn', 'MENU', 'Shows or hides the rainbow (look and feel), reverb and help icons. Tap again to tuck them away.'],
     ['#devMenuBtn', 'RAINBOW · DISPLAY MODES', 'Swipe DOWN to cycle through the display modes (the look — colours, glows, meters) in either main mode. Tap to open LOOK AND FEEL for the visual settings.'],
