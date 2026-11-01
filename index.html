@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-01 00:12:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-01 17:45:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3067,7 +3067,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-01 00:12:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-01 17:45:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -17444,7 +17444,7 @@ function _buildBounceGraph(targetCtx) {
   masterGain = targetCtx.createGain(); masterGain.gain.value = masterVol * MASTER_OUTPUT_BOOST; // must match setMasterVol's own +4dB boost, so a bounced/exported file matches what's actually heard live
   const makeupGain = targetCtx.createGain(); makeupGain.gain.value = window._BASE_MAKEUP_GAIN || 3.1623; // +10dB, matches the live init default — see _BASE_MAKEUP_GAIN's own comment
   window._makeupGain = makeupGain;
-  window._beatGain = targetCtx.createGain(); window._beatGain.gain.value = 0.50 * 1.0593; /* +3dB default DRUMS level, matching _beatVolRaw; +0.5dB more, per direct request */ // -0.4dB more (was 0.4043, -0.5dB before that, was 0.4283, -1dB, then -5% more, then 0.506, then 0.4508)
+  window._beatGain = targetCtx.createGain(); window._beatGain.gain.value = (_beatSoloMuted ? 0 : _beatVolRaw * ((_beatFx || _beatPump) ? Math.pow(10, -3 / 20) : 1) * 1.0593); /* FROM THE DRUMS BUS SLIDER (was a hard-coded 0.50 — the bus came up at 50% whatever the slider said, per the audio snapshot), +0.5dB, per direct request */ // -0.4dB more (was 0.4043, -0.5dB before that, was 0.4283, -1dB, then -5% more, then 0.506, then 0.4508)
   window._beatChokeGate = targetCtx.createGain(); window._beatChokeGate.gain.value = _beatChoke ? 0 : 1; window._beatGain.connect(window._beatChokeGate); // DRUMS FX (CHK) gate — callers connect this (not _beatGain) onward
   // NOT auto-connected to masterGain here — the caller wires in only the
   // tap(s) this pass actually wants (see _renderOfflineLoop's connectFn),
@@ -25611,7 +25611,7 @@ async function initAudio(opts) {
     window._BASE_MAKEUP_GAIN = window._BASE_MAKEUP_GAIN || 3.1623; // +10dB fixed output boost, hardcoded per direct request (was +13dB/4.4668, +8dB/2.5061 before that, +14dB before that — pulled back from +13dB after it was flagged as a likely general-overclocking/clipping contributor) — || preserves a value the OUTPUT MAKEUP GAIN slider (SETTINGS) already set, so a context rebuild (which re-runs this init) doesn't silently reset the user's own adjustment back to the hardcoded default
     const makeupGain = ctx.createGain(); makeupGain.gain.value = window._BASE_MAKEUP_GAIN;
     window._makeupGain = makeupGain;
-    window._beatGain = ctx.createGain(); window._beatGain.gain.value = 0.50 * 1.0593; /* +3dB default DRUMS level, matching _beatVolRaw; +0.5dB more, per direct request */ window._beatChokeGate = ctx.createGain(); window._beatChokeGate.gain.value = _beatChoke ? 0 : 1; window._beatGain.connect(window._beatChokeGate); window._beatChokeGate.connect(masterGain); /* DRUMS FX (CHK) gate, after the DRUMS level */ // -0.4dB more (was 0.4043, -0.5dB before that, was 0.4283, -1dB, then -5% more, then 0.506, then 0.4508)
+    window._beatGain = ctx.createGain(); window._beatGain.gain.value = (_beatSoloMuted ? 0 : _beatVolRaw * ((_beatFx || _beatPump) ? Math.pow(10, -3 / 20) : 1) * 1.0593); /* FROM THE DRUMS BUS SLIDER (was a hard-coded 0.50 — the bus came up at 50% whatever the slider said, per the audio snapshot), +0.5dB, per direct request */ window._beatChokeGate = ctx.createGain(); window._beatChokeGate.gain.value = _beatChoke ? 0 : 1; window._beatGain.connect(window._beatChokeGate); window._beatChokeGate.connect(masterGain); /* DRUMS FX (CHK) gate, after the DRUMS level */ // -0.4dB more (was 0.4043, -0.5dB before that, was 0.4283, -1dB, then -5% more, then 0.506, then 0.4508)
     // UI Sounds
     const _uiSoundBufs = (_refresh && window._uiSoundBufs) ? window._uiSoundBufs : {};
     window._uiSoundBufs = _uiSoundBufs;
