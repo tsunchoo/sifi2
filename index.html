@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-01 17:45:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-01 18:40:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3067,7 +3067,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-01 17:45:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-01 18:40:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -5846,6 +5846,24 @@ function _buildEightBitNodeScriptProcessorFallback(audioCtx) {
   };
   return node;
 }
+// CRASH FIX, per direct request (crash reports: 3 of 3 foreground crashes came ~1s after something started a crusher — the
+// logo tap turning 8-BIT on twice, SWEEP once — each time just after a second audio engine had been made): every 8-bit
+// crusher is now built from iOS's OWN audio nodes, no AudioWorklet (an extra script engine on the audio thread) any more.
+// A WaveShaper with a hard stair-step curve (6-bit: 64 levels, no oversampling, so the steps stay jagged) into a low-pass at
+// 3.7kHz (the band of the old 6x sample-and-hold). Made instantly, in the same tap — nothing async, nothing to load.
+const _8BIT_HALF_LEVELS = 32, _8BIT_LP_HZ = 3700;
+let _8bitCurve = null;
+function _make8BitNode(c) {
+  if (!_8bitCurve) { const n = 16384; _8bitCurve = new Float32Array(n); for (let i = 0; i < n; i++) { const x = (i * 2) / (n - 1) - 1; _8bitCurve[i] = Math.round(x * _8BIT_HALF_LEVELS) / _8BIT_HALF_LEVELS; } }
+  const ws = c.createWaveShaper(); ws.curve = _8bitCurve; ws.oversample = 'none';
+  const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = _8BIT_LP_HZ; lp.Q.value = 0.707;
+  ws.connect(lp);
+  // one node to the callers: audio goes INTO the shaper, and connect / disconnect act on the filter's output
+  ws.connect = function () { return lp.connect.apply(lp, arguments); };
+  ws.disconnect = function () { return lp.disconnect.apply(lp, arguments); };
+  ws._8out = lp;
+  return ws;
+}
 // Splits the very end of the master chain (_postLimiterGain -> destination)
 // into two permanent parallel legs — clean and crushed — each with its own
 // gain, so the mix crossfader can blend between them instead of hard-
@@ -5871,16 +5889,9 @@ function _ensureEightBitSplit(audioCtx) {
   // and it was being built inside EVERY audio engine (9 in one 10-minute crash report) even with 8-BIT MIX at 0. Now it's
   // only built once 8-BIT MIX is actually turned up.
   if (!((window._eightBitMix || 0) > 0)) return;
-  window._eightBitNode = true; // placeholder truthy value so a second call in flight doesn't also kick off addModule() again — replaced with the real node once ready
-  _ensureEightBitWorkletModule(audioCtx).then(() => {
-    window._eightBitNode = new AudioWorkletNode(audioCtx, 'eight-bit-processor', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2] });
-    window._eightBitNode.connect(window._eightBitWetGain);
-    window._eightBitFed = false; _applyEightBitMixGains();
-  }).catch(() => {
-    window._eightBitNode = _buildEightBitNodeScriptProcessorFallback(audioCtx);
-    window._eightBitNode.connect(window._eightBitWetGain);
-    window._eightBitFed = false; _applyEightBitMixGains();
-  });
+  window._eightBitNode = _make8BitNode(audioCtx); // native nodes, built right here (see CRASH FIX above)
+  window._eightBitNode.connect(window._eightBitWetGain);
+  window._eightBitFed = false; _applyEightBitMixGains();
 }
 // Equal-power crossfade — sounds more even across the sweep than a plain
 // linear fade, which would dip in the middle.
@@ -5916,19 +5927,17 @@ function _applyEightBitMixGains() {
 // carries whatever 8-BIT MIX % was set when it was rendered — same as
 // REALTIME (see toggleRecord's tap point) and same as what's actually
 // heard live.
-function _applyEightBitToBuffer(buffer, mix) {
+function _applyEightBitToBuffer(buffer, mix) { // the same 6-bit stair-step + 3.7kHz low-pass as _make8BitNode, on the samples
   if (!buffer || !mix || mix <= 0) return buffer;
-  const bits = 8, downsample = 6;
-  const halfLevels = Math.pow(2, bits - 1);
-  const dryGain = Math.cos(mix * Math.PI / 2);
-  const wetGain = Math.sin(mix * Math.PI / 2);
+  const H = _8BIT_HALF_LEVELS, dryGain = Math.cos(mix * Math.PI / 2), wetGain = Math.sin(mix * Math.PI / 2);
+  const w0 = 2 * Math.PI * _8BIT_LP_HZ / buffer.sampleRate, al = Math.sin(w0) / (2 * 0.707), cw = Math.cos(w0), a0 = 1 + al;
+  const b0 = (1 - cw) / 2 / a0, b1 = (1 - cw) / a0, b2 = b0, a1 = -2 * cw / a0, a2 = (1 - al) / a0;
   for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
-    const data = buffer.getChannelData(ch);
-    let hold = 0, phase = 0;
+    const data = buffer.getChannelData(ch); let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
     for (let i = 0; i < data.length; i++) {
-      if (phase === 0) hold = Math.round(Math.max(-1, Math.min(1, data[i])) * halfLevels) / halfLevels;
-      phase = (phase + 1) % downsample;
-      data[i] = data[i] * dryGain + hold * wetGain;
+      const x = Math.round(Math.max(-1, Math.min(1, data[i])) * H) / H;
+      const y = b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x; y2 = y1; y1 = y;
+      data[i] = data[i] * dryGain + y * wetGain;
     }
   }
   return buffer;
@@ -6816,8 +6825,7 @@ function _drum8In(key, dest) {
   if (!e) {
     e = _drum8[key] = { ctx, node: null, dest: null };
     const c = ctx;
-    _ensureEightBitWorkletModule(c).then(() => { if (_drum8[key] === e && c === ctx) e.node = new AudioWorkletNode(c, 'eight-bit-processor', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2] }); })
-      .catch(() => { if (_drum8[key] === e && c === ctx) e.node = _buildEightBitNodeScriptProcessorFallback(c); });
+    e.node = _make8BitNode(c); // native nodes (see CRASH FIX) — ready straight away
   }
   if (!e.node) return dest;
   if (e.dest !== dest) { try { e.node.disconnect(); } catch (er) {} e.node.connect(dest); e.dest = dest; }
@@ -25995,8 +26003,7 @@ async function hardResetAudioEngine() {
     wet.connect(out);
     const sc = swCrush;
     const attach = n => { if (swCrush !== sc) { try { n.disconnect(); } catch (e) {} return; } sc.node = n; fade.connect(n); n.connect(wet); };
-    _ensureEightBitWorkletModule(ctx).then(() => attach(new AudioWorkletNode(ctx, 'eight-bit-processor', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2] })))
-      .catch(() => { try { attach(_buildEightBitNodeScriptProcessorFallback(ctx)); } catch (e) {} });
+    try { attach(_make8BitNode(ctx)); } catch (e) {} // native nodes (see CRASH FIX)
   }
   function _sweepCrushSet(depth) {
     if (!swCrush || !ctx) return;
