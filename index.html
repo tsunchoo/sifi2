@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-01 18:40:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-01 18:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3067,7 +3067,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-01 18:40:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-01 18:50:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -24745,6 +24745,7 @@ setInterval(() => {
 // pad's 20px margins allow (shrunk if it would be too tall), centred — the notes AND every EQ type use exactly this area
 function _modifyGridBox(W, H, dpr) {
   const bz = Math.round(20 * dpr); let cw = (W - bz * 2) / 16; if (cw * 6 > H) cw = Math.max(1, H / 6); // 20px margins left / right only now — top to bottom it fills the graph
+  if (document.body.classList.contains('modify-square')) { cw = (W - bz * 2) / 16; const gw = cw * 16; return { x: Math.round((W - gw) / 2), y: 0, gw, gh: H, cw }; } // SQUARE: the EQ fills the whole (taller) graph — same 20px side margins, top to bottom like MODIFY, per direct request
   const gw = cw * 16, gh = cw * 6; return { x: Math.round((W - gw) / 2), y: Math.round((H - gh) / 2), gw, gh, cw };
 }
 function _relLum(c) { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); }
