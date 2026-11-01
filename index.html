@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-01 18:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-01 23:30:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3067,7 +3067,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-01 18:50:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-01 23:30:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -27872,6 +27872,65 @@ let _reelHoldTimer = null;
 })();
 </script>
 
+<script>
+/* OVERLOAD GUARD, per direct request: when the audio looks like it's about to fall over, playback STOPS and an OVERLOAD!!!
+   box comes up with a progress bar while everything gets its breath back; then OK starts playback again (OK is a tap, so iOS
+   lets the audio restart). The warning signs are guesses from the crash reports (nothing in them climbs steadily before a
+   crash), so every trigger is written to the crash log with its reason — the next reports will show which ones fire. */
+(function () {
+  const LIM = { sounding: 250, liveNodes: 12000, clockRatio: 0.85, backstops: 30, freezeMs: 700 };
+  const REST_MS = 5000, COOLDOWN_MS = 12000;
+  let samples = [], lastTick = performance.now(), bsHist = [], open = false, coolUntil = 0;
+  const ok = () => typeof ctx !== 'undefined' && ctx && !(ctx instanceof OfflineAudioContext);
+  function check() {
+    const now = performance.now(), gap = now - lastTick; lastTick = now;
+    if (open || now < coolUntil || document.visibilityState !== 'visible' || typeof playing === 'undefined' || !playing || !ok() || ctx.state !== 'running') { samples = []; bsHist = []; return; }
+    if (window._audioRefreshing) { samples = []; return; } // an engine swap in progress isn't an overload
+    const st = window._crashStats || {};
+    let why = null;
+    if (gap > LIM.freezeMs) why = 'the page froze for ' + Math.round(gap) + 'ms';
+    if (!why && st.sounding > LIM.sounding) why = st.sounding + ' sounds playing at once';
+    if (!why && st.liveNodes > LIM.liveNodes) why = st.liveNodes + ' audio nodes alive';
+    // the audio clock falling behind the real clock = the audio thread can't keep up
+    samples.push([now, ctx.currentTime, ctx]); while (samples.length && now - samples[0][0] > 2500) samples.shift();
+    if (!why && samples.length > 6 && samples[0][2] === ctx) { const dW = (now - samples[0][0]) / 1000, dA = ctx.currentTime - samples[0][1]; if (dW > 2 && dA / dW < LIM.clockRatio) why = 'the audio clock fell behind (' + Math.round(100 * dA / dW) + '% speed)'; }
+    // finished sounds iOS stopped reporting, piling up fast
+    const bs = window._endedBackstops || 0; bsHist.push([now, bs]); while (bsHist.length && now - bsHist[0][0] > 3000) bsHist.shift();
+    if (!why && bsHist.length > 1 && bs - bsHist[0][1] > LIM.backstops) why = (bs - bsHist[0][1]) + ' sounds iOS lost track of in 3s';
+    if (why) trip(why);
+  }
+  function trip(why) {
+    open = true;
+    try { window._crashCrumb && window._crashCrumb('OVERLOAD: ' + why + ' — playback stopped'); } catch (e) {}
+    try { if (playing) togglePlay(); } catch (e) {}
+    try { window._spareCtx && window._spareCtx.state === 'running' && window._spareCtx.suspend(); } catch (e) {} // the idle spare engine rests too
+    const ov = document.createElement('div'); ov.id = 'overloadBox';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;font-family:"DM Sans",sans-serif;';
+    ov.innerHTML = '<div style="background:#111;color:#fff;width:min(300px,84vw);padding:22px 20px 18px;box-shadow:0 8px 30px rgba(0,0,0,.5);text-align:center;">'
+      + '<div style="font-size:1.6rem;font-weight:700;letter-spacing:2px;color:#ff2a2a;">OVERLOAD!!!</div>'
+      + '<div id="ovlWhy" style="font-size:0.66rem;letter-spacing:0.5px;text-transform:uppercase;opacity:.7;margin:8px 0 14px;"></div>'
+      + '<div style="height:8px;background:#333;"><div id="ovlBar" style="height:100%;width:0;background:#ff2a2a;transition:width .2s linear;"></div></div>'
+      + '<button id="ovlOk" type="button" disabled style="margin-top:16px;width:100%;padding:12px;border:none;background:#333;color:#777;font:700 0.9rem \'DM Sans\',sans-serif;letter-spacing:2px;">COOLING DOWN…</button></div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#ovlWhy').textContent = why;
+    const bar = ov.querySelector('#ovlBar'), btn = ov.querySelector('#ovlOk'), t0 = performance.now();
+    const iv = setInterval(() => {
+      const st = window._crashStats || {}, el = performance.now() - t0, settled = !(st.sounding > 20);
+      const f = Math.min(1, el / REST_MS) * (settled ? 1 : 0.95); bar.style.width = (f * 100).toFixed(1) + '%';
+      if (el >= REST_MS && (settled || el > REST_MS * 3)) { clearInterval(iv); bar.style.width = '100%'; btn.disabled = false; btn.textContent = 'OK'; btn.style.background = '#ff2a2a'; btn.style.color = '#fff'; }
+    }, 100);
+    btn.addEventListener('click', e => {
+      e.stopPropagation(); if (btn.disabled) return;
+      ov.remove(); open = false; coolUntil = performance.now() + COOLDOWN_MS; samples = []; bsHist = [];
+      try { window._crashCrumb && window._crashCrumb('OVERLOAD: OK — playback back on'); } catch (er) {}
+      try { if (ctx && ctx.state !== 'running') ctx.resume(); } catch (er) {}
+      try { if (!playing) togglePlay(); } catch (er) {}
+    });
+  }
+  window._overloadTest = () => trip('test');
+  setInterval(check, 250);
+})();
+</script>
 <script>
 /* SNAPSHOT DISPLAY (DEV button), per direct request — captures every
    display parameter currently in effect so it can be sent back and
