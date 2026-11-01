@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-01 23:30:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-01 23:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3067,7 +3067,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-01 23:30:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-01 23:55:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -3198,16 +3198,16 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
     <!-- Sliders — own gap:24px group, matching SETTINGS' own Sliders block, rather than the panel's outer gap:16px -->
     <div style="display:flex;flex-direction:column;gap:24px;">
       <label class="reverb-menu-row">
-        <span class="reverb-menu-row-head"><span>REVERB MIX (OVERALL)</span><span id="reverbMixVal" style="color:#111;">0</span></span>
-        <input autocomplete="off" type="range" id="delayMixBar" min="0" max="100" value="0" class="master-vol-slider" style="width:100%;" oninput="setGlobalDelayMix(this.value/100); document.getElementById('reverbMixVal').textContent=this.value">
+        <span class="reverb-menu-row-head"><span>REVERB MIX (OVERALL)</span><span id="reverbMixVal" style="color:#111;">35</span></span>
+        <input autocomplete="off" type="range" id="delayMixBar" min="0" max="100" value="35" class="master-vol-slider" style="width:100%;" oninput="setGlobalDelayMix(this.value/100); document.getElementById('reverbMixVal').textContent=this.value">
       </label>
       <label class="reverb-menu-row">
-        <span class="reverb-menu-row-head"><span>REVERB SIZE</span><span id="reverbIntensityVal" style="color:#111;">51</span></span>
-        <input autocomplete="off" type="range" id="reverbIntensityBar" min="0" max="100" value="51" class="master-vol-slider" style="width:100%;" oninput="setReverbIntensity(this.value/100); document.getElementById('reverbIntensityVal').textContent=this.value">
+        <span class="reverb-menu-row-head"><span>REVERB SIZE</span><span id="reverbIntensityVal" style="color:#111;">32</span></span>
+        <input autocomplete="off" type="range" id="reverbIntensityBar" min="0" max="100" value="32" class="master-vol-slider" style="width:100%;" oninput="setReverbIntensity(this.value/100); document.getElementById('reverbIntensityVal').textContent=this.value">
       </label>
       <label class="reverb-menu-row">
-        <span class="reverb-menu-row-head"><span>REVERB ON BEAT</span><span id="beatReverbMixVal" style="color:#111;">24</span></span>
-        <input autocomplete="off" type="range" id="beatReverbMixBar" min="0" max="100" value="24" class="master-vol-slider" style="width:100%;" oninput="setBeatReverbMix(this.value/100); document.getElementById('beatReverbMixVal').textContent=this.value">
+        <span class="reverb-menu-row-head"><span>REVERB ON BEAT</span><span id="beatReverbMixVal" style="color:#111;">9</span></span>
+        <input autocomplete="off" type="range" id="beatReverbMixBar" min="0" max="100" value="9" class="master-vol-slider" style="width:100%;" oninput="setBeatReverbMix(this.value/100); document.getElementById('beatReverbMixVal').textContent=this.value">
       </label>
     </div>
     <!-- DELAY (was FX ECHO DELAY / FX ECHO LEVEL in SETTINGS), per direct request: the echo on an instrument's DL stop.
@@ -4093,13 +4093,13 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
       <!-- MUSIC BUS, per direct request: the overall level of everything that isn't DRUMS or PERCUSSION (every melody / bass / pad
            track, their reverb included) — the drums menu, kit and percussion tracks are untouched. -->
       <div style="display:flex;flex-direction:column;gap:15px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">MUSIC BUS</div><div id="musicBusVal" style="font-size:0.85rem;font-weight:700;color:#111;">84%</div></div>
-        <input autocomplete="off" type="range" id="musicBusBar" min="0" max="100" value="84" class="master-vol-slider" style="width:100%;" oninput="setMusicBus(this.value)" onchange="setMusicBus(this.value)">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">MUSIC BUS</div><div id="musicBusVal" style="font-size:0.85rem;font-weight:700;color:#111;">61%</div></div>
+        <input autocomplete="off" type="range" id="musicBusBar" min="0" max="100" value="61" class="master-vol-slider" style="width:100%;" oninput="setMusicBus(this.value)" onchange="setMusicBus(this.value)">
       </div>
       <!-- DRUMS BUS (was the DRUMS menu's volume slider), per direct request -->
       <div style="display:flex;flex-direction:column;gap:15px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">DRUMS BUS</div><div id="beatVolBusVal" style="font-size:0.85rem;font-weight:700;color:#111;">30%</div></div>
-        <input autocomplete="off" type="range" id="beatVolBar" min="0" max="100" value="30" class="master-vol-slider" style="width:100%;" oninput="setBeatVol(this.value/100)" onchange="setBeatVol(this.value/100)">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">DRUMS BUS</div><div id="beatVolBusVal" style="font-size:0.85rem;font-weight:700;color:#111;">47%</div></div>
+        <input autocomplete="off" type="range" id="beatVolBar" min="0" max="100" value="47" class="master-vol-slider" style="width:100%;" oninput="setBeatVol(this.value/100)" onchange="setBeatVol(this.value/100)">
       </div>
 
       <!-- AUTO NOTE OUTLINE slider removed, per direct request — hard-coded 3px (see --auto-outline-w on :root) -->
@@ -4438,7 +4438,7 @@ function syncSettingsPanel() {
   }
   const rib = document.getElementById('reverbIntensityBar');
   if (rib) {
-    rib.value = Math.round((window._reverbIntensity !== undefined ? window._reverbIntensity : 0.51) * 100);
+    rib.value = Math.round((window._reverbIntensity !== undefined ? window._reverbIntensity : 0.32) * 100);
     const riv = document.getElementById('reverbIntensityVal'); if (riv) riv.textContent = rib.value;
   }
   const is = document.getElementById('intensitySlider');
@@ -5747,7 +5747,8 @@ function setReverbIntensity(v) {
   if (ctx && window._reverbConv) window._reverbConv.buffer = _buildReverbIRBuffer(ctx, _reverbSizeFromSlider(v));
 }
 
-window._globalDelayMix = 0; // REVERB MIX default: zero, per direct request
+window._globalDelayMix = 0.35; // REVERB MIX default 35% (was zero), per direct request
+window._reverbIntensity = 0.32; // REVERB SIZE default 32% (was 51%), per direct request
 function setGlobalDelayMix(v) {
   // REVERB MIX (OVERALL) now only reaches TONAL content, per direct request: the wet return stays at full
   // (REVERB_MIX_MAX) and the mix is applied on the tonal side of the send instead (_tonalRevIn), so DRUMS /
@@ -6599,7 +6600,7 @@ function _setFxEchoLevel(v) {
   v = Math.max(0, Math.min(100, +v || 0)); window._fxEchoLevel = v / 100;
   const r = document.getElementById('fxEchoLevelVal'); if (r) r.textContent = Math.round(v) + '%';
   const sl = document.getElementById('fxEchoLevelSlider'); if (sl && +sl.value !== v) sl.value = v;
-  try { for (let t = 0; t < NUM_TRACKS; t++) { const n = trackFxNodes[t]; if (n && n.echoGain && ctx) n.echoGain.gain.setTargetAtTime(window._fxEchoLevel, ctx.currentTime, 0.02); } } catch (e) {}
+  try { for (let t = 0; t < NUM_TRACKS; t++) { const n = trackFxNodes[t]; if (n && n.echoGain && ctx) n.echoGain.gain.setTargetAtTime(window._fxEchoLevel * _echoTrim(t), ctx.currentTime, 0.02); } } catch (e) {}
 }
 // DIRTY ECHO (REVERB menu > DELAY), per direct request: every echo (tracks and DRUMS) goes through a 'cheap' chain — high-pass
 // 400Hz + low-pass 2.2kHz (telephone band) and a gritty saturation — instead of coming back clean. Rewired live; new chains
@@ -6629,6 +6630,7 @@ function _shuffleEcho() {
   const t = [3, 5, 6][Math.floor(Math.random() * 3)]; _setFxEchoExtra(t); // 3 values around the DOTTED 8TH default — 8TH, DOTTED 8TH, QUARTER — nothing too crazy, per direct request { const sl = document.getElementById('fxEchoExtraSlider'); if (sl) sl.value = t; }
   const lv = 40 + Math.round(Math.random() * 60); _setFxEchoLevel(lv);
 }
+function _echoTrim(tr) { return trackInstruments[tr] === 'tomLo' ? 0.5 : 1; } // TOM LOW's DELAY −6dB (its dirty echo was piling onto an already fat low-mid range and clipping, under CHARLIE especially), per direct report
 function _fxEchoOn(tr) { const f = trackFx[tr]; return !!(f && (f.x > 0 || f.y > 0) && !trackPump[tr] && !trackChink[tr]); } // the DELAY stop only — never while CHK is on (a CHK track carrying a leftover FX layer used to read DL and skip BLAST)
 function _syncFxEcho(tr) {
   const n = trackFxNodes[tr]; if (!n || !n.echoGain || !ctx) return;
@@ -6637,10 +6639,10 @@ function _syncFxEcho(tr) {
   if (on && !n.echoConn) { try { n.envGain.connect(n.echoDelay); n.echoConn = true; } catch (e) {} } // only the FX'd output (on FX the voices all go through it)
   else if (!on && n.echoConn) { try { n.envGain.disconnect(n.echoDelay); } catch (e) {} n.echoConn = false; }
   n.echoDelay.delayTime.value = _fxEchoTime(); // plain values, no smoothing ramps (cheaper; a tempo change just jumps)
-  n.echoGain.gain.value = window._fxEchoLevel; // the input tap does the switching now (level = FX ECHO LEVEL slider)
+  n.echoGain.gain.value = window._fxEchoLevel * _echoTrim(tr); // the input tap does the switching now (level = FX ECHO LEVEL slider)
 }
 // the echo follows tempo changes (TEMPO, nudges, tape tempos) — a cheap check, only touches tracks with FX on
-setInterval(() => { if (!ctx) return; const sd = _fxEchoTime(); for (let t = 0; t < NUM_TRACKS; t++) { const n = trackFxNodes[t]; if (n && n.echoConn && Math.abs(n.echoDelay.delayTime.value - sd) > 0.001) n.echoDelay.delayTime.value = sd; } }, 500);
+setInterval(() => { if (!ctx) return; const sd = _fxEchoTime(); for (let t = 0; t < NUM_TRACKS; t++) { const n = trackFxNodes[t]; if (n && n.echoConn && Math.abs(n.echoDelay.delayTime.value - sd) > 0.001) n.echoDelay.delayTime.value = sd; if (n && n.echoConn) { const lv = window._fxEchoLevel * _echoTrim(t); if (Math.abs(n.echoGain.gain.value - lv) > 0.001) n.echoGain.gain.value = lv; } } }, 500); // (+ the level, so an instrument swap picks up its own DELAY trim)
 // FX BUTTON GLYPHS, per direct request: FX = off, EN = FX1 (the envelope — CHK), DS = FX2 (distortion — BLAST), DL = DELAY
 function _fxGlyph(tr) { return trackChink[tr] ? 'EN' : trackPump[tr] ? 'DS' : _fxEchoOn(tr) ? 'DL' : 'FX'; }
 function _beatFxGlyph() { try { return _beatChoke ? 'EN' : _beatPump ? 'DS' : _beatEchoOn() ? 'DL' : 'FX'; } catch (e) { return 'FX'; } }
@@ -17483,7 +17485,7 @@ function _buildBounceGraph(targetCtx) {
   window._reverbSendBus = targetCtx.createGain(); window._reverbSendBus.gain.value = 1;
   window._reverbConv = targetCtx.createConvolver();
   window._reverbConv.normalize = false; // browser auto-normalize crushes a dense noise-decay IR like this to near-silence
-  window._reverbConv.buffer = _buildReverbIRBuffer(targetCtx, _reverbSizeFromSlider((window._reverbIntensity !== undefined) ? window._reverbIntensity : 0.51));
+  window._reverbConv.buffer = _buildReverbIRBuffer(targetCtx, _reverbSizeFromSlider((window._reverbIntensity !== undefined) ? window._reverbIntensity : 0.32));
   window._reverbOutGain = targetCtx.createGain();
   window._reverbOutGain.gain.value = REVERB_MIX_MAX; // fixed — OVERALL mix lives on the tonal send side now
   window._tonalRevIn = targetCtx.createGain(); window._tonalRevIn.gain.value = (window._globalDelayMix !== undefined) ? window._globalDelayMix : 0; window._tonalRevIn.connect(window._reverbSendBus);
@@ -24813,7 +24815,7 @@ function fullReset() {
   try { const _fe = document.getElementById('fxEchoExtraSlider'); if (_fe) _fe.value = 5; _setFxEchoExtra(5); } catch (e) {}
   try { _setFxEchoLevel(15); } catch (e) {}
   try { _setEchoDirty(true); } catch (e) {}
-  try { const _mb = document.getElementById('musicBusBar'); if (_mb) _mb.value = 84; setMusicBus(84); } catch (e) {}
+  try { const _mb = document.getElementById('musicBusBar'); if (_mb) _mb.value = 61; setMusicBus(61); } catch (e) {}
   try { const _an = document.getElementById('autoNotesFlashLenSlider'); if (_an) _an.value = 3.25; _setAutoNotesFlashLen(3.25); } catch (e) {}
   try { setDrums8bit(false); } catch (e) {}
   // Cancel any per-track pattern-generation steps still queued from a
@@ -24905,9 +24907,9 @@ function fullReset() {
   const _topTempoBpmNum = document.getElementById('topTempoBpmNum'); if (_topTempoBpmNum) _topTempoBpmNum.textContent = bpm;
   const _bpmSliderEl = document.getElementById('bpmSlider'); if (_bpmSliderEl) _bpmSliderEl.value = bpm;
   const _bpmSettingsSliderEl = document.getElementById('bpmSettingsSlider'); if (_bpmSettingsSliderEl) _bpmSettingsSliderEl.value = bpm;
-  _beatOffset = 0; _beatReverbMix = 0.24; _beatFx = false; _beatPump = false; _setBeatChoke(false);
+  _beatOffset = 0; _beatReverbMix = 0.09; { const b = document.getElementById('beatReverbMixBar'); if (b) b.value = 9; const v = document.getElementById('beatReverbMixVal'); if (v) v.textContent = '9'; } // REVERB ON BEAT default 9%, per direct request _beatFx = false; _beatPump = false; _setBeatChoke(false);
   _beatAutoRandActive = false; _beatAutoRandBarCount = 0; window._beatBulldozer = false;
-  _beatVolRaw = 0.30; _applyBeatVolWithDuck(); // DRUMS BUS default 30% (was 40%, 50%, 60%, 39% before that), per direct request
+  _beatVolRaw = 0.47; _applyBeatVolWithDuck(); // DRUMS BUS default 47% (was 30%, 40%, 50%, 60%, 39% before that), per direct request
   const _bbFullReset = document.getElementById('beatBtn'); if (_bbFullReset) _bbFullReset.classList.remove('beat-auto-active');
   if (window._beatReverbSend && ctx) window._beatReverbSend.gain.setValueAtTime(_beatReverbGainForMix(_beatReverbMix), ctx.currentTime); // on by default now, not silenced
   if (window._beatCrunchSend && ctx) window._beatCrunchSend.gain.setValueAtTime(0, ctx.currentTime);
@@ -24916,11 +24918,12 @@ function fullReset() {
   currentScaleName = 'penta-min'; PENTA_MINOR = SCALES['penta-min']; globalScaleRoot = null;
   activeSlot = -1;
   slots.fill(null); _pendingSlot = -1; _autoSlotQueue = [];
-  setGlobalDelayMix(0); // REVERB MIX starts at ZERO (the reverb icon's "off" state), per direct request — was 0.3; also clears the icon glow + the whole-mix send
-  { const dmb = document.getElementById('delayMixBar'); if (dmb) dmb.value = 0; const rmv = document.getElementById('reverbMixVal'); if (rmv) rmv.textContent = '0'; }
+  setGlobalDelayMix(0.35); // REVERB MIX default 35% (was zero), per direct request
+  { const dmb = document.getElementById('delayMixBar'); if (dmb) dmb.value = 35; const rmv = document.getElementById('reverbMixVal'); if (rmv) rmv.textContent = '35'; }
   { const rb = document.getElementById('randomizeReverbIconBtn'); if (rb) rb._revSwipeN = 0; } // so the next swipe turns it ON
-  window._reverbIntensity = 0.51; // REVERB SIZE — +20% from the previous 0.425 default
-  if (window._reverbConv && ctx) window._reverbConv.buffer = _buildReverbIRBuffer(ctx, _reverbSizeFromSlider(0.51));
+  window._reverbIntensity = 0.32; // REVERB SIZE default 32% (was 51%), per direct request
+  if (window._reverbConv && ctx) window._reverbConv.buffer = _buildReverbIRBuffer(ctx, _reverbSizeFromSlider(0.32));
+  { const b = document.getElementById('reverbIntensityBar'); if (b) b.value = 32; const v = document.getElementById('reverbIntensityVal'); if (v) v.textContent = '32'; }
 
   // Display prefs back to default
   _bgPulseEnabled = false; _bgStaticEnabled = false; _bgPulseSteps = 4; _bgPulseCounter = 0;
@@ -25662,7 +25665,7 @@ window.masterLimiter = ctx.createDynamicsCompressor(); const masterLimiter = win
     window._reverbSendBus = ctx.createGain(); window._reverbSendBus.gain.value = 1;
     window._reverbConv = ctx.createConvolver();
     window._reverbConv.normalize = false; // browser auto-normalize crushes a dense noise-decay IR like this to near-silence
-    window._reverbConv.buffer = _buildReverbIRBuffer(ctx, _reverbSizeFromSlider((window._reverbIntensity !== undefined) ? window._reverbIntensity : 0.51));
+    window._reverbConv.buffer = _buildReverbIRBuffer(ctx, _reverbSizeFromSlider((window._reverbIntensity !== undefined) ? window._reverbIntensity : 0.32));
     window._reverbOutGain = ctx.createGain(); window._reverbOutGain.gain.value = REVERB_MIX_MAX; // fixed — REVERB MIX (OVERALL) is applied on the tonal send side (_tonalRevIn) so drums bypass it
     window._tonalRevIn = ctx.createGain(); window._tonalRevIn.gain.value = (window._globalDelayMix !== undefined) ? window._globalDelayMix : 0; window._tonalRevIn.connect(window._reverbSendBus);
     window._drumMasterRevSend = ctx.createGain(); window._drumMasterRevSend.gain.value = 1; window._drumMasterRevSend.connect(window._reverbSendBus); // drum tracks' whole-signal reverb (REVERB ON BEAT), bypassing OVERALL
@@ -26447,7 +26450,7 @@ function _setBeatCountShown(on) {
 // the gain actually applied to the node also folds in a -1.5dB duck
 // whenever FX or BLAST is engaged on BEAT, so the dial itself always
 // reflects what the user set rather than the post-duck level.
-let _beatVolRaw = 0.30; // DRUMS BUS default 30% (was 40%, 50%, 60%, 39%, before that 0.5711), per direct request
+let _beatVolRaw = 0.47; // DRUMS BUS default 47% (was 30%, 40%, 50%, 60%, 39%, before that 0.5711), per direct request
 let _beatSoloMuted = false; // true whenever any track is soloed — SOLO should silence BEAT too, same as every un-soloed track
 // AUDIO SNAPSHOT (DEV > DIAGNOSTICS), per direct request — for the "DRUMS is just a filtered snare" state. Now AUTOMATIC as
 // well, since it's too rare to remember to press: a DRUMS WATCHDOG listens for 1 second every 15 seconds while DRUMS is
@@ -26735,7 +26738,7 @@ function setBeatVol(v) {
 // ── BEAT control row: L / < / R / FX / R(rand) — mirrors the per-track
 // control row exactly (same toggle/cycle logic), just aimed at the shared
 // BEAT bus (window._beatGain) instead of a single track's gain node.
-let _beatReverbMix = 0.24;               // slider under BEAT VOL — 0-1, scales the send level whenever 'R' is on — 24% default (up another 10% relative from 22%)
+let _beatReverbMix = 0.09; // REVERB ON BEAT default 9% (was 24%), per direct request —               // slider under BEAT VOL — 0-1, scales the send level whenever 'R' is on — 24% default (up another 10% relative from 22%)
 let _beatFx = false, _beatPump = false;  // 'FX' — 3-state cycle: off / on / on+blast
 // DRUMS FX = CHK now, per direct request (same as every track's FX button): off -> CHK -> CHK+BLAST -> off. The old crunch FX
 // only sounds as BLAST's layer underneath, like on the tracks. _beatChoke = the CHK gate on the drums bus (window._beatChokeGate).
@@ -26857,7 +26860,7 @@ const _BEAT_ADDED_DRUM_KEYS = new Set(['ride', 'sidestick', 'ssnare', 'toms', 's
 // MUSIC BUS (SETTINGS, under MAIN VOL), per direct request: one level for every track that isn't drums / percussion. A gain per
 // track sits between its fader and its CHOKE gate (so its reverb follows too); drum / percussion tracks stay at 1. Re-checked
 // whenever instruments change (and twice a second as a backstop) since a track can swap between the two at any time.
-window._musicBus = 0.84; // default 84% (was 46%, 63%, 85% before that), per direct request
+window._musicBus = 0.61; // default 61% (was 84%, 46%, 63%, 85% before that), per direct request
 function _musicBusFor(tr) { try { return _isDrumTrack(tr) ? 1 : window._musicBus * (_BASS_KEYS_FOR_TRIM.has(trackInstruments[tr]) ? 0.8913 /* basses -1dB (−0.5dB, then another −0.5dB per direct request) */ : 0.9661 /* tonal -0.3dB */); } catch (e) { return 1; } } // per direct request
 function _syncMusicBus() {
   const gs = window._musicBusGains; if (!gs || !ctx) return;
