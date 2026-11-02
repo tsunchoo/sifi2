@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-02 19:05:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-02 19:15:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2690,7 +2690,7 @@ html body.modify #modifyPadMarks { display: block; }
 /* the 6×16 note grid drawn over the pad while it's held (40% max), fading out over 0.5s on release, per direct request */
 #modifyGridCv { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease-out; pointer-events: none; }
 #modifyPadMarks.sp-held #modifyGridCv, #modifyPadMarks.sp-reveal #modifyGridCv { opacity: var(--modify-notes-op, 0.4); transition: opacity 0.12s ease-out; } /* (sp-reveal: a DOUBLE CLICK on >> shows the new notes landing) */
-#modifyLock { display: none; position: absolute; left: 6px; bottom: 6px; z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+#modifyLock { display: none; position: absolute; right: 6px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); /* TOP-RIGHT corner of the graph (just under the song name strip), per direct request — was bottom-left */ z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 html body.modify #modifyLock { display: flex; } /* the MAGNET (was the padlock), per direct request — ON by default: let go and the ring springs back to the centre */
 #modifyLock.sp-mag-off { opacity: 0.45; }
 html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; } /* SQUARE: the ring twice as big and twice as thick, per direct request */
@@ -3081,7 +3081,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 19:05:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 19:15:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -6644,7 +6644,7 @@ function _setEchoDirty(on) {
 // DOUBLE-CLICK on >>, per direct request: a random DELAY TIME (any of the 14 stops) and a random DELAY LEVEL — never below 40%
 function _shuffleEcho() {
   const t = [3, 5, 6][Math.floor(Math.random() * 3)]; _setFxEchoExtra(t); // 3 values around the DOTTED 8TH default — 8TH, DOTTED 8TH, QUARTER — nothing too crazy, per direct request { const sl = document.getElementById('fxEchoExtraSlider'); if (sl) sl.value = t; }
-  const lv = 40 + Math.round(Math.random() * 60); _setFxEchoLevel(lv);
+  const lv = 5 + Math.round(Math.random() * 10); _setFxEchoLevel(lv); // 5–15% — capped at 15%, per direct request (was 40–100%)
 }
 function _echoTrim(tr) { return trackInstruments[tr] === 'tomLo' ? 0.5 : 1; } // TOM LOW's DELAY −6dB (its dirty echo was piling onto an already fat low-mid range and clipping, under CHARLIE especially), per direct report
 function _fxEchoOn(tr) { const f = trackFx[tr]; return !!(f && (f.x > 0 || f.y > 0) && !trackPump[tr] && !trackChink[tr]); } // the DELAY stop only — never while CHK is on (a CHK track carrying a leftover FX layer used to read DL and skip BLAST)
