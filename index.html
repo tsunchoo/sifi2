@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-02 21:20:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-02 21:30:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3081,7 +3081,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 21:20:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 21:30:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -5474,7 +5474,8 @@ function setNoButtonSounds(on) {
   const cb = document.getElementById('noButtonSoundsToggle'); if (cb) cb.checked = !!on;
 }
 document.addEventListener('DOMContentLoaded', () => { setButtonSoundsToMix(window._buttonSoundsToMix); setNoButtonSounds(window._noButtonSounds); });
-function playUiSound(name, forceMix, trim) { // trim: optional extra gain multiplier for this one play // forceMix: always through the mix (so REALTIME recording captures it), whatever BUTTON SOUNDS TO MIX says
+function playUiSound(name, forceMix, trim) {
+  if (name === 'tinyclick' || name === 'click') { playUiBeep(); return; } // every button CLICK is now a tiny beep (never recorded), per direct request — PLAY / STOP and RECORD keep their own sounds // trim: optional extra gain multiplier for this one play // forceMix: always through the mix (so REALTIME recording captures it), whatever BUTTON SOUNDS TO MIX says
   if (window._noButtonSounds) return;
   if (window._tapeDrawerQuiet) return; // TAPE DRAWER is silent — no tape button / play / stop noises while it's open, per direct request
   if (!ctx || !window._uiSoundBufs || !window._uiSoundBufs[name]) return;
@@ -5502,20 +5503,35 @@ function playUiSound(name, forceMix, trim) { // trim: optional extra gain multip
 // sweep, like a card being flipped. Fires for every instrument a >> single click changes, once per asterisk press, and on
 // opening the TAPE DRAWER. Same on/off and routing as the other button sounds.
 let _flipNoiseBuf = null;
+// UI-only output: level-matched to the mix (master volume) but straight to the speakers, past the mix — so REALTIME
+// recordings never contain button sounds, per direct request
+function _uiDirectOut(node) { const o = ctx.createGain(); o.gain.value = (masterGain ? masterGain.gain.value : 1) * (window._makeupGain ? window._makeupGain.gain.value : 1); node.connect(o); o.connect(ctx.destination); return o; }
+// BUTTON BEEP, per direct request: every button 'click' (all but PLAY / STOP and RECORD) is now a very tiny electronic beep —
+// a 2.6kHz soft square blip, 22ms, quiet. Never recorded (see _uiDirectOut).
+function playUiBeep(trim) {
+  if (window._noButtonSounds || window._tapeDrawerQuiet || !ctx || ctx instanceof OfflineAudioContext || ctx.state !== 'running') return;
+  try {
+    const t = ctx.currentTime + 0.003, o = ctx.createOscillator(); o.type = 'square'; o.frequency.setValueAtTime(2600, t);
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5000; lp.Q.value = 0.7; // takes the edge off the square
+    const g = ctx.createGain(), pk = 0.018 * (trim || 1);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(pk, t + 0.002); g.gain.setValueAtTime(pk, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.022);
+    const _o = (o.connect(lp), lp.connect(g), _uiDirectOut(g));
+    o.start(t); o.stop(t + 0.03); o.onended = () => { try { g.disconnect(); _o.disconnect(); } catch (e) {} };
+  } catch (e) {}
+}
 function playFlipSound(trim) {
   if (window._noButtonSounds || window._tapeDrawerQuiet || !ctx || ctx instanceof OfflineAudioContext || ctx.state !== 'running') return;
   try {
     if (!_flipNoiseBuf || _flipNoiseBuf.sampleRate !== ctx.sampleRate) { const n = Math.round(ctx.sampleRate * 0.3); _flipNoiseBuf = ctx.createBuffer(1, n, ctx.sampleRate); const d = _flipNoiseBuf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; }
     const t = ctx.currentTime + 0.005, src = ctx.createBufferSource(); src.buffer = _flipNoiseBuf;
     src.playbackRate.value = 0.9 + Math.random() * 0.25; // a touch of variety so a run of flips doesn't machine-gun
-    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.6; bp.frequency.setValueAtTime(2400, t); bp.frequency.exponentialRampToValueAtTime(6000, t + 0.1); bp.frequency.exponentialRampToValueAtTime(3000, t + 0.24); // ALL SWISH, per direct request: the band rises then falls (a whoosh past the ear) — // SWISHIER, per direct request: a wider band sweeping down over 120ms (was a 50ms tick)
-    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 900; // less low 'clack'
-    const g = ctx.createGain(), peak = 0.0518 * (trim || 1); // −3dB more (was 0.0731, 0.13 before that), per direct request
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + 0.07); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25); // NO 'chk': a slow 70ms swell in (no transient at all) and a 180ms fade // soft 18ms swell in (no hard click at the front), 130ms long
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.9; bp.frequency.setValueAtTime(5200, t); bp.frequency.exponentialRampToValueAtTime(2000, t + 0.09); // HALFWAY between the clack and the whoosh, per direct request: a quick single downward sweep // SWISHIER, per direct request: a wider band sweeping down over 120ms (was a 50ms tick)
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1000; // less low 'clack'
+    const g = ctx.createGain(), peak = 0.0327 * (trim || 1); // −4dB more (was 0.0518), per direct request
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.1); // a little 'clack' back: a 6ms rise (not a hard click, not a slow swell), ~100ms long // soft 18ms swell in (no hard click at the front), 130ms long
     src.connect(bp); bp.connect(hp); hp.connect(g);
-    if (window._buttonSoundsToMix === false) { g.gain.value; const lv = (masterGain ? masterGain.gain.value : 1) * (window._makeupGain ? window._makeupGain.gain.value : 1); const o = ctx.createGain(); o.gain.value = lv; g.connect(o); o.connect(ctx.destination); }
-    else g.connect(masterGain);
-    src.start(t); src.stop(t + 0.27); src.onended = () => { try { g.disconnect(); } catch (e) {} };
+    const _o = _uiDirectOut(g); // straight to the speakers — never into the mix, so REALTIME recording doesn't pick it up, per direct request
+    src.start(t); src.stop(t + 0.12); src.onended = () => { try { g.disconnect(); _o.disconnect(); } catch (e) {} };
   } catch (e) {}
 }
 // Builds (and caches) a reversed copy of a decoded UI sound buffer — Web
