@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-02 20:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-02 20:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3081,7 +3081,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 20:50:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 20:55:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8459,6 +8459,7 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
     held = false; pend = null; if (raf) { cancelAnimationFrame(raf); raf = 0; }
     const m = marks(); if (m) m.classList.remove('sp-held', 'sp-xm', 'sp-xp', 'sp-ym', 'sp-yp');
     easeHome(true); restore(); // (no click sound, per direct request)
+    try { _clearSweeps(); } catch (e) {} // …and any SWEEP sound still going is cleared, per direct request
     try { _playSpoolAmalgamSwell(); } catch (e) {} // …the RIGHT TAPE SPOOL's amalgam swell instead, per direct request
   }
   window._modifyPadReset = padReset;
@@ -19671,7 +19672,17 @@ function playRandReleaseSweep(time, mult) { // mult: optional extra level (SWEEP
   g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
   src.connect(bp); bp.connect(g); g.connect(masterGain);
   src.start(time);
-  src.onended = () => { try { bp.disconnect(); g.disconnect(); } catch(err) {} };
+  const v = { g: g.gain, src }; (window._sweepVoices = window._sweepVoices || new Set()).add(v); // so a graph double-tap can clear it (see _clearSweeps)
+  src.onended = () => { window._sweepVoices && window._sweepVoices.delete(v); try { bp.disconnect(); g.disconnect(); } catch(err) {} };
+}
+// CLEAR EVERY SWEEP SOUND, per direct request (a double-tap on the MODIFY / SQUARE graph): a held SWEEP is let go, and every
+// sweep tail still ringing (SWEEP releases, the new-pattern noise sweep) fades out over 30ms and stops
+function _clearSweeps() {
+  try { window._sweepKillHeld && window._sweepKillHeld(); } catch (e) {}
+  if (!ctx || !window._sweepVoices) return;
+  const t = ctx.currentTime;
+  window._sweepVoices.forEach(v => { try { v.g.cancelScheduledValues(t); v.g.setValueAtTime(v.g.value, t); v.g.linearRampToValueAtTime(0, t + 0.03); v.src.stop(t + 0.05); } catch (e) {} });
+  window._sweepVoices.clear();
 }
 
 // Stops every flavor of auto-rand — the top-row RAND AUTO loop, every
@@ -26022,6 +26033,7 @@ async function hardResetAudioEngine() {
     btn.classList.add('active');
   }
 
+  window._sweepKillHeld = () => { if (sweepNodes) stopSweep(); }; // (a held SWEEP — its tail is then cleared with the rest)
   function stopSweep() {
     if (!sweepNodes || !ctx) return;
     const { bp, gain, noise, sweepMaster } = sweepNodes;
@@ -26040,6 +26052,7 @@ async function hardResetAudioEngine() {
     // release left a 12s looping noise voice running for good. Now the stop is
     // scheduled on the audio clock and the chain is only taken apart after it.
     try { noise.stop(t + halfNote + 0.05); } catch(e) {}
+    { const v = { g: gain.gain, src: noise }; (window._sweepVoices = window._sweepVoices || new Set()).add(v); setTimeout(() => window._sweepVoices && window._sweepVoices.delete(v), (halfNote + 0.4) * 1000); } // (clearable — see _clearSweeps)
     _afterAudio(t + halfNote + 0.3, () => { try { noise.disconnect(); bp.disconnect(); gain.disconnect(); } catch(e) {} try { sweepMaster && sweepMaster.disconnect(); } catch (e) {} });
     // the music comes back up over the same release as SWEEP fades out
     try { const fg = window._normalTrackFadeGain.gain; fg.cancelScheduledValues(t); fg.setValueAtTime(fg.value, t); fg.linearRampToValueAtTime(1, t + Math.max(0.05, halfNote)); } catch (e) {}
