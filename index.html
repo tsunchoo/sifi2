@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-02 19:15:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-02 19:40:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3081,7 +3081,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 19:15:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 19:40:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8311,7 +8311,7 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
   function redraw() { for (let tr = 0; tr < NUM_TRACKS; tr++) { try { redrawTrackCells(tr, true); } catch (e) {} } try { _queueFxBtnSync(); } catch (e) {} }
   // MAGNET, per direct request: let go and the ring glides back to the centre over an 8th note at the current tempo, the pattern
   // following it back step by step (the same path, so it's smooth), landing on the pattern exactly as it was
-  let springRaf = 0;
+  let springRaf = 0, padSaved = null;
   function springStop() { if (springRaf) { cancelAnimationFrame(springRaf); springRaf = 0; } }
   function springHome(x0, y0) {
     springStop(); let T = 0.25; try { T = stepDuration() * 2; } catch (e) {} T = Math.max(0.06, Math.min(1, T)) * 1000;
@@ -8448,9 +8448,15 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
   setInterval(() => {
     const sp = document.body.classList.contains('modify');
     if (sp) marks();
+    // back in MODIFY / SQUARE: the ring (and the pad's state) come back exactly where they were left — as long as it's the same
+    // pattern and nothing was edited in between (otherwise it starts afresh from the centre)
+    if (sp && !pad && padSaved) { const ps = padSaved; padSaved = null;
+      if (ps.name === nameNow() && ps.sig === JSON.stringify(grid)) { pad = ps.pad; try { apply(pad.x, pad.y); redraw(); showDot([pad.x, pad.y]); } catch (e) {} } }
     if (sp && !held && !springRaf) { try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} } // RING COLOUR kept up to date while idle (display mode / SQUARE / page colour changes) — it used to only catch up once you touched the graph, per direct report
     if (!pad) return;
-    if (!sp) { held = false; if (window._padLatch) bake(); else restore(); return; } // left MODIFY: latched result kept for real, otherwise put back
+    if (!sp) { held = false; springStop();
+      if (window._padLatch) { const keep = pad; bake(); padSaved = { pad: keep, sig: JSON.stringify(grid), name: nameNow() }; } // left MODIFY: latched result kept for real — and REMEMBERED (where the ring was), per direct request
+      else restore(); return; }
     if (!held && pad.name !== nameNow()) { window._padMute = null; pad = null; easeHome(); } // a new pattern arrived — the old pad state no longer applies
   }, 300);
   // DOUBLE CLICK on >> in MODIFY, per direct request: the note grid shows (as when the pad is held) while the new pattern's notes
