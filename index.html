@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-02 21:05:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-02 21:15:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3081,7 +3081,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 21:05:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 21:15:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -5510,7 +5510,7 @@ function playFlipSound(trim) {
     src.playbackRate.value = 0.9 + Math.random() * 0.25; // a touch of variety so a run of flips doesn't machine-gun
     const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.8; bp.frequency.setValueAtTime(6500, t); bp.frequency.exponentialRampToValueAtTime(2200, t + 0.12); // SWISHIER, per direct request: a wider band sweeping down over 120ms (was a 50ms tick)
     const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1200; // less low 'clack'
-    const g = ctx.createGain(), peak = 0.13 * (trim || 1);
+    const g = ctx.createGain(), peak = 0.0731 * (trim || 1); // −5dB (was 0.13), per direct request
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.018); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13); // soft 18ms swell in (no hard click at the front), 130ms long
     src.connect(bp); bp.connect(hp); hp.connect(g);
     if (window._buttonSoundsToMix === false) { g.gain.value; const lv = (masterGain ? masterGain.gain.value : 1) * (window._makeupGain ? window._makeupGain.gain.value : 1); const o = ctx.createGain(); o.gain.value = lv; g.connect(o); o.connect(ctx.destination); }
@@ -8335,7 +8335,8 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
   let springRaf = 0, padSaved = null;
   function springStop() { if (springRaf) { cancelAnimationFrame(springRaf); springRaf = 0; } }
   function springHome(x0, y0) {
-    springStop(); let T = 0.25; try { T = stepDuration() * 2; } catch (e) {} T = Math.max(0.06, Math.min(1, T)) * 1000;
+    springStop(); try { _clearSweeps(); } catch (e) {} // SWEEP cleared whenever the ring heads back to the centre, per direct request
+    let T = 0.25; try { T = stepDuration() * 2; } catch (e) {} T = Math.max(0.06, Math.min(1, T)) * 1000;
     const t0 = performance.now(), ease = k => k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
     const step = () => {
       springRaf = 0; if (held || !pad) return;
@@ -8385,6 +8386,7 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
   }
   // back to the centre, EASED (a new pattern) — dragging again cancels the ease straight away
   function easeHome(fast) { const m = marks(); if (!m) return;
+    try { _clearSweeps(); } catch (e) {} // SWEEP cleared whenever the ring heads back to the centre, per direct request
     { const dd = m.querySelector('.sp-dot'); if (dd && dd._home && dd._home.playState === 'running') return; } // already easing home (>> started it) — don't restart it when the new pattern then lands
     let dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--new-pattern-dur')); if (!(dur >= 0.4 && dur <= 4)) dur = 1.3; // (that variable can be 0 for a moment while the new pattern is set up)
     if (fast) dur /= 3; // DOUBLE-TAP RESET only: 3x faster back to the centre, per direct request (>> / a new pattern keep the original speed)
