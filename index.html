@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-02 18:20:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-02 19:00:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1225,10 +1225,10 @@ body:not(.rand-btn-ff):not(.rand-btn-asterisk) #randBtn > .glyph { position: rel
 .track-ctrl-icon-btn.lock-btn:not(#beatCtrlL) { width: calc(32px * var(--track-btn-scale, 1)); background: #999; color: #fff; }
 .track-ctrl-icon-btn.lock-btn.sweep-on:not(#beatCtrlL) { background: #999; color: #000; } /* engaged: button BG stays as it was, padlock goes black, per direct request (was #333 bg / white lock) */
 .fx-btn.on { background: var(--track-btn-on-color, #f17d21); color: var(--track-btn-on-text, #fff); }
-.fx-btn.blast-on { background: var(--track-btn-blast-color, var(--playhead)); color: var(--track-btn-blast-text, #fff); }
+.fx-btn.blast-on { background: var(--track-btn-on-color, #f17d21); color: var(--track-btn-on-text, #fff); } /* DS exactly like EN / DL (no BLAST colours of its own any more), per direct request */
 /* FX (the old crunch + a 16th-note echo) — the button's 4th stop: same look as CHK but in its own colour (the 2nd highlight) */
 .fill-low-opt.sel, .fill-high-opt.sel { border-color: #111 !important; box-shadow: 0 0 0 2px #f5f0e8 inset; }
-.fx-btn.fx-echo { --track-btn-on-color: var(--highlight2-color, #0078ff); --track-btn-on-text: var(--highlight2-text, #fff); --lit-glyph: var(--highlight2-color, #0078ff); }
+.fx-btn.fx-echo { } /* DL now looks exactly like EN / DS when active (was its own highlight-2 colour), per direct request */
 .track-ctrl-icon-btn.sweep-on { background: var(--playhead); color: var(--track-btn-on-text, #fff); }
 .track-ctrl-icon-btn.solo-on { background: #ffe400; } /* solid, not pulsing — was var(--track-btn-on-color, #FFA700) with animation: engaged-btn-pulse 0.6s ease-in-out infinite, per direct request */
 /* LOCK BUTTONS = NEW SOUND: the padlock is swapped for the asterisk glyph (same shape as + BUTTON = ASTERISK), white, lock state not shown */
@@ -1358,7 +1358,7 @@ body.lock-swap.failsafe-hl.seq-playing .lock-ast-shape.ast-beat-b { animation-na
   animation: engaged-btn-pulse 0.6s ease-in-out infinite;
 }
 .fx-btn.blast-on {
-  animation: engaged-btn-pulse-blast 0.6s ease-in-out infinite;
+  animation: engaged-btn-pulse 0.6s ease-in-out infinite; /* same pulse as EN / DL, per direct request */
 }
 body.no-fx-reverb-pulse .fx-btn.on, body.no-fx-reverb-pulse .fx-btn.blast-on, body.no-fx-reverb-pulse .shift-btn.right.on { animation: none; }
 .rand-btn.pulsing { color: #fff; animation: pulse 0.5s infinite alternate; }
@@ -1591,15 +1591,7 @@ body.track-btn-lights .rand-btn.rand-auto svg {
    flash colour in lights mode, per direct request — same hue, pushed to
    (near) full saturation and a little brighter (--play-flash-hot, derived
    in JS from the PLAY FLASH picker by _updatePlayFlashHot). */
-body.track-btn-lights .fx-btn.blast-on,
-body.track-btn-lights .rand-btn.rand-auto {
-  color: var(--lit-glyph-hot, var(--play-flash-hot, #ff8a2e)) !important;
-  text-shadow: 0 0 calc(9.55px * var(--tglow, 1)) color-mix(in srgb, var(--lit-glyph-hot, var(--play-flash-hot, #ff8a2e)) calc(min(100%, 100% * var(--tglow, 1))), transparent) !important;
-}
-body.track-btn-lights .fx-btn.blast-on svg,
-body.track-btn-lights .rand-btn.rand-auto svg {
-  filter: drop-shadow(0 0 calc(5.6px * var(--tglow, 1)) color-mix(in srgb, var(--lit-glyph-hot, var(--play-flash-hot, #ff8a2e)) calc(min(100%, 100% * var(--tglow, 1))), transparent));
-}
+/* (DS's own HOT glyph colour removed — it lights exactly like EN / DL now, per direct request) */
 /* LIGHTS PULSE (DEV toggle next to TRACK BUTTON LIGHTS) — lets the
    engaged FX / BLAST / reverb / sweep / + auto buttons keep a scale-only
    pulse while lit. Scale only, no colour or brightness, so the lit glyph
@@ -1617,7 +1609,7 @@ html body.track-btn-lights.track-btn-lights-pulse .rand-btn.rand-auto {
    amount --auto-mix set per frame by _randAutoBreatheTick), replacing the
    opacity breathe. Overrides the flat hot colour above. */
 html body.track-btn-lights .rand-btn.rand-auto {
-  --auto-col: color-mix(in srgb, var(--lit-glyph-hot, var(--play-flash-hot, #ff8a2e)) var(--auto-mix, 100%), var(--lit-glyph, var(--play-flash-color, #f17d21)));
+  --auto-col: color-mix(in srgb, var(--lit-glyph, var(--play-flash-color, #f17d21)) var(--auto-mix, 100%), var(--track-btn-text-color, #fff)); /* pulses up to the SAME orange as the lit FX glyphs (no red any more), per direct request */
   color: var(--auto-col) !important;
   text-shadow: 0 0 calc(9.55px * var(--tglow, 1)) color-mix(in srgb, var(--auto-col) calc(min(100%, 100% * var(--tglow, 1))), transparent) !important;
 }
@@ -3089,7 +3081,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 18:20:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 19:00:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -6071,8 +6063,7 @@ window._randoLast = null;
 // DOUBLE CLICK on >> always frees every track first: locked → unlocked, muted → unmuted, per direct request
 function _dblUnlockUnmuteAll() {
   for (let tr = 0; tr < NUM_TRACKS; tr++) {
-    if (trackSweep[tr] && document.body.classList.contains('modify')) continue; // MODIFY: LOCKED tracks stay locked (and untouched) through a double-click, per direct request
-    if (trackSweep[tr]) { try { _toggleTrackLock(tr); } catch (e) { trackSweep[tr] = false; } }
+    if (trackSweep[tr]) continue; // LOCKED tracks stay locked (and untouched) through a double-click — in MAIN too now, not just MODIFY, per direct request
     if (trackMuted[tr]) { trackMuted[tr] = false; try { updateTrackMute(tr); } catch (e) {} }
   }
 }
@@ -6622,8 +6613,11 @@ function _setFxEchoLevel(v) {
   v = Math.max(0, Math.min(100, +v || 0)); window._fxEchoLevel = v / 100;
   const r = document.getElementById('fxEchoLevelVal'); if (r) r.textContent = Math.round(v) + '%';
   const sl = document.getElementById('fxEchoLevelSlider'); if (sl && +sl.value !== v) sl.value = v;
-  try { for (let t = 0; t < NUM_TRACKS; t++) { const n = trackFxNodes[t]; if (n && n.echoGain && ctx) n.echoGain.gain.setTargetAtTime(window._fxEchoLevel * _echoTrim(t), ctx.currentTime, 0.02); } } catch (e) {}
+  try { for (let t = 0; t < NUM_TRACKS; t++) { const n = trackFxNodes[t]; if (n && n.echoGain && ctx) _setEchoGain(n.echoGain, window._fxEchoLevel * _echoTrim(t)); } } catch (e) {}
+  try { if (ctx && window._beatEchoGain && window._beatEchoGain.context === ctx) _setEchoGain(window._beatEchoGain, window._fxEchoLevel); } catch (e) {} // DRUMS' delay follows LEVEL too now (it was stuck at a fixed 34% — so 0% never muted it), per direct report
 }
+// plain set (any old ramp cleared first, so a later plain value is never fighting a leftover automation), 0% = fully silent
+function _setEchoGain(g, v) { try { const p = g.gain, t = ctx.currentTime; p.cancelScheduledValues(0); p.setValueAtTime(v, t); p.value = v; } catch (e) {} }
 // DIRTY ECHO (REVERB menu > DELAY), per direct request: every echo (tracks and DRUMS) goes through a 'cheap' chain — high-pass
 // 400Hz + low-pass 2.2kHz (telephone band) and a gritty saturation — instead of coming back clean. Rewired live; new chains
 // pick it up as they're built.
@@ -6661,10 +6655,10 @@ function _syncFxEcho(tr) {
   if (on && !n.echoConn) { try { n.envGain.connect(n.echoDelay); n.echoConn = true; } catch (e) {} } // only the FX'd output (on FX the voices all go through it)
   else if (!on && n.echoConn) { try { n.envGain.disconnect(n.echoDelay); } catch (e) {} n.echoConn = false; }
   n.echoDelay.delayTime.value = _fxEchoTime(); // plain values, no smoothing ramps (cheaper; a tempo change just jumps)
-  n.echoGain.gain.value = window._fxEchoLevel * _echoTrim(tr); // the input tap does the switching now (level = FX ECHO LEVEL slider)
+  _setEchoGain(n.echoGain, window._fxEchoLevel * _echoTrim(tr)); // the input tap does the switching now (level = FX ECHO LEVEL slider)
 }
 // the echo follows tempo changes (TEMPO, nudges, tape tempos) — a cheap check, only touches tracks with FX on
-setInterval(() => { if (!ctx) return; const sd = _fxEchoTime(); for (let t = 0; t < NUM_TRACKS; t++) { const n = trackFxNodes[t]; if (n && n.echoConn && Math.abs(n.echoDelay.delayTime.value - sd) > 0.001) n.echoDelay.delayTime.value = sd; if (n && n.echoConn) { const lv = window._fxEchoLevel * _echoTrim(t); if (Math.abs(n.echoGain.gain.value - lv) > 0.001) n.echoGain.gain.value = lv; } } }, 500); // (+ the level, so an instrument swap picks up its own DELAY trim)
+setInterval(() => { if (!ctx) return; const sd = _fxEchoTime(); for (let t = 0; t < NUM_TRACKS; t++) { const n = trackFxNodes[t]; if (n && n.echoConn && Math.abs(n.echoDelay.delayTime.value - sd) > 0.001) n.echoDelay.delayTime.value = sd; if (n && n.echoConn) { const lv = window._fxEchoLevel * _echoTrim(t); if (Math.abs(n.echoGain.gain.value - lv) > 0.001) _setEchoGain(n.echoGain, lv); } } }, 500); // (+ the level, so an instrument swap picks up its own DELAY trim)
 // FX BUTTON GLYPHS, per direct request: FX = off, EN = FX1 (the envelope — CHK), DS = FX2 (distortion — BLAST), DL = DELAY
 function _fxGlyph(tr) { return trackChink[tr] ? 'EN' : trackPump[tr] ? 'DS' : _fxEchoOn(tr) ? 'DL' : 'FX'; }
 function _beatFxGlyph() { try { return _beatChoke ? 'EN' : _beatPump ? 'DS' : _beatEchoOn() ? 'DL' : 'FX'; } catch (e) { return 'FX'; } }
@@ -8453,6 +8447,7 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
   setInterval(() => {
     const sp = document.body.classList.contains('modify');
     if (sp) marks();
+    if (sp && !held && !springRaf) { try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} } // RING COLOUR kept up to date while idle (display mode / SQUARE / page colour changes) — it used to only catch up once you touched the graph, per direct report
     if (!pad) return;
     if (!sp) { held = false; if (window._padLatch) bake(); else restore(); return; } // left MODIFY: latched result kept for real, otherwise put back
     if (!held && pad.name !== nameNow()) { window._padMute = null; pad = null; easeHome(); } // a new pattern arrived — the old pad state no longer applies
@@ -26837,7 +26832,7 @@ function _ensureBeatFxChain() {
   // after the FX crunch; silent unless DRUMS is on the FX stop (see _syncBeatEcho).
   const echoDelay = ctx.createDelay(2); echoDelay.delayTime.value = _fxEchoTime();
   const echoGain = ctx.createGain(); echoGain.gain.value = 0;
-  echoDelay.connect(echoGain); echoGain.connect(masterGain); echoGain.gain.value = FX_ECHO_LEVEL; // inputs only connected while DRUMS is on FX (cheaper, see _syncBeatEcho)
+  echoDelay.connect(echoGain); echoGain.connect(masterGain); echoGain.gain.value = window._fxEchoLevel; /* LEVEL slider (was the fixed FX_ECHO_LEVEL) */ // inputs only connected while DRUMS is on FX (cheaper, see _syncBeatEcho)
   window._beatEchoTaps = [dryGain, postGain]; window._beatEchoConn = false;
   window._beatDryGain = dryGain; window._beatCrunchSend = crunchSend; window._beatReverbSend = reverbSend;
   window._beatEchoDelay = echoDelay; window._beatEchoGain = echoGain;
