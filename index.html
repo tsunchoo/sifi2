@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-02 19:00:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-02 19:05:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3081,7 +3081,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 19:00:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 19:05:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8434,7 +8434,8 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
   function padReset() {
     held = false; pend = null; if (raf) { cancelAnimationFrame(raf); raf = 0; }
     const m = marks(); if (m) m.classList.remove('sp-held', 'sp-xm', 'sp-xp', 'sp-ym', 'sp-yp');
-    easeHome(true); restore(); // (silent — no click sound, per direct request)
+    easeHome(true); restore(); // (no click sound, per direct request)
+    try { _playSpoolAmalgamSwell(); } catch (e) {} // …the RIGHT TAPE SPOOL's amalgam swell instead, per direct request
   }
   window._modifyPadReset = padReset;
   window.addEventListener('touchstart', e => { if (!inPad(e)) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (e.touches.length === 1 && isDouble()) { padReset(); return; } const t = e.touches[0]; start(t.clientX, t.clientY); }, { capture: true, passive: false });
@@ -28174,7 +28175,7 @@ function snapshotDisplay() {
     ['#tapeWindow', 'TAPE WINDOW · TAPE DRAWER', 'Tap for SETTINGS. Drag DOWN for the TAPE DRAWER — every pattern is kept there automatically (12 max, the oldest drops off). Tap a tape to loop it (tap again to stop), or PLAY ALL — a rewind plays between tapes with different tempos.'],
     ['#nameBar', 'SONG NAME', (x, y) => {
       const r = document.getElementById('nameBar').getBoundingClientRect();
-      if (MOD() && y - r.top >= 56) return ['MODIFY PAD', 'Hold and move: LEFT mutes notes, RIGHT adds them; UP takes effects away (and chops tracks with EN), DOWN adds random effects (drums too). The centre is the pattern as it was; With the MAGNET on (default) it springs back to the centre when you let go; tap the magnet to make it stay where you leave it. Double-tap the graph to reset it. Double-click >> to watch the new notes land below. The big number is the count.'];
+      if (MOD() && y - r.top >= 56) return ['MODIFY PAD', 'Hold and move: LEFT mutes notes, RIGHT adds them; UP takes effects away (and chops tracks with EN), DOWN adds random effects (drums too). The centre is the pattern as it was; With the MAGNET on (default) it springs back to the centre when you let go; tap the magnet to make it stay where you leave it. Double-tap the graph to reset it (with the right spool swell). Double-click >> to watch the new notes land below. The big number is the count.'];
       return [MOD() ? 'SONG NAME (MODIFY)' : 'SONG NAME', 'Each new pattern gets a randomized name. Double-tap to keep it in the TAPE DRAWER (a heart floats up). Swipe RIGHT to add effects (and change the EQ type), LEFT to take them off. Hold to hide or show the name.'];
     }],
     ['#slotBar', 'SLOTS', 'Up to six saved patterns. Tap one to switch to it on the next beat.'],
