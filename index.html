@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-02 20:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-02 21:05:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3081,7 +3081,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 20:55:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 21:05:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -5505,17 +5505,17 @@ let _flipNoiseBuf = null;
 function playFlipSound(trim) {
   if (window._noButtonSounds || window._tapeDrawerQuiet || !ctx || ctx instanceof OfflineAudioContext || ctx.state !== 'running') return;
   try {
-    if (!_flipNoiseBuf || _flipNoiseBuf.sampleRate !== ctx.sampleRate) { const n = Math.round(ctx.sampleRate * 0.08); _flipNoiseBuf = ctx.createBuffer(1, n, ctx.sampleRate); const d = _flipNoiseBuf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; }
+    if (!_flipNoiseBuf || _flipNoiseBuf.sampleRate !== ctx.sampleRate) { const n = Math.round(ctx.sampleRate * 0.2); _flipNoiseBuf = ctx.createBuffer(1, n, ctx.sampleRate); const d = _flipNoiseBuf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; }
     const t = ctx.currentTime + 0.005, src = ctx.createBufferSource(); src.buffer = _flipNoiseBuf;
     src.playbackRate.value = 0.9 + Math.random() * 0.25; // a touch of variety so a run of flips doesn't machine-gun
-    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.1; bp.frequency.setValueAtTime(4200, t); bp.frequency.exponentialRampToValueAtTime(1600, t + 0.05);
-    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 700;
-    const g = ctx.createGain(), peak = 0.16 * (trim || 1);
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.055);
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.8; bp.frequency.setValueAtTime(6500, t); bp.frequency.exponentialRampToValueAtTime(2200, t + 0.12); // SWISHIER, per direct request: a wider band sweeping down over 120ms (was a 50ms tick)
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1200; // less low 'clack'
+    const g = ctx.createGain(), peak = 0.13 * (trim || 1);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.018); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13); // soft 18ms swell in (no hard click at the front), 130ms long
     src.connect(bp); bp.connect(hp); hp.connect(g);
     if (window._buttonSoundsToMix === false) { g.gain.value; const lv = (masterGain ? masterGain.gain.value : 1) * (window._makeupGain ? window._makeupGain.gain.value : 1); const o = ctx.createGain(); o.gain.value = lv; g.connect(o); o.connect(ctx.destination); }
     else g.connect(masterGain);
-    src.start(t); src.stop(t + 0.07); src.onended = () => { try { g.disconnect(); } catch (e) {} };
+    src.start(t); src.stop(t + 0.15); src.onended = () => { try { g.disconnect(); } catch (e) {} };
   } catch (e) {}
 }
 // Builds (and caches) a reversed copy of a decoded UI sound buffer — Web
@@ -6311,14 +6311,14 @@ function _nshTextColour() { // dark text on a light PLAY FLASH background, light
     document.body.style.setProperty('--nsh-text', L > 0.35 ? '#111' : '#fff');
   } catch (e) {}
 }
-function _startNameShuffle(tr, pool) {
+function _startNameShuffle(tr, pool, flip) { // flip: a FLIP sound on every white flash (the double-click >> cascade)
   const nb = document.getElementById(`tbtn-${tr}`); if (!nb || !pool.length) return null;
   _nshTextColour();
   let n = 0, last = nb.textContent;
   const iv = setInterval(() => {
     let nm = last; for (let i = 0; i < 6 && nm === last; i++) nm = INSTRUMENTS[pool[Math.floor(Math.random() * pool.length)]].name;
     last = nm; nb.textContent = nm;
-    nb.classList.toggle('name-shuffle-hit', n++ % 2 === 0); // on / off flashes — no forced reflow to restart an animation (PERF)
+    const _on = n++ % 2 === 0; nb.classList.toggle('name-shuffle-hit', _on); if (_on && flip) { try { playFlipSound(0.55); } catch (e) {} } // on / off flashes — no forced reflow to restart an animation (PERF)
   }, NAME_SHUFFLE_TICK);
   const sh = { tr, iv }; _nameShuffles.push(sh); return sh;
 }
@@ -18184,9 +18184,10 @@ function _patternCascade(fromBpm, toBpm) {
     const g = INSTRUMENTS[k].group;
     const pool = INSTRUMENT_KEYS.filter(x => INSTRUMENTS[x] && x !== 'toms' && INSTRUMENTS[x].group === g);
     const box = {};
-    _cascadeTimers.push(setTimeout(() => { try { box.sh = _startNameShuffle(tr, pool); } catch (e) {} }, startDelay + tr * _NAME_STEP));
+    const _flipNow = (window._dblFlipUntil || 0) > performance.now(); // a FLIP on every white flash — only for a double-click >> new pattern, per direct request
+    _cascadeTimers.push(setTimeout(() => { try { box.sh = _startNameShuffle(tr, pool, _flipNow); } catch (e) {} }, startDelay + tr * _NAME_STEP));
     _cascadeTimers.push(setTimeout(() => {
-      try { if (box.sh) clearInterval(box.sh.iv); const nb = document.getElementById(`tbtn-${tr}`); const kk = trackInstruments[tr]; if (nb && kk && INSTRUMENTS[kk]) nb.textContent = INSTRUMENTS[kk].name; _endNameShuffle(box.sh); } catch (e) {}
+      try { if (box.sh) clearInterval(box.sh.iv); const nb = document.getElementById(`tbtn-${tr}`); const kk = trackInstruments[tr]; if (nb && kk && INSTRUMENTS[kk]) nb.textContent = INSTRUMENTS[kk].name; const _wasLit = nb && nb.classList.contains('name-shuffle-hit'); _endNameShuffle(box.sh); if (_flipNow && box.sh && !_wasLit) playFlipSound(0.55); } catch (e) {} // (the landing flash flips too — unless it was already lit, so it's one flip per flash)
     }, startDelay + tr * _NAME_STEP + _NAME_RUN));
   }
   const tt = document.getElementById('topTempoBpmNum');
@@ -19789,6 +19790,7 @@ function stopAllAutoRand() {
         try { window._modifyNoteReveal && window._modifyNoteReveal(); } catch (e) {} // MODIFY: show the notes it picks behind the pad
         try { _shuffleEcho(); } catch (e) {} // DELAY TIME + LEVEL shuffled on every double-click, per direct request
         try { _dblUnlockUnmuteAll(); } catch (e) {}
+        window._dblFlipUntil = performance.now() + 8000; // the new pattern's name cascade flips on every flash (see _patternCascade)
         // RANDO BUTTON: DOUBLE CLICK set to SHUFFLE INSTRUMENTS — a short asterisk turn and the swap, no new pattern
         const _dk = window._dblKey || 'dbl'; // DOUBLE CLICK, or SHAKE (its own column) — see _randDoubleTap
         if (!_randoIsFull(window._randoCfg[_dk])) { // not a whole new pattern: notes / instruments / extras on the current one
