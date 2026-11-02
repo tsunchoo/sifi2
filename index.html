@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-02 19:40:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-02 20:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3081,7 +3081,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 19:40:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 20:50:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4979,6 +4979,7 @@ function _flashLogoColor() {
   setTimeout(() => { if (window._logoColorMode === 'flash' && el.style.color) el.style.color = ''; }, 80);
 }
 function randomizeAppColors() {
+  if (document.body.classList.contains('mono') || document.body.classList.contains('gray-mode')) return; // MONO / GRAY: never re-coloured (they'd lose their black-and-white / grey look)
   try { _audioCushion(); } catch (e) {}
   // SATURATION CEILING (COLOR MENU) — caps how vivid any of these random
   // picks below are allowed to land, without changing their hue/lightness
@@ -5496,6 +5497,26 @@ function playUiSound(name, forceMix, trim) { // trim: optional extra gain multip
   }
   src.start();
   src.onended = () => { try { g.disconnect(); } catch(e) {} };
+}
+// FLIP SOUND, per direct request: a small, innocuous white-noise 'flip' — a ~50ms band-passed noise tick with a quick downward
+// sweep, like a card being flipped. Fires for every instrument a >> single click changes, once per asterisk press, and on
+// opening the TAPE DRAWER. Same on/off and routing as the other button sounds.
+let _flipNoiseBuf = null;
+function playFlipSound(trim) {
+  if (window._noButtonSounds || window._tapeDrawerQuiet || !ctx || ctx instanceof OfflineAudioContext || ctx.state !== 'running') return;
+  try {
+    if (!_flipNoiseBuf || _flipNoiseBuf.sampleRate !== ctx.sampleRate) { const n = Math.round(ctx.sampleRate * 0.08); _flipNoiseBuf = ctx.createBuffer(1, n, ctx.sampleRate); const d = _flipNoiseBuf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; }
+    const t = ctx.currentTime + 0.005, src = ctx.createBufferSource(); src.buffer = _flipNoiseBuf;
+    src.playbackRate.value = 0.9 + Math.random() * 0.25; // a touch of variety so a run of flips doesn't machine-gun
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.1; bp.frequency.setValueAtTime(4200, t); bp.frequency.exponentialRampToValueAtTime(1600, t + 0.05);
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 700;
+    const g = ctx.createGain(), peak = 0.16 * (trim || 1);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.055);
+    src.connect(bp); bp.connect(hp); hp.connect(g);
+    if (window._buttonSoundsToMix === false) { g.gain.value; const lv = (masterGain ? masterGain.gain.value : 1) * (window._makeupGain ? window._makeupGain.gain.value : 1); const o = ctx.createGain(); o.gain.value = lv; g.connect(o); o.connect(ctx.destination); }
+    else g.connect(masterGain);
+    src.start(t); src.stop(t + 0.07); src.onended = () => { try { g.disconnect(); } catch (e) {} };
+  } catch (e) {}
 }
 // Builds (and caches) a reversed copy of a decoded UI sound buffer — Web
 // Audio doesn't support negative playbackRate reliably, so an actual
@@ -6386,7 +6407,7 @@ function randomizeCurrentInstruments(opts) {
     _randInstTimers.push(setTimeout(() => {
       const _sh = _shBox.sh;
       try { clearInterval(_sh && _sh.iv); selectSound(_tr, k); if (_muted) { trackMuted[_tr] = true; updateTrackMute(_tr); } redrawTrackCells(_tr, true); } catch (e) { console.error('instrument swap failed', e); }
-      _endNameShuffle(_sh);
+      _endNameShuffle(_sh); try { playFlipSound(); } catch (e) {} // FLIP sound for each instrument that changes
     }, _landAt));
   });
   if (opts) opts.lastLandMs = _lastLand;
@@ -8238,7 +8259,7 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
   const marks = () => {
     let m = document.getElementById('modifyPadMarks'), b = nb();
     if (!m && b) {
-      m = document.createElement('div'); m.id = 'modifyPadMarks'; m.innerHTML = '<div class="sp-tint"></div><div class="sp-glow"></div><canvas id="modifyGridCv"></canvas><div class="sp-count" id="modifyCount"></div><div class="sp-top"></div><div class="sp-bot"></div><div class="sp-xlab"><span class="sp-g sp-m">&minus;</span><span>NOTES</span><span class="sp-g sp-p">+</span></div><div class="sp-ylab"><span class="sp-g sp-p">+</span><span>EFFECTS</span><span class="sp-g sp-m">&minus;</span></div><div class="sp-h"></div><div class="sp-v"></div><div class="sp-dot"></div>'; b.appendChild(m);
+      m = document.createElement('div'); m.id = 'modifyPadMarks'; m.innerHTML = '<div class="sp-tint"></div><div class="sp-glow"></div><canvas id="modifyGridCv"></canvas><div class="sp-count" id="modifyCount"></div><div class="sp-top"></div><div class="sp-bot"></div><div class="sp-xlab"><span class="sp-g sp-m">&minus;</span><span>NOTES</span><span class="sp-g sp-p">+</span></div><div class="sp-ylab"><span class="sp-g sp-m">&minus;</span><span>EFFECTS</span><span class="sp-g sp-p">+</span></div><div class="sp-h"></div><div class="sp-v"></div><div class="sp-dot"></div>'; b.appendChild(m);
       const lk = document.createElement('button'); lk.id = 'modifyLock'; lk.type = 'button'; lk.setAttribute('aria-label', 'magnet'); lk.innerHTML = LOCK_SVG(); lk.classList.toggle('sp-mag-off', !!window._padLatch);
       lk.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setLatch(!window._padLatch); });
       b.appendChild(lk);
@@ -8286,7 +8307,7 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
   function apply(x, y) {
     if (!pad) return; const B = pad.base; pad.x = x; pad.y = y;
     const dz = v => { const a = Math.abs(v); return a < 0.06 ? 0 : Math.sign(v) * Math.min(1, (a - 0.06) / 0.86); }; // a small dead zone round the centre so 'as it was' is easy to hit, and the last few % at each edge = all the way
-    const X = dz(Math.max(-1, Math.min(1, x * 2 - 1))), Y = dz(Math.max(-1, Math.min(1, y * 2 - 1)));
+    const X = dz(Math.max(-1, Math.min(1, x * 2 - 1))), Y = dz(Math.max(-1, Math.min(1, 1 - y * 2))); // Y FLIPPED, per direct request: the BOTTOM is now fewest effects and the TOP most (Y > 0 = more)
     // NOTES — taking away = MUTING (the notes stay in the pattern); adding = real notes on empty steps
     const g = B.grid.map(r => r.slice()), mute = new Uint8Array(NUM_TRACKS * NUM_STEPS);
     if (X < 0) { const n = Math.round(pad.notes.length * -X); for (let i = 0; i < n; i++) { const [tr, st] = pad.notes[i]; mute[tr * NUM_STEPS + st] = 1; } }
@@ -8346,7 +8367,8 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
     const m = document.getElementById('modifyPadMarks'); if (!m) return; const t = m.querySelector('.sp-tint'), gl = m.querySelector('.sp-glow'); if (!t) return;
     x = Math.max(0, Math.min(1, x)); y = Math.max(0, Math.min(1, y));
     const cs = _rootCS(), N = _anyRgba(cs.getPropertyValue('--playhead-color').trim()) || [80, 80, 200, 1], E = _anyRgba(cs.getPropertyValue('--highlight2-color').trim()) || [200, 80, 160, 1];
-    const sum = x + y, kE = sum > 0 ? y / sum : 0.5;
+    const ye = 1 - y; // (effects now grow UPWARDS)
+    const sum = x + ye, kE = sum > 0 ? ye / sum : 0.5;
     const rgb = [0, 1, 2].map(i => Math.round(N[i] * (1 - kE) + E[i] * kE)).join(',');
     const d0 = Math.min(1, Math.hypot(x - 0.5, y - 0.5) / 0.5), a = 0.85 * Math.pow(d0, 1.1); // NOTHING at the centre (the graph stays see-through until you move away — it was reading as a background in GOTH / NYC, per direct report), strong out at the edges
     t.style.backgroundColor = `rgba(${rgb},${a.toFixed(3)})`;
@@ -8358,6 +8380,8 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
       }
       dot.style.color = rc;
     }
+    // MAGNET colour from the page background too (very light / very dark, whichever stands out more), so it can't get lost, per direct request
+    { const lk = document.getElementById('modifyLock'); if (lk) { try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.5), 0.95), dkC = _hslRgb(hh, Math.min(ss, 0.6), 0.1), useLt = _contrast(lt, bg) >= _contrast(dkC, bg); lk.style.color = `rgb(${(useLt ? lt : dkC).join(',')})`; lk.style.background = useLt ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)'; } catch (e) {} } }
   }
   // back to the centre, EASED (a new pattern) — dragging again cancels the ease straight away
   function easeHome(fast) { const m = marks(); if (!m) return;
@@ -8378,7 +8402,7 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
     springStop(); { const m = document.getElementById('modifyPadMarks'); if (m) m.querySelectorAll('.sp-dot, .sp-tint').forEach(n => { if (n._home) { n._home.cancel(); n._home = null; } }); } // a touch mid-ease takes over straight away
     const r = (document.getElementById('modifyPadMarks') || nb()).getBoundingClientRect(); const x = (cx - r.left) / r.width, y = (cy - r.top) / r.height; // the pad = the bottom 90%
     showDot([x, y]); tint(x, y); pend = [x, y]; if (!raf) raf = requestAnimationFrame(tick);
-    { const m = document.getElementById('modifyPadMarks'); if (m) { m.classList.toggle('sp-xm', x < 0.47); m.classList.toggle('sp-xp', x > 0.53); m.classList.toggle('sp-ym', y < 0.47); m.classList.toggle('sp-yp', y > 0.53); } } // which − / + to show
+    { const m = document.getElementById('modifyPadMarks'); if (m) { m.classList.toggle('sp-xm', x < 0.47); m.classList.toggle('sp-xp', x > 0.53); m.classList.toggle('sp-ym', y > 0.53); m.classList.toggle('sp-yp', y < 0.47); } } // which − / + to show
   }
   // NOTE GRID over the pad: every track (in the order they sit on screen) × 16 steps, only the notes that are actually sounding
   // right now (muted ones left out), in each track's own colour — every note the same size, filling its cell
@@ -14383,6 +14407,7 @@ function buildUI() {
           document.body.classList.add('tname-slide-long'); clearTimeout(window._tnLongT); window._tnLongT = setTimeout(() => document.body.classList.remove('tname-slide-long'), 1100);
         }
         swapTrackInstrumentInGroup(tr, dbl, dbl ? sweepBtnL._preSwapInst : undefined);
+        try { playFlipSound(); } catch (e) {} // FLIP sound, once per asterisk press
         return;
       }
       _toggleTrackLock(tr);
@@ -18272,10 +18297,10 @@ function randAll(mode, opts) {
       // are re-rolled on top as before
       const _wildLook = () => {
         try {
-          const cur = window._rainbowIdx, pool = _RAINBOW_CYCLE.map((m, i) => i).filter(i => i !== cur && !_RAINBOW_CYCLE[i].liveOnly && _RAINBOW_CYCLE[i].name !== 'MONO' && _RAINBOW_CYCLE[i].name !== 'GRAY'); // (MONO only from the rainbow icon — a random jump into it switched WILD off and left you stuck there, per direct report)
+          const cur = window._rainbowIdx, pool = _RAINBOW_CYCLE.map((m, i) => i).filter(i => i !== cur && !_RAINBOW_CYCLE[i].liveOnly ); // (MONO and GRAY are back in the random pick, per direct request — no colour re-roll on them, see below) // (MONO only from the rainbow icon — a random jump into it switched WILD off and left you stuck there, per direct report)
           if (pool.length && !(_RAINBOW_CYCLE[cur] && _RAINBOW_CYCLE[cur].liveOnly)) { const nm = _RAINBOW_CYCLE[pool[Math.floor(Math.random() * pool.length)]]; _applyRainbowState(nm); }
         } catch (e) {}
-        randomizeAppColors();
+        if (!document.body.classList.contains('mono') && !document.body.classList.contains('gray-mode')) randomizeAppColors(); // MONO / GRAY keep their own black-and-white / grey palette
       };
       // When the new pattern lands from the scheduler (bar line, playing), the heavy look change (display mode + colours) runs
       // on its own, when the bar is actually HEARD — after the scheduler has planned well ahead — instead of inside the
@@ -19727,7 +19752,6 @@ function stopAllAutoRand() {
       btn.style.setProperty('--playdoe-spin-dur', _spinA.toFixed(3) + 's');
       btn.classList.remove('playdoe-ast', 'np-scroll'); void btn.offsetWidth; btn.classList.add('playdoe-ast');
       setTimeout(() => btn.classList.remove('playdoe-ast'), 10000); /* failsafe */
-      if (document.body.classList.contains('mono') || document.body.classList.contains('gray-mode')) { try { _cycleRainbowMode(); } catch (e) {} } // MONO: a double-click >> takes you back out into colour (the next display mode, WILD back as it was), per direct report
       _randoApply('dbl'); setBtnBlueHeld('randBtn'); queueRand();
       return;
     }
@@ -19754,7 +19778,6 @@ function stopAllAutoRand() {
         try { window._modifyNoteReveal && window._modifyNoteReveal(); } catch (e) {} // MODIFY: show the notes it picks behind the pad
         try { _shuffleEcho(); } catch (e) {} // DELAY TIME + LEVEL shuffled on every double-click, per direct request
         try { _dblUnlockUnmuteAll(); } catch (e) {}
-        if (document.body.classList.contains('mono') || document.body.classList.contains('gray-mode')) { try { _cycleRainbowMode(); } catch (e) {} } // MONO: a double-click >> takes you back out into colour (the next display mode, WILD back as it was), per direct report
         // RANDO BUTTON: DOUBLE CLICK set to SHUFFLE INSTRUMENTS — a short asterisk turn and the swap, no new pattern
         const _dk = window._dblKey || 'dbl'; // DOUBLE CLICK, or SHAKE (its own column) — see _randDoubleTap
         if (!_randoIsFull(window._randoCfg[_dk])) { // not a whole new pattern: notes / instruments / extras on the current one
@@ -22959,6 +22982,7 @@ async function exportAllTapes() {
 function openTapeDrawer() {
   if (!window._oneShot) window._tapeMainBpm = bpm; // the main page's tempo, for FORCE TEMPO
   const ov = document.getElementById('tapeDrawerOverlay'); if (!ov || ov.style.display === 'block') return;
+  try { playFlipSound(); } catch (e) {} // FLIP sound as the drawer opens (before it goes quiet)
   window._tapeDrawerQuiet = true;
   const _wasPlaying = playing;
   if (playing) togglePlay();
@@ -28181,7 +28205,7 @@ function snapshotDisplay() {
     ['#tapeWindow', 'TAPE WINDOW · TAPE DRAWER', 'Tap for SETTINGS. Drag DOWN for the TAPE DRAWER — every pattern is kept there automatically (12 max, the oldest drops off). Tap a tape to loop it (tap again to stop), or PLAY ALL — a rewind plays between tapes with different tempos.'],
     ['#nameBar', 'SONG NAME', (x, y) => {
       const r = document.getElementById('nameBar').getBoundingClientRect();
-      if (MOD() && y - r.top >= 56) return ['MODIFY PAD', 'Hold and move: LEFT mutes notes, RIGHT adds them; UP takes effects away (and chops tracks with EN), DOWN adds random effects (drums too). The centre is the pattern as it was; With the MAGNET on (default) it springs back to the centre when you let go; tap the magnet to make it stay where you leave it. Double-tap the graph to reset it (with the right spool swell). Double-click >> to watch the new notes land below. The big number is the count.'];
+      if (MOD() && y - r.top >= 56) return ['MODIFY PAD', 'Hold and move: LEFT mutes notes, RIGHT adds them; DOWN takes effects away (and chops tracks with EN), UP adds random effects (drums too). The centre is the pattern as it was; With the MAGNET on (default) it springs back to the centre when you let go; tap the magnet to make it stay where you leave it. Double-tap the graph to reset it (with the right spool swell). Double-click >> to watch the new notes land below. The big number is the count.'];
       return [MOD() ? 'SONG NAME (MODIFY)' : 'SONG NAME', 'Each new pattern gets a randomized name. Double-tap to keep it in the TAPE DRAWER (a heart floats up). Swipe RIGHT to add effects (and change the EQ type), LEFT to take them off. Hold to hide or show the name.'];
     }],
     ['#slotBar', 'SLOTS', 'Up to six saved patterns. Tap one to switch to it on the next beat.'],
