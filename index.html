@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-02 01:40:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-02 02:00:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2678,7 +2678,7 @@ html body.modify #modifyPadMarks { display: block; }
 /* the 6×16 note grid drawn over the pad while it's held (40% max), fading out over 0.5s on release, per direct request */
 #modifyGridCv { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease-out; pointer-events: none; }
 #modifyPadMarks.sp-held #modifyGridCv, #modifyPadMarks.sp-reveal #modifyGridCv { opacity: var(--modify-notes-op, 0.4); transition: opacity 0.12s ease-out; } /* (sp-reveal: a DOUBLE CLICK on >> shows the new notes landing) */
-#modifyLock { display: none; position: absolute; left: 6px; bottom: 6px; z-index: 3; width: 30px; height: 30px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+#modifyLock { display: none; position: absolute; left: 6px; bottom: 6px; z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 html body.modify #modifyLock { display: flex; } /* the MAGNET (was the padlock), per direct request — ON by default: let go and the ring springs back to the centre */
 #modifyLock.sp-mag-off { opacity: 0.45; }
 html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; } /* SQUARE: the ring twice as big and twice as thick, per direct request */
@@ -3069,7 +3069,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 01:40:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-02 02:00:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8220,7 +8220,7 @@ window._padLatch = false; // MAGNET ON by default (= no latch), per direct reque
 (function () {
   let pad = null, raf = 0, pend = null, held = false;
   const nb = () => document.getElementById('nameBar');
-  const LOCK_SVG = () => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="display:block;"><path d="M6 3v8a6 6 0 0 0 12 0V3" stroke="currentColor" stroke-width="4" stroke-linecap="butt"/><path d="M4 3h4M16 3h4" stroke="currentColor" stroke-width="3"/></svg>`; // MAGNET icon (was a padlock), per direct request
+  const LOCK_SVG = () => `<svg width="24" height="24" style="display:block;" viewBox="0 0 24 24" fill="none"><g transform="translate(-1.2 1.2) rotate(45 12 12) translate(12 12) scale(0.86) translate(-12 -12)"><path d="M7 9.4v2.1a5 5 0 0 0 10 0V9.4" stroke="currentColor" stroke-width="4.6" opacity="0.6"/><path d="M7 3.2v4.4M17 3.2v4.4" stroke="currentColor" stroke-width="4.6"/></g><path d="M18.6 5.4l2.3-2.3M15.6 3.3l0.6-2.1M20.7 8.4l2.1-0.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`; // MAGNET icon — a horseshoe magnet on the diagonal, solid poles, with field sparks (the plain U read as a letter), per direct request
   const marks = () => {
     let m = document.getElementById('modifyPadMarks'), b = nb();
     if (!m && b) {
