@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-03 05:05:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-03 05:15:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3085,7 +3085,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-03 05:05:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-03 05:15:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4009,11 +4009,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
       <div style="display:flex;flex-direction:column;gap:2px;"><div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">UPDATES</div><div id="updStatus" style="font-size:0.58rem;color:#666;letter-spacing:0.5px;">not checked yet</div></div>
       <button type="button" onclick="window._sifiCheckUpdate && window._sifiCheckUpdate(); const s = document.getElementById('updStatus'); if (s) s.textContent = 'checking…';" style="flex-shrink:0;font:700 0.6rem 'DM Sans',sans-serif;letter-spacing:1px;padding:6px 10px;background:none;border:1px solid #999;color:#111;cursor:pointer;">CHECK NOW</button>
     </div>
-    <!-- MODIFY SLIM NOTE ROWS: grayscale (default) or each track's colour, per direct request -->
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">MODIFY NOTE ROWS IN TRACK COLOURS (OFF = GREY)</div>
-      <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="modifyRowColoursToggle" onchange="setModifyRowColours(this.checked)"><span class="wild-toggle-slider"></span></label>
-    </div>
+    <!-- MODIFY NOTE ROWS IN TRACK COLOURS removed from SETTINGS and hard-coded ON, per direct request -->
     <!-- SONG NAME EQ (moved to the top of SETTINGS from LOOK AND FEEL > DEV), per direct request -->
     <div style="display:flex;flex-direction:column;gap:6px;">
       <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">SONG NAME EQ</div>
@@ -4056,15 +4052,15 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
         <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">OPACITY</div>
-        <div id="modifyCountOpVal" style="font-size:0.75rem;font-weight:700;color:#111;">25%</div>
+        <div id="modifyCountOpVal" style="font-size:0.75rem;font-weight:700;color:#111;">30%</div>
       </div>
-      <input autocomplete="off" type="range" id="modifyCountOpSlider" min="0" max="100" step="1" value="25" class="master-vol-slider" oninput="setModifyCountOpacity(this.value)" onchange="setModifyCountOpacity(this.value)" style="width:100%;">
+      <input autocomplete="off" type="range" id="modifyCountOpSlider" min="0" max="100" step="1" value="30" class="master-vol-slider" oninput="setModifyCountOpacity(this.value)" onchange="setModifyCountOpacity(this.value)" style="width:100%;">
       <!-- MODIFY NOTE MARKERS opacity (the notes shown on the pad while it's held / after a >> double-click), per direct request -->
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
         <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">NOTE MARKERS OPACITY</div>
-        <div id="modifyNotesOpVal" style="font-size:0.75rem;font-weight:700;color:#111;">40%</div>
+        <div id="modifyNotesOpVal" style="font-size:0.75rem;font-weight:700;color:#111;">30%</div>
       </div>
-      <input autocomplete="off" type="range" id="modifyNotesOpSlider" min="0" max="100" step="1" value="40" class="master-vol-slider" oninput="setModifyNotesOpacity(this.value)" onchange="setModifyNotesOpacity(this.value)" style="width:100%;">
+      <input autocomplete="off" type="range" id="modifyNotesOpSlider" min="0" max="100" step="1" value="30" class="master-vol-slider" oninput="setModifyNotesOpacity(this.value)" onchange="setModifyNotesOpacity(this.value)" style="width:100%;">
     </div>
     <!-- FX ECHO DELAY / LEVEL moved to the REVERB menu under DELAY, per direct request -->
     <!-- everything that was above the song name (VOL FILL look/colours, AUTO NOTES FLASH LENGTH, SWEEP RIGHT = 8-BIT) moved to DEV, next to VOLUME SLIDER, per direct request -->
@@ -6733,19 +6729,24 @@ setInterval(_syncBgDark, 700); document.addEventListener('DOMContentLoaded', _sy
 let _fxSyncQ = null;
 try { document.fonts && document.fonts.ready.then(() => { window._chkSqMeasured = 0; _queueFxBtnSync(); }); } catch (e) {}
 function _queueFxBtnSync() { if (!window._chkSqMeasured && document.querySelector('.fx-btn')) { window._chkSqMeasured = 1; _measureChkSqueeze(); } if (_fxSyncQ) return; _fxSyncQ = true; queueMicrotask(() => { _fxSyncQ = null; for (let t = 0; t < NUM_TRACKS; t++) _syncFxBtn(t); }); }
-// RIDE + DS, per direct request: whenever RIDE ends up on DS (BLAST) — picked by a new pattern, a swipe, the pad or by hand — its vol
+// ANY INSTRUMENT + DS, per direct request (RIDE first, then every instrument): whenever a track ends up on DS (BLAST) — picked by a new pattern, a swipe, the pad or by hand — its vol
 // slider comes 20% further DOWN its travel; leaving DS (or a new pattern) puts that 20% back. Checked a few times a second.
-window._rideDs = {}; // tr -> { pat: the pattern it was applied in, gain: the level it was set to }
+window._rideDs = {}; // tr -> { pat: the pattern it was applied in }
+// …except the ones that ALREADY have their own DS (BLAST) level trims from earlier requests: HASSELL, SLUDGE BASS, KATHEDRA,
+// MARACAS, UNDERPASS, SPARP, SYNTH BASS 3 (MOTOWN), PLUNK BASS, PULSE BASS (RIDE also had one, but was asked for by name)
+const _DS_ALREADY_TRIMMED = new Set(['blunt', 'sludge', 'denial', 'guiro', 'underpass', 'sflute', 'sbass3', 'sbass4', 'pbass']);
 setInterval(() => {
   try {
     if (typeof trackInstruments === 'undefined') return;
     for (let tr = 0; tr < NUM_TRACKS; tr++) {
-      const want = trackInstruments[tr] === 'ride' && !!trackPump[tr], st = window._rideDs[tr], pat = window._lastPatternAt || 0;
-      if (st && (st.pat !== pat || trackInstruments[tr] !== 'ride')) { delete window._rideDs[tr]; continue; } // a new pattern / instrument: it starts fresh (its fader was set anew)
+      const inst = trackInstruments[tr], want = !!trackPump[tr] && !!inst && !_DS_ALREADY_TRIMMED.has(inst), st = window._rideDs[tr], pat = window._lastPatternAt || 0;
+      if (st && st.inst !== inst) { delete window._rideDs[tr]; continue; } // a different instrument: starts fresh
+      if (st && st.pat !== pat) { if (Math.abs(trackVolume[tr] - st.gain) > 1e-4) { delete window._rideDs[tr]; continue; } st.pat = pat; } // a new pattern that set the fader anew: starts fresh (one that didn't touch it keeps the turn-down, never stacked twice) // a new pattern / instrument: it starts fresh (its fader was set anew)
       if (want === !!st) continue;
       const pos = volGainToPos(trackVolume[tr]);
-      if (want) trackVolume[tr] = volPosToGain(pos * 0.8); else trackVolume[tr] = volPosToGain(Math.min(1, pos / 0.8));
-      if (want) window._rideDs[tr] = { pat }; else delete window._rideDs[tr];
+      const pre = trackVolume[tr];
+      if (want) trackVolume[tr] = volPosToGain(pos * 0.8); else trackVolume[tr] = (Math.abs(trackVolume[tr] - st.gain) < 1e-4) ? st.pre : volPosToGain(Math.min(1, pos / 0.8)); // back to EXACTLY where it was (unless the slider was moved meanwhile)
+      if (want) window._rideDs[tr] = { pat, inst, gain: trackVolume[tr], pre }; else delete window._rideDs[tr];
       if (ctx && trackGainNodes[tr]) trackGainNodes[tr].gain.setTargetAtTime(trackVolume[tr], ctx.currentTime, 0.03);
       try { updateVolFillDisplay(tr); } catch (e) {}
     }
@@ -8585,13 +8586,13 @@ function _setModify(on, quiet) {
   _showNotice(on ? 'MODIFY MODE' : 'LIVE MODE');
 }
 function setModifyRowColours(on) { window._modifyRowColours = !!on; const cb = document.getElementById('modifyRowColoursToggle'); if (cb) cb.checked = !!on; try { localStorage.setItem('sifiModifyRowCol', on ? '1' : '0'); } catch (e) {} }
-document.addEventListener('DOMContentLoaded', () => { let on = true; try { if (localStorage.getItem('sifiModifyRowColV2') !== '1') { localStorage.setItem('sifiModifyRowColV2', '1'); localStorage.removeItem('sifiModifyRowCol'); } const v = localStorage.getItem('sifiModifyRowCol'); if (v !== null) on = v === '1'; } catch (e) {} setModifyRowColours(on); });
+document.addEventListener('DOMContentLoaded', () => { setModifyRowColours(true); }); // always ON (track colours) — the SETTINGS switch was removed, per direct request
 // MODIFY COUNT settings (SETTINGS), per direct request — remembered on this device
 function setModifyCount(on) { document.body.classList.toggle('modify-count-off', !on); const cb = document.getElementById('modifyCountToggle'); if (cb) cb.checked = !!on; try { localStorage.setItem('sifiModifyCount', on ? '1' : '0'); } catch (e) {} }
 function setModifyNotesOpacity(v, fromMode) { v = Math.max(0, Math.min(100, +v || 0)); document.documentElement.style.setProperty('--modify-notes-op', (v / 100).toFixed(2)); const r = document.getElementById('modifyNotesOpVal'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('modifyNotesOpSlider'); if (sl && +sl.value !== v) sl.value = v; if (!fromMode) { try { localStorage.setItem('sifiModifyNotesOp', String(v)); } catch (e) {} } }
-document.addEventListener('DOMContentLoaded', () => { let op = 40; try { if (localStorage.getItem('sifiModifyNotesOpV2') !== '1') { localStorage.setItem('sifiModifyNotesOpV2', '1'); localStorage.removeItem('sifiModifyNotesOp'); } /* back to the 40% default once, per direct request */ const o = localStorage.getItem('sifiModifyNotesOp'); if (o !== null) op = +o; } catch (e) {} setModifyNotesOpacity(op); });
+document.addEventListener('DOMContentLoaded', () => { let op = 30; try { if (localStorage.getItem('sifiModifyNotesOpV3') !== '1') { localStorage.setItem('sifiModifyNotesOpV3', '1'); localStorage.removeItem('sifiModifyNotesOp'); } /* NOTE MARKERS OPACITY 30% default, applied once to every phone, per direct request (was 40%) */ const o = localStorage.getItem('sifiModifyNotesOp'); if (o !== null) op = +o; } catch (e) {} setModifyNotesOpacity(op); });
 function setModifyCountOpacity(v) { v = Math.max(0, Math.min(100, +v || 0)); document.documentElement.style.setProperty('--modify-count-op', (v / 100).toFixed(2)); const r = document.getElementById('modifyCountOpVal'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('modifyCountOpSlider'); if (sl && +sl.value !== v) sl.value = v; try { localStorage.setItem('sifiModifyCountOp', String(v)); } catch (e) {} }
-document.addEventListener('DOMContentLoaded', () => { let on = true, op = 25; try { on = localStorage.getItem('sifiModifyCount') !== '0'; const o = localStorage.getItem('sifiModifyCountOp'); if (o !== null) op = +o; } catch (e) {} setModifyCount(on); setModifyCountOpacity(op); });
+document.addEventListener('DOMContentLoaded', () => { let on = true, op = 30; try { on = localStorage.getItem('sifiModifyCount') !== '0'; if (localStorage.getItem('sifiModifyCountOpV2') !== '1') { localStorage.setItem('sifiModifyCountOpV2', '1'); localStorage.removeItem('sifiModifyCountOp'); } /* COUNT OPACITY 30% default, applied once to every phone, per direct request */ const o = localStorage.getItem('sifiModifyCountOp'); if (o !== null) op = +o; } catch (e) {} setModifyCount(on); setModifyCountOpacity(op); });
 // the MODIFY pad's COUNT mirrors #beatCount's text as it changes
 (function () { const go = () => { const bc = document.getElementById('beatCount'); if (!bc) return;
   const sync = () => { const m = document.getElementById('modifyCount'); if (m && document.body.classList.contains('modify')) { const t = bc.textContent; if (m.textContent !== t) { m.textContent = t;
