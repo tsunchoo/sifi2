@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-03 00:00:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-03 00:25:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3085,7 +3085,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-03 00:00:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-03 00:25:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8297,7 +8297,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   const fxOf = tr => ({ x: trackFx[tr] ? trackFx[tr].x : 0, y: trackFx[tr] ? trackFx[tr].y : 0, pump: !!trackPump[tr], chink: !!trackChink[tr] });
   const fxOn = f => !!(f.chink || f.pump || f.x > 0 || f.y > 0);
   const RAND_FX = [{ x: 0, y: 0, pump: false, chink: true } /* CHK */, { x: 0.5, y: 0.5, pump: true, chink: false } /* BLAST */, { x: 0.5, y: 0.5, pump: false, chink: false } /* DL */];
-  const nameNow = () => { try { return _tapeAutoName(); } catch (e) { return _currentSpecies || ''; } };
+  const nameNow = () => { try { if (typeof _currentSpecies === 'string' && _currentSpecies) return _currentSpecies; return _tapeAutoName(); } catch (e) { return ''; } }; // the song's real name (not the name DISPLAY, which is blank / part-drawn while it scrolls in — that was resetting a locked pad)
   function capture() {
     const base = { grid: grid.map(r => r.slice()), rev: trackDelay.slice(), fx: [], drums: drumsFx() }; for (let tr = 0; tr < NUM_TRACKS; tr++) base.fx.push(fxOf(tr));
     const notes = [], empties = [], effOn = [], effOff = [], pick = [];
@@ -8419,7 +8419,11 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     try { if (d && fromL) { if (d._home) d._home.cancel(); d._home = d.animate([{ left: fromL, top: fromT }, { left: '50%', top: '50%' }], { duration: dur * 1000, easing: ease }); } } catch (e) {}
     try { if (t && fromC) { const toC = getComputedStyle(t).backgroundColor; if (t._home) t._home.cancel(); t._home = t.animate([{ backgroundColor: fromC }, { backgroundColor: toC }], { duration: dur * 1000, easing: ease }); } } catch (e) {}
   }
-  window.addEventListener('pointerup', e => { if (document.body.classList.contains('modify') && e.target && e.target.closest && e.target.closest('#randBtn') && pad && !held) easeHome(); }, true); // >> pressed: start the ease right away
+  // LOCKED (padlock on), per direct request: a >> single click (an instrument swap — same song, the name just gains a numeral)
+  // leaves the ring and the pad exactly where they are; only a real new pattern (double-click) resets them
+  const _stripNum = n => (n || '').trim().replace(/\s+[IVXLC]+$/, '');
+  const sameSong = () => !!(window._padLatch && pad && _stripNum(pad.name) === _stripNum(nameNow()));
+  window.addEventListener('pointerup', e => { if (document.body.classList.contains('modify') && e.target && e.target.closest && e.target.closest('#randBtn') && pad && !held && !window._padLatch) easeHome(); }, true); // >> pressed: start the ease right away (not when LOCKED — see sameSong)
   function pos(cx, cy) {
     springStop(); { const m = document.getElementById('modifyPadMarks'); if (m) m.querySelectorAll('.sp-dot, .sp-tint').forEach(n => { if (n._home) { n._home.cancel(); n._home = null; } }); } // a touch mid-ease takes over straight away
     const r = (document.getElementById('modifyPadMarks') || nb()).getBoundingClientRect(); const x = (cx - r.left) / r.width, y = (cy - r.top) / r.height; // the pad = the bottom 90%
@@ -8456,7 +8460,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // the SONG NAME strip is left to the song name's OWN gestures (double-tap = tape drawer + heart, SWIPES left/right, hold), per
   // direct request — only the pad below it is taken over here
   const start = (cx, cy) => {
-    if (pad && pad.name !== nameNow()) { window._padMute = null; pad = null; } // a new pattern since — start afresh
+    if (pad && pad.name !== nameNow() && !sameSong()) { window._padMute = null; pad = null; } // a new pattern since — start afresh
     if (!pad) pad = capture();
     held = true; pos(cx, cy);
     const m = marks(); if (m) { drawGrid(); m.classList.add('sp-held'); }
@@ -8504,7 +8508,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     if (!sp) { held = false; springStop();
       if (window._padLatch) { const keep = pad; bake(); padSaved = { pad: keep, sig: JSON.stringify(grid), name: nameNow() }; } // left MODIFY: latched result kept for real — and REMEMBERED (where the ring was), per direct request
       else restore(); return; }
-    if (!held && pad.name !== nameNow()) { window._padMute = null; pad = null; easeHome(); } // a new pattern arrived — the old pad state no longer applies
+    if (!held && pad.name !== nameNow()) { if (sameSong()) pad.name = nameNow(); else { window._padMute = null; pad = null; easeHome(); } } // a new pattern arrived — the old pad state no longer applies (a LOCKED pad rides through a >> instrument swap, see sameSong)
   }, 300);
   // DOUBLE CLICK on >> in MODIFY, per direct request: the note grid shows (as when the pad is held) while the new pattern's notes
   // land, redrawn every frame so you watch them arrive, then fades out the same way
