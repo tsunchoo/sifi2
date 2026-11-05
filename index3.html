@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 02:25:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 02:30:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2702,7 +2702,11 @@ html body.modify #modifyLock { display: flex; } /* the MAGNET (was the padlock),
 html body.modify.modify-square #modifyAuto { display: flex; }
 #modifyAuto.sp-mag-off { opacity: 0.45; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyAuto:not(.sp-mag-off) { background: #000 !important; color: #fff !important; }
-html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; } /* SQUARE: the ring twice as big and twice as thick, per direct request */
+html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; }
+/* CHROMATIC ABERRATION on the ring, per direct request — the cheap way: no filters, just four soft coloured shadows (red one side,
+   cyan the other, inside and out, each slightly blurred) so its edges split like light through a cheap lens */
+html body:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { box-shadow: -2px 0 1px rgba(255,20,60,0.85), 2px 0 1px rgba(0,200,255,0.85), inset -2px 0 1px rgba(0,200,255,0.7), inset 2px 0 1px rgba(255,20,60,0.7), 0 0 2px rgba(255,255,255,0.25) !important; }
+html body.modify-square:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { box-shadow: -3px 0 1.5px rgba(255,20,60,0.85), 3px 0 1.5px rgba(0,200,255,0.85), inset -3px 0 1.5px rgba(0,200,255,0.7), inset 3px 0 1.5px rgba(255,20,60,0.7), 0 0 3px rgba(255,255,255,0.25) !important; } /* (outranks the glow-off / glow-pause rules — it's not a glow) */ /* SQUARE: the ring twice as big and twice as thick, per direct request */
 #modifyLock.sp-unlatched { opacity: 0.55; }
 html body.name-bg-clear #nameBar { background: transparent !important; background-color: transparent !important; } /* SONG NAME BG TRANSPARENT (SETTINGS > SONG NAME EQ), per direct request */
 html body.song-name-hidden.seq-playing #nameDisplay { visibility: hidden !important; } /* SONG NAME hidden (hold the bar), per direct request — only WHILE PLAYING: stopped, the name always shows; press play and it's hidden again */
@@ -3090,7 +3094,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 02:25:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 02:30:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
