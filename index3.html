@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-03 05:15:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 01:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3085,7 +3085,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-03 05:15:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 01:50:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -3194,11 +3194,11 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
         </div>
 
         <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">RECORDING</div>
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">REC BUTTON FUNCTION</div>
           <div style="display:flex;flex-direction:column;gap:6px;">
-            <button id="recMode_realtime" class="rec-mode-btn" onclick="setRecordMode('realtime')">REALTIME</button>
+            <button id="recMode_realtime" class="rec-mode-btn" onclick="setRecordMode('realtime')">REALTIME RECORDING</button>
             <button id="recMode_bounceLoop" class="rec-mode-btn" onclick="setRecordMode('bounceLoop')">BOUNCE LOOP</button>
-            <button id="recMode_bounceStems" class="rec-mode-btn" onclick="setRecordMode('bounceStems')">BOUNCE LOOP STEMS</button>
+            <button id="recMode_bounceStems" class="rec-mode-btn" onclick="setRecordMode('bounceStems')">BOUNCE STEMS</button>
           </div>
         </div>
         <label style="display:flex;align-items:center;gap:8px;font-size:0.66rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#111;cursor:pointer;">
@@ -8366,6 +8366,27 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // MAGNET, per direct request: let go and the ring glides back to the centre over an 8th note at the current tempo, the pattern
   // following it back step by step (the same path, so it's smooth), landing on the pattern exactly as it was
   let springRaf = 0, padSaved = null;
+  // SQUARE ORBIT, per direct request: in SQUARE the ring circles the graph CLOCKWISE on its own — a circle 70% of the graph's
+  // height — driving the pad as it goes (so you HEAR it: notes and effects come and go round the circle), until the graph is
+  // touched. One lap every 2 bars at the current tempo. Leaving SQUARE re-arms it for next time.
+  let orbitRaf = 0, orbitOff = false, orbitA = null, orbitR = 0, orbitLast = 0, orbitApplyAt = 0;
+  const orbiting = () => document.body.classList.contains('modify-square') && !orbitOff && !held;
+  function orbitTick(now) {
+    orbitRaf = 0; if (!orbiting()) return;
+    if (!pad) { pad = capture(); }
+    const dt = Math.min(0.1, Math.max(0, (now - (orbitLast || now)) / 1000)); orbitLast = now;
+    let per = 4; try { per = Math.max(2, Math.min(16, stepDuration() * 32)); } catch (e) {}
+    if (orbitA === null) { const dx = pad.x - 0.5, dy = pad.y - 0.5; orbitA = Math.atan2(dy, dx); orbitR = Math.hypot(dx, dy); if (orbitR < 0.01) orbitA = -Math.PI / 2; }
+    orbitA += 2 * Math.PI * dt / per; orbitR += (0.35 - orbitR) * Math.min(1, dt * 1.2); // (eases out to the circle from wherever it was)
+    const x = 0.5 + orbitR * Math.cos(orbitA), y = 0.5 + orbitR * Math.sin(orbitA); // +angle with y pointing down = CLOCKWISE on screen
+    pad.x = x; pad.y = y; showDot([x, y]);
+    if (now - orbitApplyAt > 60) { orbitApplyAt = now; try { apply(x, y); } catch (e) {} } // the sound follows ~16x a second
+    orbitRaf = requestAnimationFrame(orbitTick);
+  }
+  setInterval(() => {
+    if (!document.body.classList.contains('modify-square')) { orbitOff = false; orbitA = null; orbitLast = 0; return; } // re-armed for the next visit
+    if (orbiting() && !orbitRaf) { springStop(); orbitLast = 0; orbitRaf = requestAnimationFrame(orbitTick); }
+  }, 250);
   function springStop() { if (springRaf) { cancelAnimationFrame(springRaf); springRaf = 0; } }
   function springHome(x0, y0) {
     springStop(); try { _clearSweeps(); } catch (e) {} // SWEEP cleared whenever the ring heads back to the centre, per direct request
@@ -8418,7 +8439,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     { const lk = document.getElementById('modifyLock'); if (lk) { try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.5), 0.95), dkC = _hslRgb(hh, Math.min(ss, 0.6), 0.1), useLt = _contrast(lt, bg) >= _contrast(dkC, bg); lk.style.color = `rgb(${(useLt ? lt : dkC).join(',')})`; lk.style.background = useLt ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)'; } catch (e) {} } }
   }
   // back to the centre, EASED (a new pattern) — dragging again cancels the ease straight away
-  function easeHome(fast) { const m = marks(); if (!m) return;
+  function easeHome(fast) { const m = marks(); if (!m || orbiting()) return;
     try { _clearSweeps(); } catch (e) {} // SWEEP cleared whenever the ring heads back to the centre, per direct request
     { const dd = m.querySelector('.sp-dot'); if (dd && dd._home && dd._home.playState === 'running') return; } // already easing home (>> started it) — don't restart it when the new pattern then lands
     let dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--new-pattern-dur')); if (!(dur >= 0.4 && dur <= 4)) dur = 1.3; // (that variable can be 0 for a moment while the new pattern is set up)
@@ -8473,6 +8494,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // the SONG NAME strip is left to the song name's OWN gestures (double-tap = tape drawer + heart, SWIPES left/right, hold), per
   // direct request — only the pad below it is taken over here
   const start = (cx, cy) => {
+    if (document.body.classList.contains('modify-square')) { orbitOff = true; if (orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } } // a touch ends the SQUARE orbit
     if (pad && pad.name !== nameNow() && !sameSong()) { window._padMute = null; pad = null; } // a new pattern since — start afresh
     if (!pad) pad = capture();
     held = true; pos(cx, cy);
@@ -8521,7 +8543,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     if (!sp) { held = false; springStop();
       if (window._padLatch) { const keep = pad; bake(); padSaved = { pad: keep, sig: JSON.stringify(grid), name: nameNow() }; } // left MODIFY: latched result kept for real — and REMEMBERED (where the ring was), per direct request
       else restore(); return; }
-    if (!held && pad.name !== nameNow()) { if (sameSong()) pad.name = nameNow(); else { window._padMute = null; pad = null; easeHome(); } } // a new pattern arrived — the old pad state no longer applies (a LOCKED pad rides through a >> instrument swap, see sameSong)
+    if (!held && pad.name !== nameNow()) { if (sameSong()) pad.name = nameNow(); else { window._padMute = null; pad = null; if (!orbiting()) easeHome(); } } // (orbiting: it just picks the new pattern up and keeps circling) // a new pattern arrived — the old pad state no longer applies (a LOCKED pad rides through a >> instrument swap, see sameSong)
   }, 300);
   // DOUBLE CLICK on >> in MODIFY, per direct request: the note grid shows (as when the pad is held) while the new pattern's notes
   // land, redrawn every frame so you watch them arrive, then fades out the same way
