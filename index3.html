@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 03:15:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 03:25:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2702,11 +2702,11 @@ html body.modify #modifyLock { display: flex; } /* the MAGNET (was the padlock),
 html body.modify #modifyAuto { display: flex; } /* MODIFY too now (was SQUARE only), per direct request */
 #modifyAuto.sp-mag-off { opacity: 0.45; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyAuto:not(.sp-mag-off) { background: #000 !important; color: #fff !important; }
-html body.modify #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; }
+html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; }
 /* CHROMATIC ABERRATION on the ring, per direct request — the cheap way: no filters, just four soft coloured shadows (red one side,
    cyan the other, inside and out, each slightly blurred) so its edges split like light through a cheap lens */
 html body:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 3px; box-shadow: calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1px rgba(255,20,60,calc(0.85 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1px rgba(0,200,255,calc(0.85 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1px rgba(0,200,255,calc(0.7 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1px rgba(255,20,60,calc(0.7 * var(--caa, 1))), 0 0 2px rgba(255,255,255,calc(0.25 * var(--caa, 1))) !important; /* the split now points AWAY FROM / TOWARDS THE GRAPH'S CENTRE (--cax / --cay, set as the ring moves) and grows towards the edges, like a real lens, per direct request */ }
-html body.modify:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 4.5px; box-shadow: calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1.5px rgba(255,20,60,calc(0.85 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1.5px rgba(0,200,255,calc(0.85 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1.5px rgba(0,200,255,calc(0.7 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1.5px rgba(255,20,60,calc(0.7 * var(--caa, 1))), 0 0 3px rgba(255,255,255,calc(0.25 * var(--caa, 1))) !important; } /* (outranks the glow-off / glow-pause rules — it's not a glow) */ /* SQUARE: the ring twice as big and twice as thick, per direct request */
+html body.modify-square:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 4.5px; box-shadow: calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1.5px rgba(255,20,60,calc(0.85 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1.5px rgba(0,200,255,calc(0.85 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1.5px rgba(0,200,255,calc(0.7 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1.5px rgba(255,20,60,calc(0.7 * var(--caa, 1))), 0 0 3px rgba(255,255,255,calc(0.25 * var(--caa, 1))) !important; } /* (outranks the glow-off / glow-pause rules — it's not a glow) */ /* SQUARE: the ring twice as big and twice as thick, per direct request */
 #modifyLock.sp-unlatched { opacity: 0.55; }
 html body.name-bg-clear #nameBar { background: transparent !important; background-color: transparent !important; } /* SONG NAME BG TRANSPARENT (SETTINGS > SONG NAME EQ), per direct request */
 html body.song-name-hidden.seq-playing #nameDisplay { visibility: hidden !important; } /* SONG NAME hidden (hold the bar), per direct request — only WHILE PLAYING: stopped, the name always shows; press play and it's hidden again */
@@ -3094,7 +3094,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 03:15:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 03:25:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8392,9 +8392,9 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     if (!pad) { pad = capture(); }
     const dt = Math.min(0.1, Math.max(0, (now - (orbitLast || now)) / 1000)); orbitLast = now;
     let per = 8; try { per = Math.max(4, Math.min(32, stepDuration() * 64)); } catch (e) {} // one lap every 4 bars (was 2 — half the speed), per direct request
-    let asp = 1; { const m = document.getElementById('modifyPadMarks'); if (m && m.clientHeight) asp = m.clientWidth / m.clientHeight; } // (a true CIRCLE on MODIFY's wide graph too — radius in graph-height units)
+    const asp = 1; // the track is set in the graph's OWN units: a circle on SQUARE, an OVAL across the full width on MODIFY's wide graph, per direct request
     if (orbitA === null) { const dx = (pad.x - 0.5) * asp, dy = pad.y - 0.5; orbitA = Math.atan2(dy, dx); orbitR = Math.hypot(dx, dy); if (orbitR < 0.01) orbitA = -Math.PI / 2; }
-    orbitA += 2 * Math.PI * dt / per; { const m = document.getElementById('modifyPadMarks'), hMax = m && m.clientHeight ? 0.5 - 24 / m.clientHeight : 0.44; orbitR += (Math.min(orbitTargetR, Math.max(0.05, hMax)) - orbitR) * Math.min(1, dt * 3); } // (never off the graph — MODIFY's short graph caps it) /* 77% of the graph's height (10% bigger than 70%), per direct request */ // (eases out to the circle from wherever it was)
+    orbitA += 2 * Math.PI * dt / per; { const m = document.getElementById('modifyPadMarks'), hMax = m && m.clientHeight ? 0.5 - ringPx() / m.clientHeight : 0.44; orbitR += (Math.min(orbitTargetR, Math.max(0.05, hMax)) - orbitR) * Math.min(1, dt * 3); } // (never off the graph — MODIFY's short graph caps it) /* 77% of the graph's height (10% bigger than 70%), per direct request */ // (eases out to the circle from wherever it was)
     const x = 0.5 + orbitR * Math.cos(orbitA) / asp, y = 0.5 + orbitR * Math.sin(orbitA); // +angle with y pointing down = CLOCKWISE on screen
     pad.x = x; pad.y = y; showDot([x, y]);
     if (now - orbitApplyAt > 60) { orbitApplyAt = now; try { apply(x, y); } catch (e) {} } // the sound follows ~16x a second
@@ -8551,8 +8551,9 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // SQUARE + AUTO, per direct request: touching the graph no longer stops the orbit (only the A button does) — a touch / drag just
   // sets the SIZE of the circle (how far from the centre you are), kept inside the graph so the ring never goes off it
   let orbitGrab = false;
-  const orbitSize = (cx, cy) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); const x = (cx - rc.left) / rc.width, y = (cy - rc.top) / rc.height, asp = rc.width / Math.max(1, rc.height);
-    const ringHalf = 24 / Math.max(40, rc.height); orbitTargetR = Math.max(0.04, Math.min(0.5 - ringHalf, Math.hypot((x - 0.5) * asp, y - 0.5))); }; // (graph-height units — the ring never leaves the graph)
+  const ringPx = () => document.body.classList.contains('modify-square') ? 24 : 13; // half the ring + a hair (SQUARE's big ring / MODIFY's normal one)
+  const orbitSize = (cx, cy) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); const x = (cx - rc.left) / rc.width, y = (cy - rc.top) / rc.height;
+    const ringHalf = ringPx() / Math.max(40, rc.height); orbitTargetR = Math.max(0.04, Math.min(0.5 - ringHalf, Math.hypot(x - 0.5, y - 0.5))); }; // (never off the graph) // (graph-height units — the ring never leaves the graph)
   window.addEventListener('touchstart', e => { if (!inPad(e)) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (orbiting()) { orbitGrab = true; const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (e.touches.length === 1 && isDouble()) { padReset(); return; } const t = e.touches[0]; start(t.clientX, t.clientY); }, { capture: true, passive: false });
   window.addEventListener('touchmove', e => { if (orbitGrab) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (!held) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; pos(t.clientX, t.clientY); }, { capture: true, passive: false });
   ['touchend', 'touchcancel'].forEach(t => window.addEventListener(t, e => { if (orbitGrab) { e.stopPropagation(); if (!e.touches || !e.touches.length) orbitGrab = false; return; } if (!held) return; e.stopPropagation(); if (!e.touches || !e.touches.length) end(); }, { capture: true }));
