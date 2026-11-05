@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 19:31:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 19:41:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -136,6 +136,7 @@ html body.night-invert:not(.no-glow):not(.safe-gfx) #tapeReels { isolation: isol
 html body.night-invert #beatCount, html body.night-invert #modeLabel { --header-text-color: #ececec; }
 html body.night-invert #topTempoReadout { --header-text-color: var(--top-row-text-color, #ececec); }
 #beatCount { -webkit-tap-highlight-color: transparent; outline: none; } /* no iOS grey tap flash over the numeral's box, per direct request */
+#beatCount:not(.beat-count-hidden) { opacity: var(--modify-count-op, 0.3); } /* the header COUNT uses the same opacity as the GRAPH COUNT (DEV > GRAPH COUNT OPACITY, 30%), per direct request */
 #beatCount.beat-count-hidden { opacity: 0; } /* hidden but still tappable to bring it back */
 /* BEAT COUNT PULSE (2nd tap), per direct request — each new beat flashes the
    numeral up to the PLAY FLASH colour (white by default) with a glow, then it
@@ -3101,7 +3102,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 19:31:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 19:41:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4068,11 +4069,6 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 
     <div style="font-size:0.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);text-align:center;">SETTINGS</div>
     <!-- ABERRATION COLOUR fixed at 50% (slider removed) and the CROSS CURSOR option removed, per direct request -->
-    <!-- CHECK FOR UPDATE, per direct report -->
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-      <div style="display:flex;flex-direction:column;gap:2px;"><div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">UPDATES</div><div id="updStatus" style="font-size:0.58rem;color:#666;letter-spacing:0.5px;">not checked yet</div></div>
-      <button type="button" onclick="window._sifiCheckUpdate && window._sifiCheckUpdate(); const s = document.getElementById('updStatus'); if (s) s.textContent = 'checking…';" style="flex-shrink:0;font:700 0.6rem 'DM Sans',sans-serif;letter-spacing:1px;padding:6px 10px;background:none;border:1px solid #999;color:#111;cursor:pointer;">CHECK NOW</button>
-    </div>
     <!-- MODIFY NOTE ROWS IN TRACK COLOURS removed from SETTINGS and hard-coded ON, per direct request -->
     <!-- SONG NAME EQ … GRAPH COUNT moved to LOOK AND FEEL > DEV (NOTE MARKERS OPACITY removed), per direct request -->
     <!-- FX ECHO DELAY / LEVEL moved to the REVERB menu under DELAY, per direct request -->
@@ -4166,6 +4162,11 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 
       <button id="turboBtn" onclick="toggleTurbo()" style="width:100%;background:#555;color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:14px 0;cursor:pointer;">BOOST</button>
       <button id="batterySaverBtn" onclick="toggleBatterySaver()" style="width:100%;background:#555;color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:14px 0;cursor:pointer;">BATTERY SAVER</button>
+      <!-- UPDATES moved here, below BATTERY SAVER, per direct request -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div style="display:flex;flex-direction:column;gap:2px;"><div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">UPDATES</div><div id="updStatus" style="font-size:0.58rem;color:#666;letter-spacing:0.5px;">not checked yet</div></div>
+      <button type="button" onclick="window._sifiCheckUpdate && window._sifiCheckUpdate(); const s = document.getElementById('updStatus'); if (s) s.textContent = 'checking…';" style="flex-shrink:0;font:700 0.6rem 'DM Sans',sans-serif;letter-spacing:1px;padding:6px 10px;background:none;border:1px solid #999;color:#111;cursor:pointer;">CHECK NOW</button>
+      </div>
       <!-- EXPERIMENTAL STUFF, per direct request (OFF by default): gates the RANDO BUTTON and LOOK AND FEEL menus -->
       <label style="display:flex;align-items:center;gap:8px;font-size:0.66rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#111;cursor:pointer;">
         <input autocomplete="off" type="checkbox" id="experimentalToggle" onchange="_setExperimental(this.checked)" style="width:14px;height:14px;cursor:pointer;">EXPERIMENTAL STUFF
@@ -26702,6 +26703,9 @@ function stopRecallLoop() {
   };
 })();
 // COUNT toggle in SETTINGS — shows / hides the beat count (same states as tapping the count itself)
+// the COUNT toggle always shows what the count is actually doing — the graph modes force it on and MAIN puts back how it was,
+// which used to leave the toggle saying ON while the count was hidden, per direct report
+document.addEventListener('DOMContentLoaded', () => { const bc = document.getElementById('beatCount'); if (!bc) return; const sync = () => { const ct = document.getElementById('countToggle'); if (ct) ct.checked = !bc.classList.contains('beat-count-hidden'); }; new MutationObserver(sync).observe(bc, { attributes: true, attributeFilter: ['class'] }); sync(); });
 function _setBeatCountShown(on) {
   const el = document.getElementById('beatCount'); if (!el) return;
   if (!on && document.body.classList.contains('live-layout')) on = true; // always shown in PERFORMANCE MODE
