@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 18:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 19:12:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3101,7 +3101,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 18:50:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 19:12:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -3218,7 +3218,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
           </div>
         </div>
         <label style="display:flex;align-items:center;gap:8px;font-size:0.66rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#111;cursor:pointer;">
-          <input autocomplete="off" type="checkbox" id="buttonSoundsToMixToggle" checked onchange="setButtonSoundsToMix(this.checked)" style="width:14px;height:14px;cursor:pointer;">BUTTONS SOUNDS TO MIX
+          <input autocomplete="off" type="checkbox" id="buttonSoundsToMixToggle" onchange="setButtonSoundsToMix(this.checked)" style="width:14px;height:14px;cursor:pointer;">BUTTONS SOUNDS TO MIX
         </label>
         <label style="display:flex;align-items:center;gap:8px;font-size:0.66rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#111;cursor:pointer;">
           <input autocomplete="off" type="checkbox" id="noButtonSoundsToggle" onchange="setNoButtonSounds(this.checked)" style="width:14px;height:14px;cursor:pointer;">NO BUTTON SOUNDS
@@ -5469,12 +5469,12 @@ const buffers = {};
 //     same master volume + makeup gain the mix path would have applied, so
 //     the level stays about the same either way.
 // Both remembered across sessions (localStorage), like RECORD MODE.
-window._buttonSoundsToMix = true; window._noButtonSounds = false;
-try { const v = localStorage.getItem('_buttonSoundsToMix'); if (v !== null) window._buttonSoundsToMix = v === '1'; } catch(e) {}
+window._buttonSoundsToMix = false; window._noButtonSounds = false; // OFF by default now — button sounds never go into any recording unless asked, per direct request
+try { localStorage.removeItem('_buttonSoundsToMix'); const v = localStorage.getItem('sifiBtnSoundsToMix2'); if (v !== null) window._buttonSoundsToMix = v === '1'; } catch(e) {} // (new key, so an old saved ON doesn't carry over)
 try { window._noButtonSounds = localStorage.getItem('_noButtonSounds') === '1'; } catch(e) {}
 function setButtonSoundsToMix(on) {
   window._buttonSoundsToMix = !!on;
-  try { localStorage.setItem('_buttonSoundsToMix', on ? '1' : '0'); } catch(e) {}
+  try { localStorage.setItem('sifiBtnSoundsToMix2', on ? '1' : '0'); } catch(e) {}
   const cb = document.getElementById('buttonSoundsToMixToggle'); if (cb) cb.checked = !!on;
 }
 function setNoButtonSounds(on) {
@@ -5498,7 +5498,7 @@ function playUiSound(name, forceMix, trim) {
   // StopReversed, Cymbal, Rand, and the plain 0.7 default (click, play,
   // clickoff).
   g.gain.value = (name === 'rewind' ? 0.625 : name === 'Stop' ? 0.7 * 0.376 : name === 'StopReversed' ? 0.7 * 0.376 : name === 'Cymbal' ? 0.7 * 0.299 : name === 'Rand' ? 0.7 * 0.3548 : name === 'tinyclick' ? 0.7 * 0.7079 : 0.7) * 0.7943 * (trim || 1); // tinyclick (header icon drags) -3dB, per direct request
-  if (window._buttonSoundsToMix === false && !forceMix) {
+  if (window._buttonSoundsToMix === false) { // (forceMix no longer overrides it — with BUTTONS SOUNDS TO MIX off, NO button sound reaches any recording, per direct request)
     // Straight to the speakers, level-matched to the mix path (see above).
     g.gain.value *= (masterGain ? masterGain.gain.value : 1) * (window._makeupGain ? window._makeupGain.gain.value : 1);
     src.connect(g); g.connect(ctx.destination);
@@ -18222,6 +18222,7 @@ function _previewReverb() {
   playUiSound('tinyclick', true); // the preview's dry click ALWAYS goes through the mix, so the realtime recording bus gets it, per direct request — its wet part below already goes through the reverb return, which is in the recorded chain
   const buf = window._uiSoundBufs && window._uiSoundBufs['tinyclick'];
   if (!buf || !window._reverbSendBus) return;
+  if (!window._buttonSoundsToMix && typeof _mediaRecorder !== 'undefined' && _mediaRecorder && _mediaRecorder.state === 'recording') return; // (its reverb tail would land in a REALTIME recording — skipped while recording unless BUTTONS SOUNDS TO MIX is on, per direct request)
   const src = ctx.createBufferSource(); src.buffer = buf;
   const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2500; lp.Q.value = 0.5; // soften the click's transient before it hits the reverb
   const wet = ctx.createGain(); wet.gain.value = REVERB_PREVIEW_SEND;
