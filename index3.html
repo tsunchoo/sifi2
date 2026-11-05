@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 05:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 06:05:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2694,6 +2694,8 @@ html body.modify #modifyPadMarks { display: block; }
    lines, through the cursor, running past the graph's edges (into the song name strip above and the tracks below) */
 #spCrossH, #spCrossV { display: none; position: absolute; pointer-events: none; z-index: 60; background: currentColor; opacity: 0.9; }
 html body.modify.cross-cursor #spCrossH, html body.modify.cross-cursor #spCrossV { display: block; }
+#spCrossH { box-shadow: 0 calc(var(--cay, 0) * 2px) 1px rgba(var(--ca-r, 255,20,60), calc(0.85 * var(--caa, 1))), 0 calc(var(--cay, 0) * -2px) 1px rgba(var(--ca-c, 0,200,255), calc(0.85 * var(--caa, 1))); } /* the CHROMATIC ABERRATION on the cross too, per direct request — each line splits across itself, the same way round as the ring (from the centre) */
+#spCrossV { box-shadow: calc(var(--cax, 0) * 2px) 0 1px rgba(var(--ca-r, 255,20,60), calc(0.85 * var(--caa, 1))), calc(var(--cax, 0) * -2px) 0 1px rgba(var(--ca-c, 0,200,255), calc(0.85 * var(--caa, 1))); }
 #spCrossH { left: 0; right: 0; height: 1px; } #spCrossV { width: 1px; }
 html body.modify.cross-cursor:not(#_x1):not(#_x2):not(#_x3):not(#_x4):not(#_x5) #modifyPadMarks .sp-dot { border-color: transparent !important; box-shadow: none !important; animation: none !important; }
 #modifyPadMarks .sp-h { left: 0; right: 0; top: 50%; height: 1px; } #modifyPadMarks .sp-v { top: 0; bottom: 0; left: 50%; width: 1px; }
@@ -3103,7 +3105,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 05:55:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 06:05:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8481,11 +8483,6 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   function showDot(xy) { // the ring is always there — with nothing held / latched it sits back in the centre
     const m = marks(); if (!m) return; const d = m.querySelector('.sp-dot'); if (!xy) xy = [0.5, 0.5];
     d.style.left = (Math.max(0, Math.min(1, xy[0])) * 100) + '%'; d.style.top = (Math.max(0, Math.min(1, xy[1])) * 100) + '%';
-    if (document.body.classList.contains('cross-cursor')) { // CROSS CURSOR: two lines on the name bar (outside the graph's clipping) through the cursor
-      const b = nb(); if (b) { let ch = document.getElementById('spCrossH'), cv = document.getElementById('spCrossV');
-        if (!ch) { ch = document.createElement('div'); ch.id = 'spCrossH'; b.appendChild(ch); cv = document.createElement('div'); cv.id = 'spCrossV'; b.appendChild(cv); }
-        const pr = m.getBoundingClientRect(), br = b.getBoundingClientRect(), px = pr.left - br.left + Math.max(0, Math.min(1, xy[0])) * pr.width, py = pr.top - br.top + Math.max(0, Math.min(1, xy[1])) * pr.height, EXT = 30;
-        ch.style.top = Math.round(py) + 'px'; cv.style.left = Math.round(px) + 'px'; cv.style.top = Math.round(pr.top - br.top - EXT) + 'px'; cv.style.height = Math.round(pr.height + EXT * 2) + 'px'; } }
     { // CHROMATIC ABERRATION from the centre: red pushed outwards along the line from the centre, cyan inwards; none at the centre,
       // full strength at the edges (cheap — two CSS variables, the shadows do the rest)
       const dx = xy[0] - 0.5, dy = xy[1] - 0.5, dist = Math.hypot(dx, dy), k = Math.min(1, dist / 0.5) * 1.4;
@@ -8498,6 +8495,13 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
         const mix = (a) => a.map((v, i) => Math.round(v * (1 - m) + sym[i] * m)).join(',');
         d.style.setProperty('--ca-r', mix([255, 20, 60])); d.style.setProperty('--ca-c', mix([0, 200, 255])); } else { d.style.removeProperty('--ca-r'); d.style.removeProperty('--ca-c'); } } catch (e) {}
       d.style.setProperty('--cax', dist > 1e-4 ? (dx / dist * k).toFixed(3) : '0'); d.style.setProperty('--cay', dist > 1e-4 ? (dy / dist * k).toFixed(3) : '0'); }
+    if (document.body.classList.contains('cross-cursor')) { // CROSS CURSOR: two lines on the name bar (outside the graph's clipping) through the cursor
+      const b = nb(); if (b) { let ch = document.getElementById('spCrossH'), cv = document.getElementById('spCrossV');
+        if (!ch) { ch = document.createElement('div'); ch.id = 'spCrossH'; b.appendChild(ch); cv = document.createElement('div'); cv.id = 'spCrossV'; b.appendChild(cv); }
+        const pr = m.getBoundingClientRect(), br = b.getBoundingClientRect(), px = pr.left - br.left + Math.max(0, Math.min(1, xy[0])) * pr.width, py = pr.top - br.top + Math.max(0, Math.min(1, xy[1])) * pr.height, EXT = 0; // INSIDE the graph's coloured area only, per direct request (was 30px past it)
+        ch.style.top = Math.round(py) + 'px'; ch.style.left = Math.round(pr.left - br.left) + 'px'; ch.style.right = 'auto'; ch.style.width = Math.round(pr.width) + 'px'; cv.style.left = Math.round(px) + 'px';
+        ['--cax', '--cay', '--caa', '--ca-r', '--ca-c'].forEach(k => { const v = d.style.getPropertyValue(k); if (v) { ch.style.setProperty(k, v); cv.style.setProperty(k, v); } else { ch.style.removeProperty(k); cv.style.removeProperty(k); } }); /* the aberration rides the lines too */
+        cv.style.top = Math.round(pr.top - br.top - EXT) + 'px'; cv.style.height = Math.round(pr.height + EXT * 2) + 'px'; } }
     tint(xy[0], xy[1]);
   }
   // PAD COLOUR, per direct request: NOTES have one palette colour (the playhead colour) and EFFECTS another (highlight 2). How much
