@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 03:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 04:45:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2702,7 +2702,9 @@ html body.modify #modifyLock { display: flex; } /* the MAGNET (was the padlock),
 #modifyAuto { display: none; position: absolute; right: 46px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 html body.modify #modifyAuto { display: flex; } /* MODIFY too now (was SQUARE only), per direct request */
 #modifyAuto.sp-mag-off { opacity: 0.45; }
-html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyAuto:not(.sp-mag-off) { background: #000 !important; color: #fff !important; }
+#modifyAuto:not(.sp-mag-off) { opacity: 1; }
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyLock:not(.sp-mag-off) * { color: #fff !important; } /* the locked padlock's glyph white on black (not a solid block) */
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyAuto:not(.sp-mag-off), html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyAuto:not(.sp-mag-off) * { background: #000 !important; color: #fff !important; } /* (its A in white — it was going black-on-black, a solid block) */
 html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; }
 /* CHROMATIC ABERRATION on the ring, per direct request — the cheap way: no filters, just four soft coloured shadows (red one side,
    cyan the other, inside and out, each slightly blurred) so its edges split like light through a cheap lens */
@@ -3095,7 +3097,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 03:55:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 04:45:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4057,7 +4059,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
     <!-- MODIFY COUNT (the big count in the middle of the MODIFY pad): on/off + opacity, per direct request -->
     <div style="display:flex;flex-direction:column;gap:8px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">MODIFY COUNT</div>
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">GRAPH COUNT</div>
         <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="modifyCountToggle" checked onchange="setModifyCount(this.checked)"><span class="wild-toggle-slider"></span></label>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -8339,7 +8341,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     return m;
   };
   function setLatch(on) {
-    window._padLatch = !!on; const lk = document.getElementById('modifyLock'); if (lk) { lk.innerHTML = LOCK_SVG(window._padLatch); lk.classList.toggle('sp-mag-off', !window._padLatch); }
+    window._padLatch = !!on; const lk = document.getElementById('modifyLock'); if (lk) { lk.innerHTML = LOCK_SVG(window._padLatch); lk.classList.toggle('sp-mag-off', !window._padLatch); } try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} // (re-coloured straight away)
     try { playUiSound('tinyclick'); } catch (e) {}
     if (!window._padLatch && !held && pad) springHome(pad.x, pad.y); // magnet back on: springs home
   }
@@ -8349,12 +8351,16 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   const fxOn = f => !!(f.chink || f.pump || f.x > 0 || f.y > 0);
   const RAND_FX = [{ x: 0, y: 0, pump: false, chink: true } /* CHK */, { x: 0.5, y: 0.5, pump: true, chink: false } /* BLAST */, { x: 0.5, y: 0.5, pump: false, chink: false } /* DL */];
   const nameNow = () => { try { if (typeof _currentSpecies === 'string' && _currentSpecies) return _currentSpecies; return _tapeAutoName(); } catch (e) { return ''; } }; // the song's real name (not the name DISPLAY, which is blank / part-drawn while it scrolls in — that was resetting a locked pad)
+  // AUTO NOTES as a pad effect, per direct request
+  const autoOn = tr => !!(typeof autoShiftStops !== 'undefined' && autoShiftStops[tr]);
+  function setAuto(tr, on) { if (autoOn(tr) === !!on) return; try { if (on) { const rb = document.getElementById(`randbtn-${tr}`); if (rb && rb._restartAuto) rb._restartAuto(); } else autoShiftStops[tr](); } catch (e) {} }
   function capture() {
-    const base = { grid: grid.map(r => r.slice()), rev: trackDelay.slice(), fx: [], drums: drumsFx() }; for (let tr = 0; tr < NUM_TRACKS; tr++) base.fx.push(fxOf(tr));
+    const base = { grid: grid.map(r => r.slice()), rev: trackDelay.slice(), fx: [], drums: drumsFx(), auto: [] }; for (let tr = 0; tr < NUM_TRACKS; tr++) { base.fx.push(fxOf(tr)); base.auto.push(autoOn(tr)); }
     const notes = [], empties = [], effOn = [], effOff = [], pick = [];
     for (let tr = 0; tr < NUM_TRACKS; tr++) {
       for (let st = 0; st < NUM_STEPS; st++) (base.grid[tr][st] > 0 ? notes : empties).push([tr, st]);
       (base.rev[tr] ? effOn : effOff).push([tr, 'R']); (fxOn(base.fx[tr]) ? effOn : effOff).push([tr, 'FX']);
+      if (!trackSweep[tr]) (base.auto[tr] ? effOn : effOff).push([tr, 'AUTO']); // AUTO NOTES (the track's + on AUTO) is one more effect, like R and the FX stops, per direct request
       pick.push(RAND_FX[Math.floor(Math.random() * RAND_FX.length)]); // this track's random effect when one gets added
     }
     const chk = shuffle([...Array(NUM_TRACKS).keys()]); // the order tracks go onto FX1 (CHK) as EFFECTS is pulled towards LESS
@@ -8383,20 +8389,20 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     const g = B.grid.map(r => r.slice()), mute = new Uint8Array(NUM_TRACKS * NUM_STEPS);
     if (X < 0) { const n = Math.round(pad.notes.length * -X); for (let i = 0; i < n; i++) { const [tr, st] = pad.notes[i]; mute[tr * NUM_STEPS + st] = 1; } }
     else if (X > 0) { const n = Math.round(pad.empties.length * X); for (let i = 0; i < n; i++) { const [tr, st] = pad.empties[i]; g[tr][st] = 1; } }
-    for (let tr = 0; tr < NUM_TRACKS; tr++) for (let st = 0; st < NUM_STEPS; st++) if (grid[tr][st] !== g[tr][st]) grid[tr][st] = g[tr][st];
+    for (let tr = 0; tr < NUM_TRACKS; tr++) { if (autoOn(tr)) continue; /* AUTO NOTES tracks write their own notes every bar — the pad leaves their grid alone (its mutes still apply) */ for (let st = 0; st < NUM_STEPS; st++) if (grid[tr][st] !== g[tr][st]) grid[tr][st] = g[tr][st]; }
     window._padMute = X < 0 ? mute : null;
     // EFFECTS
     // REMOVED EFFECTS ARE GONE FOR GOOD, per direct request: an effect the pad takes off isn't remembered — moving back up / to
     // the centre / letting go doesn't bring it (or where it was) back. Each one is dropped from the pattern's own settings as it
     // goes, and its track becomes free for a new random effect if you later push towards MORE.
     if (Y < 0) { const target = Math.round(pad.effOnN * -Y);
-      while (pad.removed < target && pad.effOn.length) { const [tr, k] = pad.effOn.shift(); if (k === 'R') B.rev[tr] = false; else B.fx[tr] = { x: 0, y: 0, pump: false, chink: false }; pad.effOff.splice(Math.floor(Math.random() * (pad.effOff.length + 1)), 0, [tr, k]); pad.removed++; } }
-    const rev = B.rev.slice(), fx = B.fx.map(f => Object.assign({}, f));
+      while (pad.removed < target && pad.effOn.length) { const [tr, k] = pad.effOn.shift(); if (k === 'R') B.rev[tr] = false; else if (k === 'AUTO') B.auto[tr] = false; else B.fx[tr] = { x: 0, y: 0, pump: false, chink: false }; pad.effOff.splice(Math.floor(Math.random() * (pad.effOff.length + 1)), 0, [tr, k]); pad.removed++; } }
+    const rev = B.rev.slice(), fx = B.fx.map(f => Object.assign({}, f)), auto = (B.auto || []).slice();
     if (Y < 0) {
       // …and FX1 (CHK) comes onto more and more tracks, per direct request — it chops each hit to a blip, so it takes sound AWAY too
       const c = Math.round(NUM_TRACKS * -Y); for (let i = 0; i < c; i++) fx[pad.chk[i]] = { x: 0, y: 0, pump: false, chink: true }; }
-    else if (Y > 0) { const n = Math.round(pad.effOff.length * Y); for (let i = 0; i < n; i++) { const [tr, k] = pad.effOff[i]; if (k === 'R') rev[tr] = true; else fx[tr] = Object.assign({}, pad.pick[tr]); } }
-    for (let tr = 0; tr < NUM_TRACKS; tr++) { if (!!trackDelay[tr] !== rev[tr]) setRev(tr, rev[tr]); setFx(tr, fx[tr]); }
+    else if (Y > 0) { const n = Math.round(pad.effOff.length * Y); for (let i = 0; i < n; i++) { const [tr, k] = pad.effOff[i]; if (k === 'R') rev[tr] = true; else if (k === 'AUTO') auto[tr] = true; else fx[tr] = Object.assign({}, pad.pick[tr]); } }
+    for (let tr = 0; tr < NUM_TRACKS; tr++) { if (!!trackDelay[tr] !== rev[tr]) setRev(tr, rev[tr]); setFx(tr, fx[tr]); if (B.auto && !trackSweep[tr]) setAuto(tr, auto[tr]); }
     // DRUMS: MORE effects = DELAY from ~40% down, then FX2 (BLAST) from ~75%; LESS effects = FX1 (CHK) from about halfway up
     setDrumsFx(Y >= 0.75 ? 2 : Y >= 0.4 ? 3 : Y <= -0.5 ? 1 : B.drums);
   }
@@ -8411,7 +8417,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   const orbiting = () => document.body.classList.contains('modify') && !orbitOff && !held; // MODIFY and SQUARE, per direct request
   const orbitMoving = () => orbiting() && typeof playing !== 'undefined' && playing; // PAUSED while playback is stopped (AUTO stays on) — it picks up where it was when PLAY is pressed again, per direct request
   // the A button: lit = AUTO on (circling). Only the A button switches it off / on — touching the graph just sizes the circle
-  function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) a.classList.toggle('sp-mag-off', !!orbitOff); }
+  function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) a.classList.toggle('sp-mag-off', !!orbitOff); try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} } // (re-coloured straight away: inverted when engaged)
   function setOrbitAuto(on) { orbitOff = !on; syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; } }
   function orbitTick(now) {
     orbitRaf = 0; if (!orbitMoving()) return;
@@ -8445,7 +8451,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   }
   function restore() { // back to the pattern as it was
     if (!pad) return; const B = pad.base;
-    for (let tr = 0; tr < NUM_TRACKS; tr++) { for (let st = 0; st < NUM_STEPS; st++) grid[tr][st] = B.grid[tr][st]; if (!!trackDelay[tr] !== B.rev[tr]) setRev(tr, B.rev[tr]); setFx(tr, B.fx[tr]); }
+    for (let tr = 0; tr < NUM_TRACKS; tr++) { if (B.auto && !trackSweep[tr]) setAuto(tr, B.auto[tr]); if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) grid[tr][st] = B.grid[tr][st]; if (!!trackDelay[tr] !== B.rev[tr]) setRev(tr, B.rev[tr]); setFx(tr, B.fx[tr]); }
     setDrumsFx(B.drums);
     window._padMute = null; pad = null; redraw(); showDot(null); { const m = document.getElementById('modifyPadMarks'); if (m) m.classList.remove('sp-latched'); }
   }
@@ -8486,7 +8492,8 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
       dot.style.color = rc;
     }
     // MAGNET colour from the page background too (very light / very dark, whichever stands out more), so it can't get lost, per direct request
-    { const lk = document.getElementById('modifyLock'); if (lk) { try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.5), 0.95), dkC = _hslRgb(hh, Math.min(ss, 0.6), 0.1), useLt = _contrast(lt, bg) >= _contrast(dkC, bg); lk.style.color = `rgb(${(useLt ? lt : dkC).join(',')})`; lk.style.background = useLt ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)'; const au = document.getElementById('modifyAuto'); if (au) { au.style.color = lk.style.color; au.style.background = lk.style.background; } /* the A button wears the padlock's colours */ } catch (e) {} } }
+    { const lk = document.getElementById('modifyLock'); if (lk) { try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.5), 0.95), dkC = _hslRgb(hh, Math.min(ss, 0.6), 0.1), useLt = _contrast(lt, bg) >= _contrast(dkC, bg); const fgS = `rgb(${(useLt ? lt : dkC).join(',')})`, invS = `rgb(${(useLt ? dkC : lt).join(',')})`, plainBg = useLt ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)';
+      if (lk.classList.contains('sp-mag-off')) { lk.style.color = fgS; lk.style.background = plainBg; } else { lk.style.background = fgS; lk.style.color = invS; } /* the PADLOCK: LOCKED = INVERTED, exactly like the A button, per direct request */ const au = document.getElementById('modifyAuto'); if (au) { if (au.classList.contains('sp-mag-off')) { au.style.color = fgS; au.style.background = plainBg; } else { au.style.background = fgS; au.style.color = invS; } } /* the A button: OFF wears the padlock's colours; ENGAGED is simply INVERTED (solid in the glyph colour, the A cut out in the opposite), per direct request */ } catch (e) {} } }
   }
   // back to the centre, EASED (a new pattern) — dragging again cancels the ease straight away
   function easeHome(fast) { const m = marks(); if (!m || orbiting()) return;
@@ -8661,7 +8668,7 @@ function _setModify(on, quiet) {
   b.classList.toggle('hide-tape', !on && b.classList.contains('live-layout')); // MODIFY keeps the TAPE graphic (LIVE hides it), per direct request
   if (quiet) return;
   try { playUiSound('tinyclick'); } catch (e) {}
-  _showNotice(on ? 'MODIFY MODE' : 'LIVE MODE');
+  _showNotice(on ? 'HYBRID MODE' : 'LIVE MODE');
 }
 function setModifyRowColours(on) { window._modifyRowColours = !!on; const cb = document.getElementById('modifyRowColoursToggle'); if (cb) cb.checked = !!on; try { localStorage.setItem('sifiModifyRowCol', on ? '1' : '0'); } catch (e) {} }
 document.addEventListener('DOMContentLoaded', () => { setModifyRowColours(true); }); // always ON (track colours) — the SETTINGS switch was removed, per direct request
@@ -24490,9 +24497,10 @@ function setTonalPercBalance(v) {
     const toggleLive = window._toggleLiveMode = () => {
       playUiSound('tinyclick');
       const b = document.body;
-      if (b.classList.contains('modify') && !b.classList.contains('modify-square')) { // MODIFY → SQUARE (a 3rd main mode), per direct request
-        b.classList.add('modify-square'); try { _modifyMeasure(); } catch (e) {}
-        _showNotice('SQUARE MODE'); return;
+      // MAIN → SQUARE → HYBRID (was MODIFY) → MAIN, per direct request (the order swapped: SQUARE comes first now)
+      if (b.classList.contains('modify') && b.classList.contains('modify-square')) { // SQUARE → HYBRID
+        b.classList.remove('modify-square'); try { _modifyMeasure(); } catch (e) {}
+        _showNotice('HYBRID MODE'); return;
       }
       if (b.classList.contains('modify') || b.classList.contains('live-layout')) {
         b.classList.remove('modify-square');
@@ -24504,8 +24512,10 @@ function setTonalPercBalance(v) {
       } else {
         b.classList.add('live-layout');
         try { const lk = document.getElementById('liveKey'); if (lk) lk._k = null; _updateLiveKey(); _placeLiveKey(); } catch (e) {}
+        b.classList.add('modify-square'); // MAIN → SQUARE first
         try { _setModify(true, true); } catch (e) {}
-        _showNotice('MODIFY MODE');
+        try { _modifyMeasure(); } catch (e) {}
+        _showNotice('SQUARE MODE');
       }
     };
     const move = (y, e) => {
@@ -28340,7 +28350,7 @@ function snapshotDisplay() {
   // where you tapped, so shared parts describe MODIFY when you're in MODIFY); LIVE left out while it's hidden.
   const MOD = () => document.body.classList.contains('modify');
   const H = [
-    ['#siFiTitle', 'Si•Fi LOGO', 'Tap to toggle the 8-bit mix. Drag DOWN to step through the main modes: MAIN, MODIFY, SQUARE, then back to MAIN. Hold for a short description of Si•Fi.'],
+    ['#siFiTitle', 'Si•Fi LOGO', 'Tap to toggle the 8-bit mix. Drag DOWN to step through the main modes: MAIN, SQUARE, HYBRID, then back to MAIN. Hold for a short description of Si•Fi.'],
     ['#_helpBtn', 'HELP MODE - click anything to see what it does', ''],
     ['#_hamBtn', 'MENU', 'Shows or hides the rainbow (look and feel), reverb and help icons. Tap again to tuck them away.'],
     ['#devMenuBtn', 'RAINBOW · DISPLAY MODES', 'Swipe DOWN to cycle through the display modes (the look — colours, glows, meters) in either main mode. Tap to open LOOK AND FEEL for the visual settings.'],
@@ -28352,11 +28362,11 @@ function snapshotDisplay() {
     ['#tapeWindow', 'TAPE WINDOW · TAPE DRAWER', 'Tap for SETTINGS. Drag DOWN for the TAPE DRAWER — every pattern is kept there automatically (12 max, the oldest drops off). Tap a tape to loop it (tap again to stop), or PLAY ALL — a rewind plays between tapes with different tempos.'],
     ['#nameBar', 'SONG NAME', (x, y) => {
       const r = document.getElementById('nameBar').getBoundingClientRect();
-      if (MOD() && y - r.top >= 56) return ['MODIFY PAD', 'Hold and move: LEFT mutes notes, RIGHT adds them; DOWN takes effects away (and chops tracks with EN), UP adds random effects (drums too). The centre is the pattern as it was; With the PADLOCK off (default) it springs back to the centre when you let go; tap the padlock to lock it where you leave it. Double-tap the graph to reset it (with the right spool swell). Double-click >> to watch the new notes land below. The big number is the count.'];
-      return [MOD() ? 'SONG NAME (MODIFY)' : 'SONG NAME', 'Each new pattern gets a randomized name. Double-tap to keep it in the TAPE DRAWER (a heart floats up). Swipe RIGHT to add effects (and change the EQ type), LEFT to take them off. Hold to hide or show the name.'];
+      if (MOD() && y - r.top >= 56) return ['GRAPH', 'Hold and move: LEFT mutes notes, RIGHT adds them; DOWN takes effects away (and chops tracks with EN), UP adds random effects (drums too). The centre is the pattern as it was; With the PADLOCK off (default) it springs back to the centre when you let go; tap the padlock to lock it where you leave it. Double-tap the graph to reset it (with the right spool swell). Double-click >> to watch the new notes land below. The big number is the count.'];
+      return [MOD() ? 'SONG NAME (HYBRID / SQUARE)' : 'SONG NAME', 'Each new pattern gets a randomized name. Double-tap to keep it in the TAPE DRAWER (a heart floats up). Swipe RIGHT to add effects (and change the EQ type), LEFT to take them off. Hold to hide or show the name.'];
     }],
     ['#slotBar', 'SLOTS', 'Up to six saved patterns. Tap one to switch to it on the next beat.'],
-    ['#randBtn', '>>  RANDOMIZER', 'Tap for new instruments on the current pattern; double-tap for a brand-new groove on the next bar (and a new delay time and level). Hold for AUTO. Drag DOWN for the RANDO BUTTON menu — what a click, double-click and AUTO do. In MODIFY, locked tracks stay as they are.'],
+    ['#randBtn', '>>  RANDOMIZER', 'Tap for new instruments on the current pattern; double-tap for a brand-new groove on the next bar (and a new delay time and level). Hold for AUTO. Drag DOWN for the RANDO BUTTON menu — what a click, double-click and AUTO do. Locked tracks always stay as they are.'],
     ['#clearBtn', 'SWEEP', 'For transitions: hold and drag DOWN for more of the filter-sweep riser, drag RIGHT for 8-bit crunch. Releasing returns the mix to where it was.'],
     ['#playBtn', 'PLAY / STOP', 'Tap to start and stop. Double-tap resets the app. Long-press rebuilds the audio engine if the sound ever goes wrong.'],
     ['#beatBtn', 'DRUMS', 'Tap to switch the drum beat on or off. Hold for the beat menu — beat types, the drums\' own FX button (FX / EN / DS / DL), and A for DRUMS AUTO.'],
@@ -28364,7 +28374,7 @@ function snapshotDisplay() {
     ['#saveBtn', 'RECORD', 'Tap to start recording in real time. Hold for the RECORD menu: real time, bounce loops or stems, save a tape, or send a tape link.'],
     ['.track-name-btn', 'INSTRUMENT NAME', 'The instrument on this track. Tap to mute / unmute, hold for the instrument menu, swipe LEFT for a new instrument, RIGHT to go back to the one before (with the lock buttons set to NEW INST, swipe RIGHT locks the track instead).'],
     ['.lock-btn', 'INSTRUMENT RANDOMIZER', 'Tap for a new instrument in the same family. Double-tap to switch between tonal and drums.'],
-    ['.track-vol-bar', 'TRACK VOLUME', () => MOD() ? 'Drag to change level — in MODIFY only the live level meter shows (no fader).' : 'Drag to change level. With VOL BANGER on, the fill bounces with the track\'s live level.'],
+    ['.track-vol-bar', 'TRACK VOLUME', () => MOD() ? 'Drag to change level — in HYBRID and SQUARE only the live level meter shows (no fader).' : 'Drag to change level. With VOL BANGER on, the fill bounces with the track\'s live level.'],
     ['.shift-btn', '<  OFFSET', 'Moves the track\'s notes a step earlier. The step size is set in LOOK AND FEEL under DEV / BEHAVIOUR.'],
     ['.fx-btn', 'FX', 'Tap to cycle: FX (off) → EN (FX1, an envelope that chops each hit) → DS (FX2, distortion) → DL (delay, set in the REVERB menu) → off.'],
     ['[id^="delaybtn-"]', 'R  REVERB', 'Sends this track into the reverb. Tap to switch on or off.'],
@@ -28373,7 +28383,7 @@ function snapshotDisplay() {
     ['.step-cell', 'NOTE STEP', 'One 16th note of the bar. Tap to add or remove a note, drag right for a longer note, hold to pull notes to that point.'],
     ['.step-lane', 'PATTERN ROW', 'This track\'s 16 steps — big markers are accents, small ones softer notes, bars are held notes.'],
     ['.track-ctrl-row', 'TRACK CONTROLS', 'Volume, offset, FX, reverb, new notes and solo for this track.'],
-    ['.track-wrap', 'TRACK', () => MOD() ? ['NOTE ROW (MODIFY)', 'This track\'s notes, just to see — they follow the pad live (muted ones disappear). Colour and opacity are in SETTINGS.'] : ['TRACK', 'One track: its controls and its 16 steps.']],
+    ['.track-wrap', 'TRACK', () => MOD() ? ['NOTE ROW (HYBRID)', 'This track\'s notes, just to see — they follow the pad live (muted ones disappear). Colour and opacity are in SETTINGS.'] : ['TRACK', 'One track: its controls and its 16 steps.']],
     ['header', 'TOP BAR', 'Logo, count, tape, tempo and the menu icons.'],
   ];
   let on = false, ov = null, box = null, hl = null, btn = null;
