@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 05:40:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 05:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2690,6 +2690,12 @@ html body.modify #beatCount { visibility: hidden !important; }
 #modifyPadMarks .sp-top { position: absolute; left: 0; right: 0; top: 0; height: 1px; background: currentColor; opacity: 0.25; }
 html body.modify #modifyPadMarks { display: block; }
 #modifyPadMarks .sp-h, #modifyPadMarks .sp-v { position: absolute; background: currentColor; opacity: 0.18; }
+/* CROSS CURSOR (SETTINGS toggle), per direct request: the ring becomes a plain cross — two 1px lines like the graph's own centre
+   lines, through the cursor, running past the graph's edges (into the song name strip above and the tracks below) */
+#spCrossH, #spCrossV { display: none; position: absolute; pointer-events: none; z-index: 60; background: currentColor; opacity: 0.9; }
+html body.modify.cross-cursor #spCrossH, html body.modify.cross-cursor #spCrossV { display: block; }
+#spCrossH { left: 0; right: 0; height: 1px; } #spCrossV { width: 1px; }
+html body.modify.cross-cursor:not(#_x1):not(#_x2):not(#_x3):not(#_x4):not(#_x5) #modifyPadMarks .sp-dot { border-color: transparent !important; box-shadow: none !important; animation: none !important; }
 #modifyPadMarks .sp-h { left: 0; right: 0; top: 50%; height: 1px; } #modifyPadMarks .sp-v { top: 0; bottom: 0; left: 50%; width: 1px; }
 #modifyPadMarks .sp-dot { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 3px solid currentColor; box-sizing: border-box; opacity: 0.9; } /* 3px, and always showing (sits in the centre until moved), per direct request */
 /* the 6×16 note grid drawn over the pad while it's held (40% max), fading out over 0.5s on release, per direct request */
@@ -3097,7 +3103,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 05:40:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 05:55:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4023,6 +4029,10 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
         <div id="caSymVal" style="font-size:0.75rem;font-weight:700;color:#111;">50%</div>
       </div>
       <input autocomplete="off" type="range" id="caSymSlider" min="0" max="100" step="1" value="50" class="master-vol-slider" oninput="setCaSymMix(this.value)" onchange="setCaSymMix(this.value)" style="width:100%;">
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">CROSS CURSOR</div>
+      <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="crossCursorToggle" onchange="setCrossCursor(this.checked)"><span class="wild-toggle-slider"></span></label>
     </div>
     <!-- CHECK FOR UPDATE, per direct report -->
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -8471,6 +8481,11 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   function showDot(xy) { // the ring is always there — with nothing held / latched it sits back in the centre
     const m = marks(); if (!m) return; const d = m.querySelector('.sp-dot'); if (!xy) xy = [0.5, 0.5];
     d.style.left = (Math.max(0, Math.min(1, xy[0])) * 100) + '%'; d.style.top = (Math.max(0, Math.min(1, xy[1])) * 100) + '%';
+    if (document.body.classList.contains('cross-cursor')) { // CROSS CURSOR: two lines on the name bar (outside the graph's clipping) through the cursor
+      const b = nb(); if (b) { let ch = document.getElementById('spCrossH'), cv = document.getElementById('spCrossV');
+        if (!ch) { ch = document.createElement('div'); ch.id = 'spCrossH'; b.appendChild(ch); cv = document.createElement('div'); cv.id = 'spCrossV'; b.appendChild(cv); }
+        const pr = m.getBoundingClientRect(), br = b.getBoundingClientRect(), px = pr.left - br.left + Math.max(0, Math.min(1, xy[0])) * pr.width, py = pr.top - br.top + Math.max(0, Math.min(1, xy[1])) * pr.height, EXT = 30;
+        ch.style.top = Math.round(py) + 'px'; cv.style.left = Math.round(px) + 'px'; cv.style.top = Math.round(pr.top - br.top - EXT) + 'px'; cv.style.height = Math.round(pr.height + EXT * 2) + 'px'; } }
     { // CHROMATIC ABERRATION from the centre: red pushed outwards along the line from the centre, cyan inwards; none at the centre,
       // full strength at the edges (cheap — two CSS variables, the shadows do the rest)
       const dx = xy[0] - 0.5, dy = xy[1] - 0.5, dist = Math.hypot(dx, dy), k = Math.min(1, dist / 0.5) * 1.4;
@@ -8504,6 +8519,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
         try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.6), 0.93), dkC = _hslRgb(hh, Math.min(ss, 0.7), 0.12); rc = `rgb(${(_contrast(lt, bg) >= _contrast(dkC, bg) ? lt : dkC).join(',')})`; } catch (e) {} // whichever of a very light / very dark version stands out MORE from the page (was a fixed dark-page cut-off that left it dark on mid-tone pages), per direct report
       }
       dot.style.color = rc;
+      { const ch = document.getElementById('spCrossH'), cv = document.getElementById('spCrossV'); if (ch) ch.style.color = rc; if (cv) cv.style.color = rc; } // (the cross wears the ring's colour)
     }
     // MAGNET colour from the page background too (very light / very dark, whichever stands out more), so it can't get lost, per direct request
     { const lk = document.getElementById('modifyLock'); if (lk) { try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.5), 0.95), dkC = _hslRgb(hh, Math.min(ss, 0.6), 0.1), useLt = _contrast(lt, bg) >= _contrast(dkC, bg); const fgS = `rgb(${(useLt ? lt : dkC).join(',')})`, invS = `rgb(${(useLt ? dkC : lt).join(',')})`, plainBg = useLt ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)';
@@ -8684,6 +8700,8 @@ function _setModify(on, quiet) {
   try { playUiSound('tinyclick'); } catch (e) {}
   _showNotice(on ? 'HYBRID MODE' : 'LIVE MODE');
 }
+function setCrossCursor(on) { document.body.classList.toggle('cross-cursor', !!on); const c = document.getElementById('crossCursorToggle'); if (c) c.checked = !!on; try { localStorage.setItem('sifiCrossCur', on ? '1' : '0'); } catch (e) {} try { window._padDotRefresh && window._padDotRefresh(); } catch (e) {} }
+document.addEventListener('DOMContentLoaded', () => { let on = false; try { on = localStorage.getItem('sifiCrossCur') === '1'; } catch (e) {} setCrossCursor(on); });
 function setCaSymMix(v) { v = Math.max(0, Math.min(100, +v || 0)); window._caSymMix = v / 100; try { window._padDotRefresh && window._padDotRefresh(); } catch (e) {} const r = document.getElementById('caSymVal'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('caSymSlider'); if (sl && +sl.value !== v) sl.value = v; try { localStorage.setItem('sifiCaSym', String(v)); } catch (e) {} }
 window._caSymMix = 0.5; document.addEventListener('DOMContentLoaded', () => { let v = 50; try { const o = localStorage.getItem('sifiCaSym'); if (o !== null) v = +o; } catch (e) {} setCaSymMix(v); });
 function setModifyRowColours(on) { window._modifyRowColours = !!on; const cb = document.getElementById('modifyRowColoursToggle'); if (cb) cb.checked = !!on; try { localStorage.setItem('sifiModifyRowCol', on ? '1' : '0'); } catch (e) {} }
