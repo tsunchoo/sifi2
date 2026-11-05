@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 06:05:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 06:25:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3105,7 +3105,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 06:05:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 06:25:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -20224,6 +20224,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // a slot / tape / A-B recall or a restored session) with R (reverb) on for ANY track, REVERB MIX is lifted to at least 35% (and
 // the reverb icon lights, which follows the mix) — otherwise those tracks' reverb would be silent with the mix at zero.
 function _ensurePatternReverb() {
+  if (window._revKilled) return; // the reverb icon was swiped OFF — it stays off until it's swiped on again, per direct request
   if (typeof trackDelay === 'undefined' || !trackDelay.some(Boolean)) return;
   const cur = (window._globalDelayMix !== undefined) ? window._globalDelayMix : 0;
   if (cur >= 0.35) return;
@@ -25367,7 +25368,25 @@ function fullReset() {
         const brmb = document.getElementById('beatReverbMixBar'); if (brmb) brmb.value = 0;
         const brmv = document.getElementById('beatReverbMixVal'); if (brmv) brmv.textContent = '0';
         playUiSound('ShutVerb', true); // SHUT VERB sound when the icon swipes reverb back to zero, per direct request (instead of the dry preview click)
-      } else { _randomizeReverbSettings(); _previewReverb(); }
+        // …and every DL (delay) in the pattern goes OFF too — tracks and DRUMS — and the reverb STAYS off (new patterns don't lift it
+        // back to 35%) until the icon is swiped on again, per direct request. New DLs picked later by >> or the graph still come in.
+        window._revKilled = true;
+        // remembered, so swiping back ON puts them back (same song only)
+        window._revKilledDL = { song: (_currentSpecies || '').replace(/\s+[IVXLC]+$/, ''), tracks: [...Array(NUM_TRACKS).keys()].filter(t => _fxEchoOn(t)), drums: (() => { try { return _beatEchoOn(); } catch (e) { return false; } })() };
+        try { for (let tr = 0; tr < NUM_TRACKS; tr++) if (_fxEchoOn(tr)) { trackPump[tr] = false; trackFx[tr] = { x: 0, y: 0 }; if (ctx) setFxActive(tr, trackFx[tr]); try { _syncFxBtn(tr); } catch (e) {} } _queueFxBtnSync(); } catch (e) {}
+        try { if (_beatEchoOn()) _setBeatFxState(0); } catch (e) {}
+        try { markModified(); } catch (e) {}
+      } else {
+        window._revKilled = false; _randomizeReverbSettings(); _previewReverb();
+        // …and the DLs the off-swipe took away come BACK, per direct request — alongside any DLs picked since (they're kept). Not on a
+        // track that's LOCKED, or that has another FX stop (EN / DS) now; and only if it's still the same song.
+        const K = window._revKilledDL; window._revKilledDL = null;
+        if (K && K.song === (_currentSpecies || '').replace(/\s+[IVXLC]+$/, '')) {
+          try { K.tracks.forEach(tr => { if (trackSweep[tr] || trackChink[tr] || trackPump[tr] || _fxEchoOn(tr)) return; trackFx[tr] = { x: 0.5, y: 0.5 }; trackPump[tr] = false; if (ctx) setFxActive(tr, trackFx[tr]); try { _syncFxBtn(tr); } catch (e) {} }); _queueFxBtnSync(); } catch (e) {}
+          try { if (K.drums && !_beatChoke && !_beatPump && !_beatFx) _setBeatFxState(3); } catch (e) {}
+          try { markModified(); } catch (e) {}
+        }
+      }
     },
     noClick: true,
     onTap: () => { _pressPulse('randomizeReverbIconBtn'); openMenu(); }, // a TAP now opens the REVERB menu (was hold), with a pulse, per direct request
