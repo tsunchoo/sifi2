@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 02:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 03:15:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2699,14 +2699,14 @@ html body.modify #modifyLock { display: flex; } /* the MAGNET (was the padlock),
 #modifyLock.sp-mag-off { opacity: 0.45; }
 /* AUTO (the SQUARE orbit) button, per direct request: same footprint and colours as the padlock, just to its left — SQUARE only */
 #modifyAuto { display: none; position: absolute; right: 46px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-html body.modify.modify-square #modifyAuto { display: flex; }
+html body.modify #modifyAuto { display: flex; } /* MODIFY too now (was SQUARE only), per direct request */
 #modifyAuto.sp-mag-off { opacity: 0.45; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyAuto:not(.sp-mag-off) { background: #000 !important; color: #fff !important; }
-html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; }
+html body.modify #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; }
 /* CHROMATIC ABERRATION on the ring, per direct request — the cheap way: no filters, just four soft coloured shadows (red one side,
    cyan the other, inside and out, each slightly blurred) so its edges split like light through a cheap lens */
 html body:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 3px; box-shadow: calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1px rgba(255,20,60,calc(0.85 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1px rgba(0,200,255,calc(0.85 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1px rgba(0,200,255,calc(0.7 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1px rgba(255,20,60,calc(0.7 * var(--caa, 1))), 0 0 2px rgba(255,255,255,calc(0.25 * var(--caa, 1))) !important; /* the split now points AWAY FROM / TOWARDS THE GRAPH'S CENTRE (--cax / --cay, set as the ring moves) and grows towards the edges, like a real lens, per direct request */ }
-html body.modify-square:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 4.5px; box-shadow: calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1.5px rgba(255,20,60,calc(0.85 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1.5px rgba(0,200,255,calc(0.85 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1.5px rgba(0,200,255,calc(0.7 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1.5px rgba(255,20,60,calc(0.7 * var(--caa, 1))), 0 0 3px rgba(255,255,255,calc(0.25 * var(--caa, 1))) !important; } /* (outranks the glow-off / glow-pause rules — it's not a glow) */ /* SQUARE: the ring twice as big and twice as thick, per direct request */
+html body.modify:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 4.5px; box-shadow: calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1.5px rgba(255,20,60,calc(0.85 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1.5px rgba(0,200,255,calc(0.85 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1.5px rgba(0,200,255,calc(0.7 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1.5px rgba(255,20,60,calc(0.7 * var(--caa, 1))), 0 0 3px rgba(255,255,255,calc(0.25 * var(--caa, 1))) !important; } /* (outranks the glow-off / glow-pause rules — it's not a glow) */ /* SQUARE: the ring twice as big and twice as thick, per direct request */
 #modifyLock.sp-unlatched { opacity: 0.55; }
 html body.name-bg-clear #nameBar { background: transparent !important; background-color: transparent !important; } /* SONG NAME BG TRANSPARENT (SETTINGS > SONG NAME EQ), per direct request */
 html body.song-name-hidden.seq-playing #nameDisplay { visibility: hidden !important; } /* SONG NAME hidden (hold the bar), per direct request — only WHILE PLAYING: stopped, the name always shows; press play and it's hidden again */
@@ -3094,7 +3094,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 02:55:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 03:15:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -7122,7 +7122,7 @@ let _preSoloMuteState = null; // trackMuted snapshot from just before the first 
 const trackSweep  = new Array(NUM_TRACKS).fill(false); // L button toggle
 const trackChop   = new Array(NUM_TRACKS).fill(false);
 const _VOL_AUTO_MAX_POS = 0.82; // no fader is ever PUT at max by the app (defaults, resets, new patterns) — 82% of its travel at most, per direct request
-function _texLift(tr, g) { if (trackInstruments[tr] === 'ngate') return volPosToGain(volGainToPos(g) * 0.75); /* NOISE: fader 25% further DOWN its travel, per direct request */ return trackInstruments[tr] === 'amlgm' ? volPosToGain(Math.min(_volStepPositions[VOL_STEP_COUNT - 2], volGainToPos(g) * 1.25 * 1.2)) : g; } // TEXTURE: fader 25%, then another 20%, further up its travel (after the 82% cap), per direct request — stops one step short of max so it never comes in stuck at full
+function _texLift(tr, g) { if (trackInstruments[tr] === 'ngate') return volPosToGain(volGainToPos(g) * 0.75); /* NOISE: fader 25% further DOWN its travel, per direct request */ return trackInstruments[tr] === 'amlgm' ? volPosToGain(0.5) : g; } /* TEXTURE: its fader at 50% (it's 3dB louder at source now), per direct request — was +25% then +20% up its travel */ // TEXTURE: fader 25%, then another 20%, further up its travel (after the 82% cap), per direct request — stops one step short of max so it never comes in stuck at full
 function _capAutoVol(g) { return volGainToPos(g) > _VOL_AUTO_MAX_POS ? volPosToGain(_VOL_AUTO_MAX_POS) : g; }
 const trackVolume = [0.0501, 0.505, 0.8, 0.8, 0.8, 0.8];
 
@@ -7158,7 +7158,7 @@ function volGainToPos(gain) {
   const db = 20 * Math.log10(gain);
   return Math.max(0, Math.min(1, (db - VOL_MIN_DB) / (0 - VOL_MIN_DB)));
 }
-if (trackInstruments[0] === 'amlgm') trackVolume[0] = volPosToGain(Math.min(_volStepPositions[VOL_STEP_COUNT - 2], volGainToPos(trackVolume[0]) * 1.25 * 1.2)); // TEXTURE +25% on the fader, per direct request
+if (trackInstruments[0] === 'amlgm') trackVolume[0] = volPosToGain(0.5); // TEXTURE +25% on the fader, per direct request
 // Sets a track's vol-bar fill width from its current (gain-space) volume,
 // via the same taper, so what you see always matches where you'd need to
 // drag to get back to that level. Fill color itself is plain CSS now
@@ -8383,7 +8383,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // height — driving the pad as it goes (so you HEAR it: notes and effects come and go round the circle), until the graph is
   // touched. One lap every 4 bars at the current tempo (was 2). Leaving SQUARE re-arms it for next time.
   let orbitRaf = 0, orbitOff = false, orbitA = null, orbitR = 0, orbitLast = 0, orbitApplyAt = 0, orbitTargetR = 0.385;
-  const orbiting = () => document.body.classList.contains('modify-square') && !orbitOff && !held;
+  const orbiting = () => document.body.classList.contains('modify') && !orbitOff && !held; // MODIFY and SQUARE, per direct request
   // the A button: lit = AUTO on (circling). Only the A button switches it off / on — touching the graph just sizes the circle
   function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) a.classList.toggle('sp-mag-off', !!orbitOff); }
   function setOrbitAuto(on) { orbitOff = !on; syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; } }
@@ -8392,15 +8392,16 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     if (!pad) { pad = capture(); }
     const dt = Math.min(0.1, Math.max(0, (now - (orbitLast || now)) / 1000)); orbitLast = now;
     let per = 8; try { per = Math.max(4, Math.min(32, stepDuration() * 64)); } catch (e) {} // one lap every 4 bars (was 2 — half the speed), per direct request
-    if (orbitA === null) { const dx = pad.x - 0.5, dy = pad.y - 0.5; orbitA = Math.atan2(dy, dx); orbitR = Math.hypot(dx, dy); if (orbitR < 0.01) orbitA = -Math.PI / 2; }
-    orbitA += 2 * Math.PI * dt / per; orbitR += (orbitTargetR - orbitR) * Math.min(1, dt * 3); /* 77% of the graph's height (10% bigger than 70%), per direct request */ // (eases out to the circle from wherever it was)
-    const x = 0.5 + orbitR * Math.cos(orbitA), y = 0.5 + orbitR * Math.sin(orbitA); // +angle with y pointing down = CLOCKWISE on screen
+    let asp = 1; { const m = document.getElementById('modifyPadMarks'); if (m && m.clientHeight) asp = m.clientWidth / m.clientHeight; } // (a true CIRCLE on MODIFY's wide graph too — radius in graph-height units)
+    if (orbitA === null) { const dx = (pad.x - 0.5) * asp, dy = pad.y - 0.5; orbitA = Math.atan2(dy, dx); orbitR = Math.hypot(dx, dy); if (orbitR < 0.01) orbitA = -Math.PI / 2; }
+    orbitA += 2 * Math.PI * dt / per; { const m = document.getElementById('modifyPadMarks'), hMax = m && m.clientHeight ? 0.5 - 24 / m.clientHeight : 0.44; orbitR += (Math.min(orbitTargetR, Math.max(0.05, hMax)) - orbitR) * Math.min(1, dt * 3); } // (never off the graph — MODIFY's short graph caps it) /* 77% of the graph's height (10% bigger than 70%), per direct request */ // (eases out to the circle from wherever it was)
+    const x = 0.5 + orbitR * Math.cos(orbitA) / asp, y = 0.5 + orbitR * Math.sin(orbitA); // +angle with y pointing down = CLOCKWISE on screen
     pad.x = x; pad.y = y; showDot([x, y]);
     if (now - orbitApplyAt > 60) { orbitApplyAt = now; try { apply(x, y); } catch (e) {} } // the sound follows ~16x a second
     orbitRaf = requestAnimationFrame(orbitTick);
   }
   setInterval(() => {
-    if (!document.body.classList.contains('modify-square')) { if (orbitOff) { orbitOff = false; syncAutoBtn(); } orbitA = null; orbitLast = 0; orbitTargetR = 0.385; return; } // re-armed (AUTO on) for the next visit
+    if (!document.body.classList.contains('modify')) { if (orbitOff) { orbitOff = false; syncAutoBtn(); } orbitA = null; orbitLast = 0; orbitTargetR = 0.385; return; } // re-armed (AUTO on) for the next visit
     if (orbiting() && !orbitRaf) { springStop(); orbitLast = 0; orbitRaf = requestAnimationFrame(orbitTick); }
   }, 250);
   function springStop() { if (springRaf) { cancelAnimationFrame(springRaf); springRaf = 0; } }
@@ -8453,7 +8454,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     if (gl) gl.style.background = `radial-gradient(circle at ${(x * 100).toFixed(1)}% ${(y * 100).toFixed(1)}%, rgba(${rgb},${Math.min(0.95, a + 0.4).toFixed(2)}) 0%, rgba(${rgb},${(a * 0.5).toFixed(2)}) 30%, rgba(${rgb},0) 60%)`;
     const dot = m.querySelector('.sp-dot'); if (dot) {
       let rc = `rgb(${rgb})`;
-      if (document.body.classList.contains('modify-square')) { // SQUARE: the ring's LIGHTNESS from the page background (light ring on a dark page, dark on a light one), its hue kept, per direct request
+      if (document.body.classList.contains('modify')) { // MODIFY + SQUARE: the ring's LIGHTNESS from the page background (light ring on a dark page, dark on a light one), its hue kept, per direct request
         try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.6), 0.93), dkC = _hslRgb(hh, Math.min(ss, 0.7), 0.12); rc = `rgb(${(_contrast(lt, bg) >= _contrast(dkC, bg) ? lt : dkC).join(',')})`; } catch (e) {} // whichever of a very light / very dark version stands out MORE from the page (was a fixed dark-page cut-off that left it dark on mid-tone pages), per direct report
       }
       dot.style.color = rc;
@@ -8517,7 +8518,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // the SONG NAME strip is left to the song name's OWN gestures (double-tap = tape drawer + heart, SWIPES left/right, hold), per
   // direct request — only the pad below it is taken over here
   const start = (cx, cy) => {
-    if (document.body.classList.contains('modify-square')) { orbitOff = true; syncAutoBtn(); if (orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } } // a touch ends the SQUARE orbit (AUTO goes off)
+    if (document.body.classList.contains('modify')) { orbitOff = true; syncAutoBtn(); if (orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } } // a touch ends the SQUARE orbit (AUTO goes off)
     if (pad && pad.name !== nameNow() && !sameSong()) { window._padMute = null; pad = null; } // a new pattern since — start afresh
     if (!pad) pad = capture();
     held = true; pos(cx, cy);
@@ -8550,8 +8551,8 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // SQUARE + AUTO, per direct request: touching the graph no longer stops the orbit (only the A button does) — a touch / drag just
   // sets the SIZE of the circle (how far from the centre you are), kept inside the graph so the ring never goes off it
   let orbitGrab = false;
-  const orbitSize = (cx, cy) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); const x = (cx - rc.left) / rc.width, y = (cy - rc.top) / rc.height;
-    const ringHalf = 24 / Math.max(100, rc.width); orbitTargetR = Math.max(0.04, Math.min(0.5 - ringHalf, Math.hypot(x - 0.5, y - 0.5))); };
+  const orbitSize = (cx, cy) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); const x = (cx - rc.left) / rc.width, y = (cy - rc.top) / rc.height, asp = rc.width / Math.max(1, rc.height);
+    const ringHalf = 24 / Math.max(40, rc.height); orbitTargetR = Math.max(0.04, Math.min(0.5 - ringHalf, Math.hypot((x - 0.5) * asp, y - 0.5))); }; // (graph-height units — the ring never leaves the graph)
   window.addEventListener('touchstart', e => { if (!inPad(e)) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (orbiting()) { orbitGrab = true; const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (e.touches.length === 1 && isDouble()) { padReset(); return; } const t = e.touches[0]; start(t.clientX, t.clientY); }, { capture: true, passive: false });
   window.addEventListener('touchmove', e => { if (orbitGrab) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (!held) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; pos(t.clientX, t.clientY); }, { capture: true, passive: false });
   ['touchend', 'touchcancel'].forEach(t => window.addEventListener(t, e => { if (orbitGrab) { e.stopPropagation(); if (!e.touches || !e.touches.length) orbitGrab = false; return; } if (!held) return; e.stopPropagation(); if (!e.touches || !e.touches.length) end(); }, { capture: true }));
@@ -13082,7 +13083,7 @@ function getSourceTrimGain(tr, dest) {
     nodes.gain.connect(dest);
     nodes.dest = dest;
   }
-  nodes.gain.gain.value = (['congHi', 'congLo', 'bongHi', 'bongLo'].includes(trackInstruments[tr]) ? 0.9441 /* every CONGA / BONGO −0.5dB, per direct request */ : trackInstruments[tr] === 'guiro' ? 0.8610 /* MARACAS −1.3dB, per direct request */ : ['timbHi', 'timbMid', 'timbLo'].includes(trackInstruments[tr]) ? 0.8913 /* every TIMBALE −1dB, per direct request */ : trackInstruments[tr] === 'blunt' ? 1.4125 /* HASSELL +3dB, per direct request */ : trackInstruments[tr] === 'denial' ? 0.7943 /* KATHEDRA −2dB at source, per direct request */ : 1) * (_BASS_KEYS_FOR_TRIM.has(trackInstruments[tr]) ? 1.0593 : 1) /* every BASS +0.5dB, per direct request (SYNTH BASS included now — it goes through here like the rest) */ * ((trackInstruments[tr] === 'sbass3') ? 2 /* JAMES BASS: +6dB after the soft-clip, matching the half-level voice */ : (trackInstruments[tr] === 'dbass') ? 2 /* DOUBLE BASS: gives back the half-level voice (+6dB) after the soft-clip */ : (trackInstruments[tr] === 'pbass') ? 2 /* PULSE BASS: gives back the half-level voice (+6dB) after the soft-clip */ : (trackInstruments[tr] === 'sbass') ? 2 /* SYNTH BASS: the same — see playSynthBass */ : (trackInstruments[tr] === 'sbass4') ? 2.5179 /* PUNK BASS: the same — see playPlunkBass — plus +2dB, per direct request (added after the soft-clip, so it can't push the voice into it) */ : (trackInstruments[tr] === 'sludge') ? 2 /* SLUDGE BASS: the same — see playSludgeBass */ : _BASS_KEYS_FOR_TRIM.has(trackInstruments[tr]) ? 1 : 0.891); // -1dB for everything except basses
+  nodes.gain.gain.value = (['congHi', 'congLo', 'bongHi', 'bongLo'].includes(trackInstruments[tr]) ? 0.9441 /* every CONGA / BONGO −0.5dB, per direct request */ : trackInstruments[tr] === 'guiro' ? 0.8610 /* MARACAS −1.3dB, per direct request */ : ['timbHi', 'timbMid', 'timbLo'].includes(trackInstruments[tr]) ? 0.8913 /* every TIMBALE −1dB, per direct request */ : trackInstruments[tr] === 'blunt' ? 1.4125 /* HASSELL +3dB, per direct request */ : trackInstruments[tr] === 'denial' ? 0.7943 /* KATHEDRA −2dB at source, per direct request */ : trackInstruments[tr] === 'amlgm' ? 1.4125 /* TEXTURE +3dB at source, per direct request */ : 1) * (_BASS_KEYS_FOR_TRIM.has(trackInstruments[tr]) ? 1.0593 : 1) /* every BASS +0.5dB, per direct request (SYNTH BASS included now — it goes through here like the rest) */ * ((trackInstruments[tr] === 'sbass3') ? 2 /* JAMES BASS: +6dB after the soft-clip, matching the half-level voice */ : (trackInstruments[tr] === 'dbass') ? 2 /* DOUBLE BASS: gives back the half-level voice (+6dB) after the soft-clip */ : (trackInstruments[tr] === 'pbass') ? 2 /* PULSE BASS: gives back the half-level voice (+6dB) after the soft-clip */ : (trackInstruments[tr] === 'sbass') ? 2 /* SYNTH BASS: the same — see playSynthBass */ : (trackInstruments[tr] === 'sbass4') ? 2.5179 /* PUNK BASS: the same — see playPlunkBass — plus +2dB, per direct request (added after the soft-clip, so it can't push the voice into it) */ : (trackInstruments[tr] === 'sludge') ? 2 /* SLUDGE BASS: the same — see playSludgeBass */ : _BASS_KEYS_FOR_TRIM.has(trackInstruments[tr]) ? 1 : 0.891); // -1dB for everything except basses
   return nodes.gain;
 }
 // High-frequency percussion (shaker, hihat, ride, guiro, tambourine) has
