@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 02:00:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 02:25:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2697,6 +2697,11 @@ html body.modify #modifyPadMarks { display: block; }
 #modifyLock { display: none; position: absolute; right: 6px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); /* TOP-RIGHT corner of the graph (just under the song name strip), per direct request — was bottom-left */ z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 html body.modify #modifyLock { display: flex; } /* the MAGNET (was the padlock), per direct request — ON by default: let go and the ring springs back to the centre */
 #modifyLock.sp-mag-off { opacity: 0.45; }
+/* AUTO (the SQUARE orbit) button, per direct request: same footprint and colours as the padlock, just to its left — SQUARE only */
+#modifyAuto { display: none; position: absolute; right: 46px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+html body.modify.modify-square #modifyAuto { display: flex; }
+#modifyAuto.sp-mag-off { opacity: 0.45; }
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyAuto:not(.sp-mag-off) { background: #000 !important; color: #fff !important; }
 html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; } /* SQUARE: the ring twice as big and twice as thick, per direct request */
 #modifyLock.sp-unlatched { opacity: 0.55; }
 html body.name-bg-clear #nameBar { background: transparent !important; background-color: transparent !important; } /* SONG NAME BG TRANSPARENT (SETTINGS > SONG NAME EQ), per direct request */
@@ -3085,7 +3090,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 02:00:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 02:25:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -7113,7 +7118,7 @@ let _preSoloMuteState = null; // trackMuted snapshot from just before the first 
 const trackSweep  = new Array(NUM_TRACKS).fill(false); // L button toggle
 const trackChop   = new Array(NUM_TRACKS).fill(false);
 const _VOL_AUTO_MAX_POS = 0.82; // no fader is ever PUT at max by the app (defaults, resets, new patterns) — 82% of its travel at most, per direct request
-function _texLift(tr, g) { return trackInstruments[tr] === 'amlgm' ? volPosToGain(Math.min(_volStepPositions[VOL_STEP_COUNT - 2], volGainToPos(g) * 1.25 * 1.2)) : g; } // TEXTURE: fader 25%, then another 20%, further up its travel (after the 82% cap), per direct request — stops one step short of max so it never comes in stuck at full
+function _texLift(tr, g) { if (trackInstruments[tr] === 'ngate') return volPosToGain(volGainToPos(g) * 0.75); /* NOISE: fader 25% further DOWN its travel, per direct request */ return trackInstruments[tr] === 'amlgm' ? volPosToGain(Math.min(_volStepPositions[VOL_STEP_COUNT - 2], volGainToPos(g) * 1.25 * 1.2)) : g; } // TEXTURE: fader 25%, then another 20%, further up its travel (after the 82% cap), per direct request — stops one step short of max so it never comes in stuck at full
 function _capAutoVol(g) { return volGainToPos(g) > _VOL_AUTO_MAX_POS ? volPosToGain(_VOL_AUTO_MAX_POS) : g; }
 const trackVolume = [0.0501, 0.505, 0.8, 0.8, 0.8, 0.8];
 
@@ -8296,6 +8301,10 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
       const lk = document.createElement('button'); lk.id = 'modifyLock'; lk.type = 'button'; lk.setAttribute('aria-label', 'lock'); lk.innerHTML = LOCK_SVG(window._padLatch); lk.classList.toggle('sp-mag-off', !window._padLatch);
       lk.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setLatch(!window._padLatch); });
       b.appendChild(lk);
+      const au = document.createElement('button'); au.id = 'modifyAuto'; au.type = 'button'; au.setAttribute('aria-label', 'auto');
+      au.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="display:block;"><path d="M5.2 21L12 3.2L18.8 21M8 14.4h8" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg>'; // a capital A, the padlock glyph's height
+      au.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setOrbitAuto(orbitOff); try { playUiSound('tinyclick'); } catch (er) {} });
+      b.appendChild(au); syncAutoBtn();
       setTimeout(() => showDot(pad ? [pad.x, pad.y] : null), 0); // ring + colour showing from the start
     }
     return m;
@@ -8371,6 +8380,9 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // touched. One lap every 4 bars at the current tempo (was 2). Leaving SQUARE re-arms it for next time.
   let orbitRaf = 0, orbitOff = false, orbitA = null, orbitR = 0, orbitLast = 0, orbitApplyAt = 0;
   const orbiting = () => document.body.classList.contains('modify-square') && !orbitOff && !held;
+  // the A button: lit = AUTO on (circling). Touching the graph switches it off; tapping A switches it back on (and off again)
+  function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) a.classList.toggle('sp-mag-off', !!orbitOff); }
+  function setOrbitAuto(on) { orbitOff = !on; syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; } }
   function orbitTick(now) {
     orbitRaf = 0; if (!orbiting()) return;
     if (!pad) { pad = capture(); }
@@ -8384,7 +8396,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     orbitRaf = requestAnimationFrame(orbitTick);
   }
   setInterval(() => {
-    if (!document.body.classList.contains('modify-square')) { orbitOff = false; orbitA = null; orbitLast = 0; return; } // re-armed for the next visit
+    if (!document.body.classList.contains('modify-square')) { if (orbitOff) { orbitOff = false; syncAutoBtn(); } orbitA = null; orbitLast = 0; return; } // re-armed (AUTO on) for the next visit
     if (orbiting() && !orbitRaf) { springStop(); orbitLast = 0; orbitRaf = requestAnimationFrame(orbitTick); }
   }, 250);
   function springStop() { if (springRaf) { cancelAnimationFrame(springRaf); springRaf = 0; } }
@@ -8436,7 +8448,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
       dot.style.color = rc;
     }
     // MAGNET colour from the page background too (very light / very dark, whichever stands out more), so it can't get lost, per direct request
-    { const lk = document.getElementById('modifyLock'); if (lk) { try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.5), 0.95), dkC = _hslRgb(hh, Math.min(ss, 0.6), 0.1), useLt = _contrast(lt, bg) >= _contrast(dkC, bg); lk.style.color = `rgb(${(useLt ? lt : dkC).join(',')})`; lk.style.background = useLt ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)'; } catch (e) {} } }
+    { const lk = document.getElementById('modifyLock'); if (lk) { try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.5), 0.95), dkC = _hslRgb(hh, Math.min(ss, 0.6), 0.1), useLt = _contrast(lt, bg) >= _contrast(dkC, bg); lk.style.color = `rgb(${(useLt ? lt : dkC).join(',')})`; lk.style.background = useLt ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)'; const au = document.getElementById('modifyAuto'); if (au) { au.style.color = lk.style.color; au.style.background = lk.style.background; } /* the A button wears the padlock's colours */ } catch (e) {} } }
   }
   // back to the centre, EASED (a new pattern) — dragging again cancels the ease straight away
   function easeHome(fast) { const m = marks(); if (!m || orbiting()) return;
@@ -8487,14 +8499,14 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     });
   }
   function tick() { raf = 0; if (!pad) return; if (pend) apply(pend[0], pend[1]); drawGrid(); if (held) raf = requestAnimationFrame(tick); } // held: re-applied every frame (cheap — only real changes are written)
-  const inBar = e => document.body.classList.contains('modify') && nb() && nb().contains(e.target) && !(e.target.closest && e.target.closest('#modifyLock'));
+  const inBar = e => document.body.classList.contains('modify') && nb() && nb().contains(e.target) && !(e.target.closest && e.target.closest('#modifyLock, #modifyAuto'));
   const evY = e => { const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || e; return t.clientY; };
   const inStrip = e => { if (!inBar(e)) return false; const r = nb().getBoundingClientRect(); return evY(e) - r.top < 56.08; }; // the SONG NAME strip (the top 66px — the same size as the bar everywhere else)
   const inPad = e => inBar(e) && !inStrip(e);
   // the SONG NAME strip is left to the song name's OWN gestures (double-tap = tape drawer + heart, SWIPES left/right, hold), per
   // direct request — only the pad below it is taken over here
   const start = (cx, cy) => {
-    if (document.body.classList.contains('modify-square')) { orbitOff = true; if (orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } } // a touch ends the SQUARE orbit
+    if (document.body.classList.contains('modify-square')) { orbitOff = true; syncAutoBtn(); if (orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } } // a touch ends the SQUARE orbit (AUTO goes off)
     if (pad && pad.name !== nameNow() && !sameSong()) { window._padMute = null; pad = null; } // a new pattern since — start afresh
     if (!pad) pad = capture();
     held = true; pos(cx, cy);
@@ -8510,7 +8522,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // Capture on the WINDOW so the song name's own gestures (double-tap save, hold, swipes) never see these while in MODIFY
   // the PADLOCK: its touches/presses are kept away from the song name's handlers (their touchstart preventDefault would also
   // stop the tap's click), so a tap on it only ever toggles the latch
-  const onLock = e => e.target && e.target.closest && e.target.closest('#modifyLock');
+  const onLock = e => e.target && e.target.closest && e.target.closest('#modifyLock, #modifyAuto');
   ['touchstart', 'touchend', 'mousedown', 'mouseup', 'dblclick'].forEach(t => window.addEventListener(t, e => { if (onLock(e)) e.stopPropagation(); }, true));
   // DOUBLE TAP / DOUBLE CLICK ANYWHERE IN THE GRAPH, per direct request: the ring eases back to the centre and the graph resets —
   // the pattern goes back to how it was (effects the pad already took away stay gone, as always)
