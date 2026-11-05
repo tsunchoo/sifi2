@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 07:30:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 17:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2627,7 +2627,7 @@ html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyPadMarks .sp-tint,
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .mod-note-row, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #nameEq { opacity: 1 !important; } /* no see-through (grey) markers / EQ */
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *::before, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *::after { text-shadow: none !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .step-cell::before, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .step-cell::after { opacity: 1 !important; box-shadow: none !important; filter: none !important; } /* note markers solid black (no soft / see-through greys, no glow) */
-html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #_hamBtn { box-shadow: none !important; background: transparent !important; } /* the menu icon stays a plain icon */
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #_hamBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #devMenuBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #randomizeReverbIconBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #markerStyleIconBtn { box-shadow: none !important; background: transparent !important; } /* the header icons (menu, rainbow, reverb, marker style) stay plain icons — no black box round them, per direct report */
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #installBanner, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #_helpBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #_noticeToast, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #tapeDrawerPlayAll, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #devMenuOverlay button { background: #fff !important; box-shadow: inset 0 0 0 1.5px #000 !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #playBtnImg { filter: brightness(0) !important; } html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #playBtn.playing #playBtnImg { filter: brightness(0) invert(1) !important; } html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #playBtnMask { background: #fff !important; } html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #playBtnGlowWrap { filter: none !important; } /* the play / stop glyph: black, white on the lit (playing) button */
 /* GRAY display mode (the first MONO, kept under a new name), per direct request: the whole page grayscale (a filter on the page root — the root is the one element where
@@ -2690,14 +2690,6 @@ html body.modify #beatCount { visibility: hidden !important; }
 #modifyPadMarks .sp-top { position: absolute; left: 0; right: 0; top: 0; height: 1px; background: currentColor; opacity: 0.25; }
 html body.modify #modifyPadMarks { display: block; }
 #modifyPadMarks .sp-h, #modifyPadMarks .sp-v { position: absolute; background: currentColor; opacity: 0.18; }
-/* CROSS CURSOR (SETTINGS toggle), per direct request: the ring becomes a plain cross — two 1px lines like the graph's own centre
-   lines, through the cursor, running past the graph's edges (into the song name strip above and the tracks below) */
-#spCrossH, #spCrossV { display: none; position: absolute; pointer-events: none; z-index: 60; background: currentColor; opacity: 0.9; }
-html body.modify.cross-cursor #spCrossH, html body.modify.cross-cursor #spCrossV { display: block; }
-#spCrossH { box-shadow: 0 0 calc(6.9px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 100% * var(--mglow, 1.5))), transparent), 0 0 calc(18px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 70% * var(--mglow, 1.5))), transparent), 0 calc(var(--cay, 0) * 2px) 1px rgba(var(--ca-r, 255,20,60), calc(0.75 * var(--caa, 1))), 0 calc(var(--cay, 0) * -2px) 1px rgba(var(--ca-c, 0,200,255), calc(0.75 * var(--caa, 1))); } /* the CHROMATIC ABERRATION on the cross too, per direct request — each line splits across itself, the same way round as the ring (from the centre) */
-#spCrossV { box-shadow: 0 0 calc(6.9px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 100% * var(--mglow, 1.5))), transparent), 0 0 calc(18px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 70% * var(--mglow, 1.5))), transparent), calc(var(--cax, 0) * 2px) 0 1px rgba(var(--ca-r, 255,20,60), calc(0.75 * var(--caa, 1))), calc(var(--cax, 0) * -2px) 0 1px rgba(var(--ca-c, 0,200,255), calc(0.75 * var(--caa, 1))); } /* aberration capped at 75%; the PLAYHEAD MARKER glow on a LIGHT cursor (--rg), per direct request */
-#spCrossH { left: 0; right: 0; height: 1px; } #spCrossV { width: 1px; }
-html body.modify.cross-cursor:not(#_x1):not(#_x2):not(#_x3):not(#_x4):not(#_x5) #modifyPadMarks .sp-dot { border-color: transparent !important; box-shadow: none !important; animation: none !important; }
 #modifyPadMarks .sp-h { left: 0; right: 0; top: 50%; height: 1px; } #modifyPadMarks .sp-v { top: 0; bottom: 0; left: 50%; width: 1px; }
 #modifyPadMarks .sp-dot { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 3px solid currentColor; box-sizing: border-box; opacity: 0.9; } /* 3px, and always showing (sits in the centre until moved), per direct request */
 /* the 6×16 note grid drawn over the pad while it's held (40% max), fading out over 0.5s on release, per direct request */
@@ -2720,8 +2712,8 @@ html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyAuto:not(.sp-mag-o
 html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; }
 /* CHROMATIC ABERRATION on the ring, per direct request — the cheap way: no filters, just four soft coloured shadows (red one side,
    cyan the other, inside and out, each slightly blurred) so its edges split like light through a cheap lens */
-html body:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 3px; box-shadow: 0 0 calc(6.9px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 100% * var(--mglow, 1.5))), transparent), 0 0 calc(18px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 70% * var(--mglow, 1.5))), transparent), calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1px rgba(var(--ca-r, 255,20,60),calc(0.75 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1px rgba(var(--ca-c, 0,200,255),calc(0.75 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1px rgba(var(--ca-c, 0,200,255),calc(0.615 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1px rgba(var(--ca-r, 255,20,60),calc(0.615 * var(--caa, 1))), 0 0 2px rgba(255,255,255,calc(0.225 * var(--caa, 1))) !important; /* the split now points AWAY FROM / TOWARDS THE GRAPH'S CENTRE (--cax / --cay, set as the ring moves) and grows towards the edges, like a real lens, per direct request */ }
-html body.modify-square:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 4.5px; box-shadow: 0 0 calc(6.9px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 100% * var(--mglow, 1.5))), transparent), 0 0 calc(18px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 70% * var(--mglow, 1.5))), transparent), calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1.5px rgba(var(--ca-r, 255,20,60),calc(0.75 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1.5px rgba(var(--ca-c, 0,200,255),calc(0.75 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) 1.5px rgba(var(--ca-c, 0,200,255),calc(0.615 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) 1.5px rgba(var(--ca-r, 255,20,60),calc(0.615 * var(--caa, 1))), 0 0 3px rgba(255,255,255,calc(0.225 * var(--caa, 1))) !important; } /* (outranks the glow-off / glow-pause rules — it's not a glow) */ /* SQUARE: the ring twice as big and twice as thick, per direct request */
+html body:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 3.5px; box-shadow: 0 0 calc(6.9px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 100% * var(--mglow, 1.5))), transparent), 0 0 calc(18px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 70% * var(--mglow, 1.5))), transparent), calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) calc(1px + var(--cad, 0) * 2.5px) rgba(var(--ca-r, 255,20,60),calc(0.75 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) calc(1px + var(--cad, 0) * 2.5px) rgba(var(--ca-c, 0,200,255),calc(0.75 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) calc(1px + var(--cad, 0) * 2.5px) rgba(var(--ca-c, 0,200,255),calc(0.615 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) calc(1px + var(--cad, 0) * 2.5px) rgba(var(--ca-r, 255,20,60),calc(0.615 * var(--caa, 1))), 0 0 2px rgba(255,255,255,calc(0.225 * var(--caa, 1))) !important; /* the split now points AWAY FROM / TOWARDS THE GRAPH'S CENTRE (--cax / --cay, set as the ring moves) and grows towards the edges, like a real lens, per direct request */ }
+html body.modify-square:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 5.5px; box-shadow: 0 0 calc(6.9px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 100% * var(--mglow, 1.5))), transparent), 0 0 calc(18px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 70% * var(--mglow, 1.5))), transparent), calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) calc(1.5px + var(--cad, 0) * 3px) rgba(var(--ca-r, 255,20,60),calc(0.75 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) calc(1.5px + var(--cad, 0) * 3px) rgba(var(--ca-c, 0,200,255),calc(0.75 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) calc(1.5px + var(--cad, 0) * 3px) rgba(var(--ca-c, 0,200,255),calc(0.615 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) calc(1.5px + var(--cad, 0) * 3px) rgba(var(--ca-r, 255,20,60),calc(0.615 * var(--caa, 1))), 0 0 3px rgba(255,255,255,calc(0.225 * var(--caa, 1))) !important; } /* (outranks the glow-off / glow-pause rules — it's not a glow) */ /* SQUARE: the ring twice as big and twice as thick, per direct request */
 #modifyLock.sp-unlatched { opacity: 0.55; }
 html body.name-bg-clear #nameBar { background: transparent !important; background-color: transparent !important; } /* SONG NAME BG TRANSPARENT (SETTINGS > SONG NAME EQ), per direct request */
 html body.song-name-hidden.seq-playing #nameDisplay { visibility: hidden !important; } /* SONG NAME hidden (hold the bar), per direct request — only WHILE PLAYING: stopped, the name always shows; press play and it's hidden again */
@@ -3109,7 +3101,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 07:30:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 17:55:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4028,18 +4020,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
   <div id="settingsPanel" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#f5f0e8;padding:24px;min-width:min(340px,90vw);display:flex;flex-direction:column;gap:16px;font-family:'DM Sans',sans-serif;max-height:85vh;overflow-y:auto;">
 
     <div style="font-size:0.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);text-align:center;">SETTINGS</div>
-    <!-- ABERRATION COLOUR (top of SETTINGS), per direct request: how much of the pattern's own colour is mixed into the ring's red / cyan fringes -->
-    <div style="display:flex;flex-direction:column;gap:6px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">ABERRATION COLOUR</div>
-        <div id="caSymVal" style="font-size:0.75rem;font-weight:700;color:#111;">50%</div>
-      </div>
-      <input autocomplete="off" type="range" id="caSymSlider" min="0" max="100" step="1" value="50" class="master-vol-slider" oninput="setCaSymMix(this.value)" onchange="setCaSymMix(this.value)" style="width:100%;">
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">CROSS CURSOR</div>
-      <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="crossCursorToggle" onchange="setCrossCursor(this.checked)"><span class="wild-toggle-slider"></span></label>
-    </div>
+    <!-- ABERRATION COLOUR fixed at 50% (slider removed) and the CROSS CURSOR option removed, per direct request -->
     <!-- CHECK FOR UPDATE, per direct report -->
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
       <div style="display:flex;flex-direction:column;gap:2px;"><div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">UPDATES</div><div id="updStatus" style="font-size:0.58rem;color:#666;letter-spacing:0.5px;">not checked yet</div></div>
@@ -5829,6 +5810,11 @@ function setReverbIntensity(v) {
 }
 
 window._globalDelayMix = 0.35; // REVERB MIX default 35% (was zero), per direct request
+// REVERB ICON ACTIVE (the glow), per direct request: lit whenever REVERB MIX isn't 0%, OR REVERB ON BEAT isn't 0%, OR any track (or
+// DRUMS) is on DL — checked on every change and a few times a second
+function _revIconActive() { try { if ((window._globalDelayMix || 0) > 0.001) return true; if (typeof _beatReverbMix !== 'undefined' && _beatReverbMix > 0.001) return true; for (let t = 0; t < NUM_TRACKS; t++) if (_fxEchoOn(t)) return true; if (_beatEchoOn()) return true; } catch (e) {} return false; }
+function _syncRevIcon() { const rb = document.getElementById('randomizeReverbIconBtn'); if (rb) rb.classList.toggle('rev-on', _revIconActive()); }
+setInterval(_syncRevIcon, 300);
 window._reverbIntensity = 0.32; // REVERB SIZE default 32% (was 51%), per direct request
 function setGlobalDelayMix(v) {
   // REVERB MIX (OVERALL) now only reaches TONAL content, per direct request: the wet return stays at full
@@ -5838,7 +5824,7 @@ function setGlobalDelayMix(v) {
   if (window._tonalRevIn) window._tonalRevIn.gain.value = v;
   if (window._masterReverbSend) window._masterReverbSend.gain.value = v * REVERB_MIX_MAX; // the whole-mix send (see live init) rides the same slider
   window._globalDelayMix = v;
-  const rb = document.getElementById('randomizeReverbIconBtn'); if (rb) rb.classList.toggle('rev-on', v > 0.001); // icon glows while the reverb isn't at zero
+  _syncRevIcon(); // icon glows while any reverb / delay is in play (see _syncRevIcon)
 }
 document.addEventListener('DOMContentLoaded', () => { const rb = document.getElementById('randomizeReverbIconBtn'); if (rb) rb.classList.toggle('rev-on', (window._globalDelayMix === undefined ? 0 : window._globalDelayMix) > 0.001); });
 
@@ -8493,19 +8479,13 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
       // …and its OPACITY rises and falls round the path, per direct request: 100% at the top (12 o'clock), 0% at the bottom (6),
       // a smooth half-turn fade each way
       d.style.setProperty('--caa', dist > 1e-4 ? ((1 - dy / dist) / 2).toFixed(3) : '1');
+      d.style.setProperty('--cad', Math.min(1, dist / 0.5).toFixed(3)); // the fringes BLUR more towards the edges, like a real lens, per direct request
       // SYMPATHETIC COLOUR, per direct request: a vivid version of the pattern's own colour (the song name bar's hue) mixed into both
       // fringes by the ABERRATION COLOUR slider (SETTINGS, top) — 0% = pure red / cyan, 100% = all the pattern's colour
       try { const m = window._caSymMix || 0; if (m > 0) { const bc = _anyRgba(getComputedStyle(document.getElementById('nameBar')).backgroundColor) || _anyRgba(_currentBarColor) || [170, 100, 166], [hh] = _rgbHsl(bc.slice(0, 3)), sym = _hslRgb(hh, 0.85, 0.55);
         const mix = (a) => a.map((v, i) => Math.round(v * (1 - m) + sym[i] * m)).join(',');
         d.style.setProperty('--ca-r', mix([255, 20, 60])); d.style.setProperty('--ca-c', mix([0, 200, 255])); } else { d.style.removeProperty('--ca-r'); d.style.removeProperty('--ca-c'); } } catch (e) {}
       d.style.setProperty('--cax', dist > 1e-4 ? (dx / dist * k).toFixed(3) : '0'); d.style.setProperty('--cay', dist > 1e-4 ? (dy / dist * k).toFixed(3) : '0'); }
-    if (document.body.classList.contains('cross-cursor')) { // CROSS CURSOR: two lines on the name bar (outside the graph's clipping) through the cursor
-      const b = nb(); if (b) { let ch = document.getElementById('spCrossH'), cv = document.getElementById('spCrossV');
-        if (!ch) { ch = document.createElement('div'); ch.id = 'spCrossH'; b.appendChild(ch); cv = document.createElement('div'); cv.id = 'spCrossV'; b.appendChild(cv); }
-        const pr = m.getBoundingClientRect(), br = b.getBoundingClientRect(), px = pr.left - br.left + Math.max(0, Math.min(1, xy[0])) * pr.width, py = pr.top - br.top + Math.max(0, Math.min(1, xy[1])) * pr.height, EXT = 0; // INSIDE the graph's coloured area only, per direct request (was 30px past it)
-        ch.style.top = Math.round(py) + 'px'; ch.style.left = Math.round(pr.left - br.left) + 'px'; ch.style.right = 'auto'; ch.style.width = Math.round(pr.width) + 'px'; cv.style.left = Math.round(px) + 'px';
-        ['--cax', '--cay', '--caa', '--ca-r', '--ca-c'].forEach(k => { const v = d.style.getPropertyValue(k); if (v) { ch.style.setProperty(k, v); cv.style.setProperty(k, v); } else { ch.style.removeProperty(k); cv.style.removeProperty(k); } }); /* the aberration rides the lines too */
-        cv.style.top = Math.round(pr.top - br.top - EXT) + 'px'; cv.style.height = Math.round(pr.height + EXT * 2) + 'px'; } }
     tint(xy[0], xy[1]);
   }
   // PAD COLOUR, per direct request: NOTES have one palette colour (the playhead colour) and EFFECTS another (highlight 2). How much
@@ -8527,8 +8507,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
         try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.6), 0.93), dkC = _hslRgb(hh, Math.min(ss, 0.7), 0.12); rc = `rgb(${(_contrast(lt, bg) >= _contrast(dkC, bg) ? lt : dkC).join(',')})`; } catch (e) {} // whichever of a very light / very dark version stands out MORE from the page (was a fixed dark-page cut-off that left it dark on mid-tone pages), per direct report
       }
       dot.style.color = rc;
-      { const ca = _anyRgba(rc), lightRing = ca && _relLum(ca.slice(0, 3)) > 0.35; const rg = lightRing ? '1' : '0'; dot.style.setProperty('--rg', rg); const ch = document.getElementById('spCrossH'), cv = document.getElementById('spCrossV'); if (ch) ch.style.setProperty('--rg', rg); if (cv) cv.style.setProperty('--rg', rg); } // the LIGHT cursor gets the playhead note markers' glow (same size, scaled by MARKER GLOW), per direct request
-      { const ch = document.getElementById('spCrossH'), cv = document.getElementById('spCrossV'); if (ch) ch.style.color = rc; if (cv) cv.style.color = rc; } // (the cross wears the ring's colour)
+      { const ca = _anyRgba(rc), lightRing = ca && _relLum(ca.slice(0, 3)) > 0.35; const rg = lightRing ? '1' : '0'; dot.style.setProperty('--rg', rg); } // the LIGHT cursor gets the playhead note markers' glow (same size, scaled by MARKER GLOW), per direct request
     }
     // MAGNET colour from the page background too (very light / very dark, whichever stands out more), so it can't get lost, per direct request
     { const lk = document.getElementById('modifyLock'); if (lk) { try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.5), 0.95), dkC = _hslRgb(hh, Math.min(ss, 0.6), 0.1), useLt = _contrast(lt, bg) >= _contrast(dkC, bg); const fgS = `rgb(${(useLt ? lt : dkC).join(',')})`, invS = `rgb(${(useLt ? dkC : lt).join(',')})`, plainBg = useLt ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)';
@@ -8709,10 +8688,8 @@ function _setModify(on, quiet) {
   try { playUiSound('tinyclick'); } catch (e) {}
   _showNotice(on ? 'HYBRID MODE' : 'LIVE MODE');
 }
-function setCrossCursor(on) { document.body.classList.toggle('cross-cursor', !!on); const c = document.getElementById('crossCursorToggle'); if (c) c.checked = !!on; try { localStorage.setItem('sifiCrossCur', on ? '1' : '0'); } catch (e) {} try { window._padDotRefresh && window._padDotRefresh(); } catch (e) {} }
-document.addEventListener('DOMContentLoaded', () => { let on = false; try { on = localStorage.getItem('sifiCrossCur') === '1'; } catch (e) {} setCrossCursor(on); });
 function setCaSymMix(v) { v = Math.max(0, Math.min(100, +v || 0)); window._caSymMix = v / 100; try { window._padDotRefresh && window._padDotRefresh(); } catch (e) {} const r = document.getElementById('caSymVal'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('caSymSlider'); if (sl && +sl.value !== v) sl.value = v; try { localStorage.setItem('sifiCaSym', String(v)); } catch (e) {} }
-window._caSymMix = 0.5; document.addEventListener('DOMContentLoaded', () => { let v = 50; try { const o = localStorage.getItem('sifiCaSym'); if (o !== null) v = +o; } catch (e) {} setCaSymMix(v); });
+window._caSymMix = 0.5; // ABERRATION COLOUR fixed at 50%, per direct request (the slider was removed)
 function setModifyRowColours(on) { window._modifyRowColours = !!on; const cb = document.getElementById('modifyRowColoursToggle'); if (cb) cb.checked = !!on; try { localStorage.setItem('sifiModifyRowCol', on ? '1' : '0'); } catch (e) {} }
 document.addEventListener('DOMContentLoaded', () => { setModifyRowColours(true); }); // always ON (track colours) — the SETTINGS switch was removed, per direct request
 // MODIFY COUNT settings (SETTINGS), per direct request — remembered on this device
@@ -18408,6 +18385,7 @@ function randAll(mode, opts) {
     }
   }
   try { _glowPause(); } catch (e) {} // no glows while the new pattern draws in (performance test, per direct request)
+  try { setTimeout(_randomEqColour, 0); } catch (e) {} // RANDOM EQ COLOUR for every new pattern (after any display-mode jump has landed), per direct request
   window._visJob = 'new pattern animation'; clearTimeout(window._visJobT); window._visJobT = setTimeout(() => { window._visJob = null; }, 2600); // freeze label (see FREEZE LOG)
   window._lastPatternAt = performance.now();
   try { _snapCascadeGhosts(); } catch (e) {}
@@ -23842,6 +23820,7 @@ function _applyRainbowState(m) {
     if (m.eq) { if (window._eqBeforeMode === undefined) window._eqBeforeMode = cur(); put(Object.assign({}, window._eqBeforeMode, m.eq)); }
     else if (window._eqBeforeMode !== undefined) { const q = window._eqBeforeMode; window._eqBeforeMode = undefined; put(q); }
   } catch (e) {}
+  try { _randomEqColour(); } catch (e) {} // RANDOM EQ COLOUR on every display-mode change, per direct request (see _randomEqColour)
   // DARK vs LIGHT modes, per direct request: once the mode's colours have landed, a DARK mode turns SONG NAME BACKGROUND
   // TRANSPARENT on and a LIGHT one turns it off (unless the mode names its own setting), and a LIGHT mode turns the EQ METER's
   // glows off.
@@ -24778,6 +24757,14 @@ let _nameEqAn = null, _nameEqBins = null, _nameEqLv = new Array(10).fill(0), _na
 window._nameEqLvRaw = _nameEqLv; window._nameEqLv20Raw = _nameEqLv20; // (the same arrays — RANGE reads them through these)
 window._nameEqColor = 'flash'; // default PLAY FLASH — the NAME option is gone (it matched the bar and vanished), per direct request
 try { const v = localStorage.getItem('sifiNameEqCol'); if (v && v !== 'name' && v !== 'tape') window._nameEqColor = (v === 'vfill' ? 'vhigh' : v); } catch (e) {} // NAME and TAPE options removed (both matched the bar), per direct request
+// RANDOM EQ COLOUR, per direct request (a try-out): every new pattern and every display-mode change (the rainbow icon drag, or
+// WILD's jump) picks the EQ METER's COLOUR at random — PLAY FLASH, TOP ROW, FILL LOW or FILL HIGH — never the same twice running.
+// MONO and GRAY keep their own (they need it black / grey).
+function _randomEqColour() {
+  if (document.body.classList.contains('mono') || document.body.classList.contains('gray-mode')) return;
+  const opts = ['flash', 'toprow', 'vlow', 'vhigh'].filter(c => c !== window._nameEqColor);
+  setNameEqColor(opts[Math.floor(Math.random() * opts.length)]);
+}
 function setNameEqColor(v) { window._nameEqColor = v; document.querySelectorAll('input[name="nameEqColor"]').forEach(r => { r.checked = r.value === v; }); try { localStorage.setItem('sifiNameEqCol', v); } catch (e) {} }
 window._nameEqOpacity = 50; window._nameEqGlow = false; // default 50%, per direct request
 try { const o = localStorage.getItem('sifiNameEqOp'); if (o !== null) window._nameEqOpacity = +o; window._nameEqGlow = localStorage.getItem('sifiNameEqGlow') === '1'; } catch (e) {}
@@ -25363,7 +25350,7 @@ function fullReset() {
       // ON → OFF / OFF → ON by the reverb's actual state, per direct request (was every other swipe): if any reverb is on
       // (the icon is lit = REVERB MIX above 0%) the swipe sets REVERB MIX and REVERB ON BEAT both to 0%; if it isn't, it rolls a
       // new random reverb (which lights the icon).
-      const _revOn = (window._globalDelayMix || 0) > 0.001;
+      const _revOn = _revIconActive(); // the same test as the icon's glow — lit = this swipe turns it all OFF
       if (_revOn) {
         setGlobalDelayMix(0);
         const dmb = document.getElementById('delayMixBar'); if (dmb) dmb.value = 0;
@@ -28062,7 +28049,7 @@ let _reelHoldTimer = null;
   // direct request. (SETTINGS keeps deferring only its sliders.)
   const lookMenu = document.getElementById('devMenuOverlay');
   const DEFER_TYPES = new Set(['checkbox', 'radio', 'color']);
-  const LIVE_IDS = new Set(['caSymSlider', 'nameEqRangeSlider', 'nameEqOpSlider', 'masterVolBar', 'eightBitMixSlider', 'musicBusBar', 'beatVolBar', 'fxEchoExtraSlider', 'fxEchoLevelSlider', 'modifyCountOpSlider', 'modifyNotesOpSlider', 'swingBar', 'clickLevelSlider']);
+  const LIVE_IDS = new Set(['nameEqRangeSlider', 'nameEqOpSlider', 'masterVolBar', 'eightBitMixSlider', 'musicBusBar', 'beatVolBar', 'fxEchoExtraSlider', 'fxEchoLevelSlider', 'modifyCountOpSlider', 'modifyNotesOpSlider', 'swingBar', 'clickLevelSlider']);
   const radioPending = new Map(); // group name -> the radio in it that was clicked
   const onEv = e => {
     const el = e.target;
