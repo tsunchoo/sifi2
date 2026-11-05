@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 06:25:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 06:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2712,6 +2712,10 @@ html body.modify #modifyAuto { display: flex; } /* MODIFY too now (was SQUARE on
 #modifyAuto.sp-mag-off { opacity: 0.45; }
 #modifyAuto:not(.sp-mag-off) { opacity: 1; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyLock:not(.sp-mag-off) * { color: #fff !important; } /* the locked padlock's glyph white on black (not a solid block) */
+/* GRAY: the engaged (inverted) A and padlock keep their light glyph — GRAY forces all text black, which made them solid blocks, per direct report */
+html body.gray-mode #modifyAuto:not(.sp-mag-off), html body.gray-mode #modifyAuto:not(.sp-mag-off) *, html body.gray-mode #modifyLock:not(.sp-mag-off), html body.gray-mode #modifyLock:not(.sp-mag-off) * { color: #f2f2f2 !important; }
+html body.gray-mode #modifyAuto:not(.sp-mag-off) svg [stroke]:not([stroke="none"]), html body.gray-mode #modifyLock:not(.sp-mag-off) svg [stroke]:not([stroke="none"]) { stroke: #f2f2f2 !important; }
+html body.gray-mode #modifyAuto:not(.sp-mag-off) svg [fill]:not([fill="none"]), html body.gray-mode #modifyLock:not(.sp-mag-off) svg [fill]:not([fill="none"]) { fill: #f2f2f2 !important; } /* (GRAY paints every SVG line / fill black — not these) */
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyAuto:not(.sp-mag-off), html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyAuto:not(.sp-mag-off) * { background: #000 !important; color: #fff !important; } /* (its A in white — it was going black-on-black, a solid block) */
 html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; margin: -22px 0 0 -22px; border-width: 6px; }
 /* CHROMATIC ABERRATION on the ring, per direct request — the cheap way: no filters, just four soft coloured shadows (red one side,
@@ -3105,7 +3109,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 06:25:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 06:55:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
