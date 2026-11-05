@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 04:45:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 05:10:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3097,7 +3097,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 04:45:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 05:10:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -22780,9 +22780,18 @@ function _tapeSig(snap) {
 function _songNameSave() {
   _flashNameBarHighlight();
   try {
-    const snap = _tapeSnapshot(), sig = _tapeSig(snap), items = window._tapeDrawerItems;
+    let snap = _tapeSnapshot(), sig = _tapeSig(snap), bumped = false; const items = window._tapeDrawerItems;
+    // SQUARE / HYBRID, per direct request: every graph variant of a song saves as a NEW, NUMBERED tape — once this song has a
+    // saved tape, a different version of it bumps the name's numeral first (… II, … III) and saves as its own tape
+    if (document.body.classList.contains('modify') && !items.some(x => x.sig === sig && x.kept)) {
+      const strip = n => (n || '').trim().replace(/\s+[IVXLC]+$/, ''), base = strip(_currentSpecies);
+      if (items.some(x => x.kept && strip(x.name) === base)) {
+        _currentSpecies = _songNameNextNumeral(_currentSpecies); bumped = true; try { _setSongNameDisplay(_currentSpecies); } catch (e) {}
+        snap = _tapeSnapshot(); sig = _tapeSig(snap);
+      }
+    }
     let it = items.find(x => x.sig === sig);
-    if (!it) { _addToTapeDrawer(); it = items[items.length - 1]; }
+    if (!it) { _addToTapeDrawer(); it = items[items.length - 1]; if (bumped && it) it.name = _currentSpecies; }
     else { _floatSavedHeart(); }
     if (it) { it.kept = true; if (window._tapeAuto && window._tapeAuto.item === it) window._tapeAuto.item = null; } // kept exactly as saved
   } catch (e) { console.error('tape drawer save failed', e); }
