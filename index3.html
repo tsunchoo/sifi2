@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 03:25:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 03:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -287,6 +287,7 @@ body.seq-playing .track-vol-bar:not(.muted) .track-vol-fill-solid.flash-pulse-de
 @keyframes name-flash-white { 0% { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.9); } 100% { text-shadow: 0 0 0 rgba(255,255,255,0); } }
 #nameDisplay.name-flash { animation: name-flash-white 450ms ease-out; }
 .track-name-btn > .tname-slide { display: inline-block; animation: song-name-scroll-left 576ms ease-out both; }
+.track-name-btn > .tname-slide.tname-from-right { animation-name: song-name-scroll-right; } /* a LEFT swipe's new name comes in from the right (with the swipe); BACK / the asterisk keep the slide from the left */
 body.tname-slide-long .track-name-btn > .tname-slide { animation-duration: 1008ms; } /* double-tap: 1.75x */ /* NEW INST swap — matches the asterisk's 576ms */
 #nameDisplay.song-name-scroll-left  { animation: song-name-scroll-left  0.5s ease-out; }
 #nameDisplay.song-name-scroll-right { animation: song-name-scroll-right 0.5s ease-out; }
@@ -3094,7 +3095,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 03:25:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 03:55:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -6440,6 +6441,29 @@ function randomizeCurrentInstruments(opts) {
 // asterisk glyph and each press swaps THAT track's instrument for another from the same sound-picker group (KIT / PERC / LEAD /
 // PAD / BASS), same one-of-a-kind rules as RANDOMIZE CURRENT INSTRUMENTS. Notes, volume, FX and mute are left as they are.
 function setLockSwap(on) { document.body.classList.toggle('lock-swap', !!on); const c = document.getElementById('lockSwapToggle'); if (c) c.checked = !!on; }
+// TRACK-NAME RIGHT SWIPE = BACK, per direct request: the instrument this track had before its last new-instrument swap (each swipe
+// goes one further back). Notes, fader, FX and mute stay as they are, like the swap itself.
+function trackInstrumentBack(tr) {
+  const h = window._instHist && window._instHist[tr]; if (!h || !h.length) return false;
+  const prev = h.pop(); if (!prev || !INSTRUMENTS[prev]) return false;
+  const wasMuted = trackMuted[tr]; selectSound(tr, prev); if (wasMuted) { trackMuted[tr] = true; updateTrackMute(tr); }
+  redrawTrackCells(tr, true);
+  const nb = document.getElementById(`tbtn-${tr}`);
+  if (nb) { const s = document.createElement('span'); s.className = 'tname-slide'; s.textContent = nb.textContent; nb.textContent = ''; nb.appendChild(s); }
+  markModified(); try { playFlipSound(); } catch (e) {} return true;
+}
+// THE SONG NAME'S SWIPE SWEEP on a track name button too, per direct request: a soft band crosses it in the swipe's direction
+function _btnSwipeFx(el, dir) {
+  if (!el || typeof Element.prototype.animate !== 'function') return;
+  if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+  const wrap = document.createElement('span'); wrap.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3;border-radius:inherit;';
+  const band = document.createElement('span'); const _lt = document.body.classList.contains('bg-dark') ? '255,255,255' : '0,0,0';
+  band.style.cssText = `position:absolute;top:0;bottom:0;left:0;width:120%;background:linear-gradient(to right, rgba(${_lt},0), rgba(${_lt},0.4), rgba(${_lt},0));`;
+  wrap.appendChild(band); el.appendChild(wrap);
+  const from = dir > 0 ? '-100%' : '84%', to = dir > 0 ? '84%' : '-100%';
+  const a = band.animate([{ transform: `translateX(${from})`, opacity: 0 }, { opacity: 1, offset: 0.35 }, { opacity: 1, offset: 0.65 }, { transform: `translateX(${to})`, opacity: 0 }], { duration: 520, easing: 'cubic-bezier(0.3, 0.6, 0.3, 1)' });
+  a.onfinish = () => wrap.remove(); setTimeout(() => wrap.remove(), 1200);
+}
 function swapTrackInstrumentInGroup(tr, anyGroup, avoidKey) { // anyGroup (double-tap): pick from EVERY instrument, whatever its group — drums <-> percussion <-> tonal
   const cur = trackInstruments[tr]; if (!cur || !INSTRUMENTS[cur]) return false;
   const isBass = k => ['sbass','sbass3','sbass4','dbass','pbass','sludge'].includes(k);
@@ -6472,12 +6496,13 @@ function swapTrackInstrumentInGroup(tr, anyGroup, avoidKey) { // anyGroup (doubl
   if (!options.length) options = INSTRUMENT_KEYS.filter(k => k !== cur && inGrp(k) && !trackInstruments.includes(k)); // one-of rules would leave nothing — still never duplicate a track
   if (!options.length) return false;
   const wasMuted = trackMuted[tr];
+  { const h = (window._instHist = window._instHist || {}); (h[tr] = h[tr] || []).push(cur); if (h[tr].length > 20) h[tr].shift(); } // remembered for the track-name RIGHT swipe (back)
   selectSound(tr, options[Math.floor(Math.random() * options.length)]);
   if (wasMuted) { trackMuted[tr] = true; updateTrackMute(tr); }
   redrawTrackCells(tr, true);
   // the old name vanishes and the new one slides in from the left over the asterisk animation's length (same slide as the song name's scroll-left)
   const nb = document.getElementById(`tbtn-${tr}`);
-  if (nb) { const s = document.createElement('span'); s.className = 'tname-slide'; s.textContent = nb.textContent; nb.textContent = ''; nb.appendChild(s); }
+  if (nb) { const s = document.createElement('span'); s.className = 'tname-slide' + (window._tnFromRight ? ' tname-from-right' : ''); s.textContent = nb.textContent; nb.textContent = ''; nb.appendChild(s); }
   markModified();
   return true;
 }
@@ -8384,11 +8409,12 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // touched. One lap every 4 bars at the current tempo (was 2). Leaving SQUARE re-arms it for next time.
   let orbitRaf = 0, orbitOff = false, orbitA = null, orbitR = 0, orbitLast = 0, orbitApplyAt = 0, orbitTargetR = 0.385;
   const orbiting = () => document.body.classList.contains('modify') && !orbitOff && !held; // MODIFY and SQUARE, per direct request
+  const orbitMoving = () => orbiting() && typeof playing !== 'undefined' && playing; // PAUSED while playback is stopped (AUTO stays on) — it picks up where it was when PLAY is pressed again, per direct request
   // the A button: lit = AUTO on (circling). Only the A button switches it off / on — touching the graph just sizes the circle
   function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) a.classList.toggle('sp-mag-off', !!orbitOff); }
   function setOrbitAuto(on) { orbitOff = !on; syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; } }
   function orbitTick(now) {
-    orbitRaf = 0; if (!orbiting()) return;
+    orbitRaf = 0; if (!orbitMoving()) return;
     if (!pad) { pad = capture(); }
     const dt = Math.min(0.1, Math.max(0, (now - (orbitLast || now)) / 1000)); orbitLast = now;
     let per = 8; try { per = Math.max(4, Math.min(32, stepDuration() * 64)); } catch (e) {} // one lap every 4 bars (was 2 — half the speed), per direct request
@@ -8402,7 +8428,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   }
   setInterval(() => {
     if (!document.body.classList.contains('modify')) { if (orbitOff) { orbitOff = false; syncAutoBtn(); } orbitA = null; orbitLast = 0; orbitTargetR = 0.385; return; } // re-armed (AUTO on) for the next visit
-    if (orbiting() && !orbitRaf) { springStop(); orbitLast = 0; orbitRaf = requestAnimationFrame(orbitTick); }
+    if (orbitMoving() && !orbitRaf) { springStop(); orbitLast = 0; orbitRaf = requestAnimationFrame(orbitTick); }
   }, 250);
   function springStop() { if (springRaf) { cancelAnimationFrame(springRaf); springRaf = 0; } }
   function springHome(x0, y0) {
@@ -25382,8 +25408,14 @@ function fullReset() {
         _swipeHandled = true;
         _dragActive = false;
         if (_nameHoldTimer) { clearTimeout(_nameHoldTimer); _nameHoldTimer = null; }
-        if (dx > 0 && !document.body.classList.contains('lock-swap') && trackSweep[_nameHoldTr]) { /* LOCKED: the NEW INSTRUMENT swipe does nothing, per direct request */ }
-        else if (dx > 0 && !document.body.classList.contains('lock-swap')) {
+        if (!document.body.classList.contains('lock-swap') && trackSweep[_nameHoldTr]) { /* LOCKED: the instrument swipes do nothing, per direct request */ }
+        else if (dx > 0 && !document.body.classList.contains('lock-swap')) { // RIGHT = BACK to the previous instrument, per direct request (was NEW)
+          try { _btnSwipeFx(document.getElementById(`tbtn-${_nameHoldTr}`), 1); } catch (e) {}
+          if (!trackInstrumentBack(_nameHoldTr)) { try { _showNotice('NO EARLIER INSTRUMENT'); } catch (e) {} }
+        }
+        else if (dx < 0 && !document.body.classList.contains('lock-swap')) { // LEFT = NEW INSTRUMENT, per direct request (was the right swipe)
+          try { _btnSwipeFx(document.getElementById(`tbtn-${_nameHoldTr}`), -1); } catch (e) {}
+          window._tnFromRight = true; setTimeout(() => { window._tnFromRight = false; }, 0);
           // LOCK BUTTONS = NEW INST OFF (the button locks), per direct request: a right swipe does the NEW INSTRUMENT action instead —
           // exactly a tap on the track's asterisk button in NEW INST mode (two quick swipes = any group, like its double-tap)
           const lb = document.getElementById(`swpbtn-${_nameHoldTr}`);
@@ -28330,7 +28362,7 @@ function snapshotDisplay() {
     ['#beatBtn', 'DRUMS', 'Tap to switch the drum beat on or off. Hold for the beat menu — beat types, the drums\' own FX button (FX / EN / DS / DL), and A for DRUMS AUTO.'],
     ['#scratchBtn', 'A / B', 'Jumps back to the previous pattern; tap again to go back. Handy for comparing two grooves.'],
     ['#saveBtn', 'RECORD', 'Tap to start recording in real time. Hold for the RECORD menu: real time, bounce loops or stems, save a tape, or send a tape link.'],
-    ['.track-name-btn', 'INSTRUMENT NAME', 'The instrument on this track. Tap to mute / unmute, hold for the instrument menu, swipe RIGHT to lock the track (again to unlock).'],
+    ['.track-name-btn', 'INSTRUMENT NAME', 'The instrument on this track. Tap to mute / unmute, hold for the instrument menu, swipe LEFT for a new instrument, RIGHT to go back to the one before (with the lock buttons set to NEW INST, swipe RIGHT locks the track instead).'],
     ['.lock-btn', 'INSTRUMENT RANDOMIZER', 'Tap for a new instrument in the same family. Double-tap to switch between tonal and drums.'],
     ['.track-vol-bar', 'TRACK VOLUME', () => MOD() ? 'Drag to change level — in MODIFY only the live level meter shows (no fader).' : 'Drag to change level. With VOL BANGER on, the fill bounces with the track\'s live level.'],
     ['.shift-btn', '<  OFFSET', 'Moves the track\'s notes a step earlier. The step size is set in LOOK AND FEEL under DEV / BEHAVIOUR.'],
