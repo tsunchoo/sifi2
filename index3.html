@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 17:55:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-05 18:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3101,7 +3101,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 17:55:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 18:50:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -3322,7 +3322,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
          SHUFFLE INSTRUMENTS (was the CURRENT INSTRUMENTS button) is now a toggle per column: on = that gesture swaps the
          instruments on the current pattern; off = it makes a new pattern using that column's settings. Built in JS (_randoBuildUI). -->
     <div id="randoCols"></div>
-    <div id="randoGlobal" style="display:flex;flex-direction:column;gap:10px;border-top:1px solid rgba(0,0,0,0.12);padding-top:16px;"></div><!-- DRUM MUSIC RATIO: overall rule for every gesture -->
+    <!-- (DRUM MUSIC RATIO + NOTE INTENSITY moved back to SETTINGS, before SWING, per direct request) --><!-- DRUM MUSIC RATIO: overall rule for every gesture -->
     <!-- AUTOMATE (was the + long-press AUTO mode) and its period, per direct request -->
     <!-- AUTO MODE on/off toggle removed, per direct request (AUTO is switched on/off from the >> button itself) -->
     <!-- what AUTO does each time it triggers, per direct request: a whole NEW PATTERN (off) or NEW INSTRUMENTS on the pattern that's playing (on) -->
@@ -3769,6 +3769,53 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
            request — setBgFollowsBarColor and its applyBarColor() hook are
            kept intact elsewhere for this reason. -->
       <!-- NOTE MARKERS GRAYSCALE + all TIME RULER controls moved here (under TOP ROW COLOR) from the main menu, per direct request -->
+      <!-- moved here from SETTINGS, per direct request -->
+      <!-- SONG NAME EQ (moved to the top of SETTINGS from LOOK AND FEEL > DEV), per direct request -->
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">SONG NAME EQ</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#111;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqStyle" value="off" onchange="setNameEqStyle(this.value)" style="width:14px;height:14px;cursor:pointer;">OFF</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqStyle" value="bars" checked onchange="setNameEqStyle(this.value)" style="width:14px;height:14px;cursor:pointer;">BARS</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqStyle" value="leds" onchange="setNameEqStyle(this.value)" style="width:14px;height:14px;cursor:pointer;">LEDS</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqStyle" value="vert" onchange="setNameEqStyle(this.value)" style="width:14px;height:14px;cursor:pointer;">VERT</label>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#111;flex-wrap:wrap;">
+          <span style="color:#555;">COLOUR</span><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqColor" value="flash" checked onchange="setNameEqColor(this.value)" style="width:14px;height:14px;cursor:pointer;">PLAY FLASH</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqColor" value="toprow" onchange="setNameEqColor(this.value)" style="width:14px;height:14px;cursor:pointer;">TOP ROW</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqColor" value="vlow" onchange="setNameEqColor(this.value)" style="width:14px;height:14px;cursor:pointer;">FILL LOW</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqColor" value="vhigh" onchange="setNameEqColor(this.value)" style="width:14px;height:14px;cursor:pointer;">FILL HIGH</label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">OPACITY</div>
+          <div id="nameEqOpVal" style="font-size:0.75rem;font-weight:700;color:#111;">50%</div>
+        </div>
+        <input autocomplete="off" type="range" id="nameEqOpSlider" min="0" max="100" step="1" value="50" class="master-vol-slider" oninput="setNameEqOpacity(this.value)" onchange="setNameEqOpacity(this.value)" style="width:100%;">
+        <!-- RANGE (EXAGGERATE) slider removed — hardcoded 1.4x, per direct request -->
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">SONG NAME BACKGROUND TRANSPARENT</div>
+          <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="nameBgClearToggle" onchange="setNameBgClear(this.checked)"><span class="wild-toggle-slider"></span></label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">GLOW</div>
+          <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="nameEqGlowToggle" onchange="setNameEqGlow(this.checked)"><span class="wild-toggle-slider"></span></label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">PLAY FLASH GLOW (LIKE THE NOTES)</div>
+          <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="nameEqFlashGlowToggle" onchange="setNameEqFlashGlow(this.checked)"><span class="wild-toggle-slider"></span></label>
+        </div>
+        <script>try { let v = localStorage.getItem('sifiNameEq'); if (v === 'circles') v = 'vert'; if (v) document.querySelectorAll('input[name="nameEqStyle"]').forEach(r => { r.checked = r.value === v; }); } catch (e) {} try { const c2 = localStorage.getItem('sifiNameEqCol'); if (c2 && c2 !== 'name' && c2 !== 'tape') { const c3 = c2 === 'vfill' ? 'vhigh' : c2; document.querySelectorAll('input[name="nameEqColor"]').forEach(r => { r.checked = r.value === c3; }); } } catch (e) {}</script>
+      </div>
+      <!-- TAPE = LOGO COLOUR, per direct request -->
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">TAPE MATCHES LOGO COLOUR</div>
+        <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="tapeFromLogoToggle" onchange="setTapeFromLogo(this.checked)"><span class="wild-toggle-slider"></span></label>
+      </div>
+      <!-- MODIFY COUNT (the big count in the middle of the MODIFY pad): on/off + opacity, per direct request -->
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">GRAPH COUNT</div>
+          <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="modifyCountToggle" checked onchange="setModifyCount(this.checked)"><span class="wild-toggle-slider"></span></label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">OPACITY</div>
+          <div id="modifyCountOpVal" style="font-size:0.75rem;font-weight:700;color:#111;">30%</div>
+        </div>
+        <input autocomplete="off" type="range" id="modifyCountOpSlider" min="0" max="100" step="1" value="30" class="master-vol-slider" oninput="setModifyCountOpacity(this.value)" onchange="setModifyCountOpacity(this.value)" style="width:100%;">
+      </div>
     </div>
 
     <div id="devMorePanel2" style="display:none;flex-direction:column;gap:10px;">
@@ -4027,58 +4074,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
       <button type="button" onclick="window._sifiCheckUpdate && window._sifiCheckUpdate(); const s = document.getElementById('updStatus'); if (s) s.textContent = 'checking…';" style="flex-shrink:0;font:700 0.6rem 'DM Sans',sans-serif;letter-spacing:1px;padding:6px 10px;background:none;border:1px solid #999;color:#111;cursor:pointer;">CHECK NOW</button>
     </div>
     <!-- MODIFY NOTE ROWS IN TRACK COLOURS removed from SETTINGS and hard-coded ON, per direct request -->
-    <!-- SONG NAME EQ (moved to the top of SETTINGS from LOOK AND FEEL > DEV), per direct request -->
-    <div style="display:flex;flex-direction:column;gap:6px;">
-      <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">SONG NAME EQ</div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#111;flex-wrap:wrap;">
-        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqStyle" value="off" onchange="setNameEqStyle(this.value)" style="width:14px;height:14px;cursor:pointer;">OFF</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqStyle" value="bars" checked onchange="setNameEqStyle(this.value)" style="width:14px;height:14px;cursor:pointer;">BARS</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqStyle" value="leds" onchange="setNameEqStyle(this.value)" style="width:14px;height:14px;cursor:pointer;">LEDS</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqStyle" value="vert" onchange="setNameEqStyle(this.value)" style="width:14px;height:14px;cursor:pointer;">VERT</label>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#111;flex-wrap:wrap;">
-        <span style="color:#555;">COLOUR</span><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqColor" value="flash" checked onchange="setNameEqColor(this.value)" style="width:14px;height:14px;cursor:pointer;">PLAY FLASH</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqColor" value="toprow" onchange="setNameEqColor(this.value)" style="width:14px;height:14px;cursor:pointer;">TOP ROW</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqColor" value="vlow" onchange="setNameEqColor(this.value)" style="width:14px;height:14px;cursor:pointer;">FILL LOW</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input autocomplete="off" type="radio" name="nameEqColor" value="vhigh" onchange="setNameEqColor(this.value)" style="width:14px;height:14px;cursor:pointer;">FILL HIGH</label>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">OPACITY</div>
-        <div id="nameEqOpVal" style="font-size:0.75rem;font-weight:700;color:#111;">50%</div>
-      </div>
-      <input autocomplete="off" type="range" id="nameEqOpSlider" min="0" max="100" step="1" value="50" class="master-vol-slider" oninput="setNameEqOpacity(this.value)" onchange="setNameEqOpacity(this.value)" style="width:100%;">
-      <!-- RANGE (EXAGGERATE) slider removed — hardcoded 1.4x, per direct request -->
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">SONG NAME BACKGROUND TRANSPARENT</div>
-        <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="nameBgClearToggle" onchange="setNameBgClear(this.checked)"><span class="wild-toggle-slider"></span></label>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">GLOW</div>
-        <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="nameEqGlowToggle" onchange="setNameEqGlow(this.checked)"><span class="wild-toggle-slider"></span></label>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">PLAY FLASH GLOW (LIKE THE NOTES)</div>
-        <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="nameEqFlashGlowToggle" onchange="setNameEqFlashGlow(this.checked)"><span class="wild-toggle-slider"></span></label>
-      </div>
-      <script>try { let v = localStorage.getItem('sifiNameEq'); if (v === 'circles') v = 'vert'; if (v) document.querySelectorAll('input[name="nameEqStyle"]').forEach(r => { r.checked = r.value === v; }); } catch (e) {} try { const c2 = localStorage.getItem('sifiNameEqCol'); if (c2 && c2 !== 'name' && c2 !== 'tape') { const c3 = c2 === 'vfill' ? 'vhigh' : c2; document.querySelectorAll('input[name="nameEqColor"]').forEach(r => { r.checked = r.value === c3; }); } } catch (e) {}</script>
-    </div>
-    <!-- TAPE = LOGO COLOUR, per direct request -->
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">TAPE MATCHES LOGO COLOUR</div>
-      <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="tapeFromLogoToggle" onchange="setTapeFromLogo(this.checked)"><span class="wild-toggle-slider"></span></label>
-    </div>
-    <!-- MODIFY COUNT (the big count in the middle of the MODIFY pad): on/off + opacity, per direct request -->
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">GRAPH COUNT</div>
-        <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="modifyCountToggle" checked onchange="setModifyCount(this.checked)"><span class="wild-toggle-slider"></span></label>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">OPACITY</div>
-        <div id="modifyCountOpVal" style="font-size:0.75rem;font-weight:700;color:#111;">30%</div>
-      </div>
-      <input autocomplete="off" type="range" id="modifyCountOpSlider" min="0" max="100" step="1" value="30" class="master-vol-slider" oninput="setModifyCountOpacity(this.value)" onchange="setModifyCountOpacity(this.value)" style="width:100%;">
-      <!-- MODIFY NOTE MARKERS opacity (the notes shown on the pad while it's held / after a >> double-click), per direct request -->
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">NOTE MARKERS OPACITY</div>
-        <div id="modifyNotesOpVal" style="font-size:0.75rem;font-weight:700;color:#111;">30%</div>
-      </div>
-      <input autocomplete="off" type="range" id="modifyNotesOpSlider" min="0" max="100" step="1" value="30" class="master-vol-slider" oninput="setModifyNotesOpacity(this.value)" onchange="setModifyNotesOpacity(this.value)" style="width:100%;">
-    </div>
+    <!-- SONG NAME EQ … GRAPH COUNT moved to LOOK AND FEEL > DEV (NOTE MARKERS OPACITY removed), per direct request -->
     <!-- FX ECHO DELAY / LEVEL moved to the REVERB menu under DELAY, per direct request -->
     <!-- everything that was above the song name (VOL FILL look/colours, AUTO NOTES FLASH LENGTH, SWEEP RIGHT = 8-BIT) moved to DEV, next to VOLUME SLIDER, per direct request -->
     <!-- Song name on its own line, scale + tempo on the line below -->
@@ -4158,6 +4154,8 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 
 
 
+      <!-- DRUM MUSIC RATIO + NOTE INTENSITY back in SETTINGS right before SWING, per direct request (built by _randoBuildUI) -->
+      <div id="randoGlobal" style="display:flex;flex-direction:column;gap:10px;"></div>
       <div style="display:flex;flex-direction:column;gap:15px;">
         <div style="display:flex;justify-content:space-between;">
           <div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">SWING</div>
@@ -6099,7 +6097,7 @@ function showRandMenu() {
 const _RANDO_COL_DEFAULT = full => ({ notes: full, shuffle: true, reverb: full, beatFx: full, eightBit: false, beatType: full, tempo: full, intRand: false });
 const _RANDO_DEFAULT = () => ({ click: _RANDO_COL_DEFAULT(false), dbl: _RANDO_COL_DEFAULT(true), shake: _RANDO_COL_DEFAULT(false) /* SHAKE defaults to the same as a single click, per direct request */ });
 window._randoCfg = _RANDO_DEFAULT();
-window._randoGlobal = { ratioRand: false, ratio: 2, intensity: 25 }; // DRUM MUSIC RATIO + the one NOTE INTENSITY slider — overall rules for every gesture (each column's NOTE INTENSITY toggle: on = this slider, off = random)
+window._randoGlobal = { ratioRand: false, ratio: 3, intensity: 25 }; // DRUM MUSIC RATIO + the one NOTE INTENSITY slider — overall rules for every gesture (each column's NOTE INTENSITY toggle: on = this slider, off = random)
 // AUTO MODE's action (RANDO BUTTON menu, DOES: toggle), per direct request — 'pattern' = a whole new pattern (the DOUBLE CLICK
 // column's settings), 'instruments' = just new instruments on the pattern that's playing
 window._autoDoes = 'pattern';
@@ -8343,7 +8341,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
       lk.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setLatch(!window._padLatch); });
       b.appendChild(lk);
       const au = document.createElement('button'); au.id = 'modifyAuto'; au.type = 'button'; au.setAttribute('aria-label', 'auto');
-      au.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="display:block;"><path d="M5.2 21L12 3.2L18.8 21M8 14.4h8" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg>'; // a capital A, the padlock glyph's height
+      au.innerHTML = '<span style="display:block;font-family:\'DM Sans\',sans-serif;font-weight:700;font-size:23px;line-height:1;letter-spacing:0;pointer-events:none;">A</span>'; // a capital A in the TOP ROW buttons' font (DM Sans Bold), per direct request
       au.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setOrbitAuto(orbitOff); try { playUiSound('tinyclick'); } catch (er) {} });
       b.appendChild(au); syncAutoBtn();
       setTimeout(() => showDot(pad ? [pad.x, pad.y] : null), 0); // ring + colour showing from the start
@@ -24460,7 +24458,7 @@ window._devRandOffsetEnabled = false;
 function setDevRandOffset(on) {
   window._devRandOffsetEnabled = !!on;
 }
-window._tonalPercBalance = 2; // 0-6 — how many of the 6 tracks RAND aims for tonal, the rest going to percussion
+window._tonalPercBalance = 3; // 0-6 — how many of the 6 tracks RAND aims for tonal, the rest going to percussion
 function setTonalPercBalance(v) {
   window._tonalPercBalance = +v;
   const readout = document.getElementById('tonalPercBalanceReadout');
@@ -25220,8 +25218,8 @@ function fullReset() {
   _setCb('automateToggle', false); if (typeof _syncAutoPeriodRow === 'function') _syncAutoPeriodRow();
   setAutoRandPeriod(0); { const sl = document.getElementById('autoRandPeriodSlider'); if (sl) sl.value = 0; }
   try { setAutoDoes('pattern'); } catch (e) {}
-  setTonalPercBalance(2); { const sl = document.getElementById('tonalPercBalanceSlider'); if (sl) sl.value = 2; }
-  window._randoCfg = _RANDO_DEFAULT(); window._randoGlobal = { ratioRand: false, ratio: 2, intensity: 25 }; try { _randoBuildUI(); } catch (e) {} // RANDO BUTTON columns back to their defaults
+  setTonalPercBalance(3); { const sl = document.getElementById("tonalPercBalanceSlider"); if (sl) sl.value = 3; }
+  window._randoCfg = _RANDO_DEFAULT(); window._randoGlobal = { ratioRand: false, ratio: 3, intensity: 25 }; try { _randoBuildUI(); } catch (e) {} // RANDO BUTTON columns back to their defaults
   setIntensity(25); { const sl = document.getElementById('intensitySlider'); if (sl) sl.value = 25; }
   setMasterVol(0.8);
   setEightBitMix(0); { const sl = document.getElementById('eightBitMixSlider'); if (sl) sl.value = 0; }
