@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-06 01:32:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-06 05:31:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2717,7 +2717,7 @@ html body.modify-square #modifyPadMarks .sp-dot { width: 44px; height: 44px; mar
 html body:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 3.5px; box-shadow: 0 0 calc(6.9px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 100% * var(--mglow, 1.5))), transparent), 0 0 calc(18px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 70% * var(--mglow, 1.5))), transparent), calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) calc(1px + var(--cad, 0) * 2.5px) rgba(var(--ca-r, 255,20,60),calc(0.75 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) calc(1px + var(--cad, 0) * 2.5px) rgba(var(--ca-c, 0,200,255),calc(0.75 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) calc(1px + var(--cad, 0) * 2.5px) rgba(var(--ca-c, 0,200,255),calc(0.615 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) calc(1px + var(--cad, 0) * 2.5px) rgba(var(--ca-r, 255,20,60),calc(0.615 * var(--caa, 1))), 0 0 2px rgba(255,255,255,calc(0.225 * var(--caa, 1))) !important; /* the split now points AWAY FROM / TOWARDS THE GRAPH'S CENTRE (--cax / --cay, set as the ring moves) and grows towards the edges, like a real lens, per direct request */ }
 html body.modify-square:not(#_c1):not(#_c2):not(#_c3):not(#_c4) #modifyPadMarks .sp-dot { --cak: 5.5px; box-shadow: 0 0 calc(6.9px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 100% * var(--mglow, 1.5))), transparent), 0 0 calc(18px * var(--mglow, 1.5) * var(--rg, 0)) color-mix(in srgb, currentColor calc(min(100%, 70% * var(--mglow, 1.5))), transparent), calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) calc(1.5px + var(--cad, 0) * 3px) rgba(var(--ca-r, 255,20,60),calc(0.75 * var(--caa, 1))), calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) calc(1.5px + var(--cad, 0) * 3px) rgba(var(--ca-c, 0,200,255),calc(0.75 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak) * -1) calc(var(--cay, 0) * var(--cak) * -1) calc(1.5px + var(--cad, 0) * 3px) rgba(var(--ca-c, 0,200,255),calc(0.615 * var(--caa, 1))), inset calc(var(--cax, -0.66) * var(--cak)) calc(var(--cay, 0) * var(--cak)) calc(1.5px + var(--cad, 0) * 3px) rgba(var(--ca-r, 255,20,60),calc(0.615 * var(--caa, 1))), 0 0 3px rgba(255,255,255,calc(0.225 * var(--caa, 1))) !important; } /* (outranks the glow-off / glow-pause rules — it's not a glow) */ /* SQUARE: the ring twice as big and twice as thick, per direct request */
 #modifyLock.sp-unlatched { opacity: 0.55; }
-html body.name-bg-clear #nameBar { background: transparent !important; background-color: transparent !important; } /* SONG NAME BG TRANSPARENT (SETTINGS > SONG NAME EQ), per direct request */
+/* (SONG NAME BG TRANSPARENT no longer applies in MAIN — the bar keeps its own colour there, per direct request; HYBRID / SQUARE use the rule above) */ /* SONG NAME BG TRANSPARENT (SETTINGS > SONG NAME EQ), per direct request */
 html body.song-name-hidden.seq-playing #nameDisplay { visibility: hidden !important; } /* SONG NAME hidden (hold the bar), per direct request — only WHILE PLAYING: stopped, the name always shows; press play and it's hidden again */
 /* PLAY FLASH default = the loading bar's orange (#f17d21), per direct request. */
 :root { --play-flash-color: #ffffff; --tglow: 0.5; --fillglow: 0; --rglow: 1.5; } /* VOL FILL GLOW default 0%, per direct request (a display mode can set its own — CLUB 300%) */ /* TOP ROW GLOW hardcoded 150%, per direct request */ /* TRACK BUTTON GLOW + VOL FILL GLOW default 50%, per direct request */
@@ -3103,7 +3103,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-06 01:32:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-06 05:31:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -24750,7 +24750,13 @@ function _allocSwipeNew() {
   window._allocHistory.push(before); if (window._allocHistory.length > 20) window._allocHistory.shift();
   _allocApply(next);
 }
-function _allocSwipeBack() { // SWIPE LEFT, per direct request: takes ONE effect (an FX-button stop or an R reverb) off the pattern each time — unlocked tracks only — until none are left
+function _allocSwipeBack() { // SWIPE LEFT = RECALL the last set of effect assignments (from before the last SWIPE RIGHT), per direct request — repeatable, back through up to 20
+  try { _nameSwipeFx(-1); } catch (e) {}
+  const prev = window._allocHistory.pop();
+  if (!prev) { try { _showNotice('NO EARLIER EFFECTS'); } catch (e) {} return; }
+  _allocApply(prev); // (LOCKED tracks untouched, as ever; the ones that come back flash in)
+}
+function _allocSwipeRemoveOne() { // (was SWIPE LEFT: takes ONE effect (an FX-button stop or an R reverb) off the pattern each time — unlocked tracks only — until none are left
   try { _nameSwipeFx(-1); } catch (e) {}
   const cur = _allocSnap(), slots = [];
   for (let tr = 0; tr < NUM_TRACKS; tr++) { if (trackSweep[tr]) continue; if (_allocFxState(cur[tr]) !== 'off') slots.push([tr, 'fx']); if (cur[tr].rev) slots.push([tr, 'rev']); if (cur[tr].auto) slots.push([tr, 'auto']); }
@@ -24815,6 +24821,7 @@ function _nameEqTick(now) {
   requestAnimationFrame(_nameEqTick);
   const cv = document.getElementById('nameEq'); if (!cv) return;
   let style = window._nameEqStyle;
+  if (!document.body.classList.contains('modify')) style = 'off'; // MAIN: no EQ graphic — the song name is just its bar colour again, per direct request (HYBRID / SQUARE keep it)
   // MODIFY / SQUARE, per direct request: no LINE or LEDS there — a display mode that brings one gets BARS or VERT instead (picked
   // at random once per display mode, so it doesn't flicker between them)
   if ((style === 'leds' || style === 'peaks' || style === 'line') && document.body.classList.contains('modify')) {
@@ -24995,6 +25002,7 @@ setInterval(() => {
     let txt = null; try { const c = _anyRgba(_rootCS().getPropertyValue('--name-bar-bg').trim() || getComputedStyle(document.getElementById('nameBar')).backgroundColor); if (c && c[3] > 0.3) txt = _relLum(c) > 0.18 ? '#111111' : '#ffffff'; } catch (e) {}
     if (txt) { if (nd._eqTxt !== txt) { nd.style.setProperty('color', txt, 'important'); nd._eqTxt = txt; } return; }
   }
+  if (!document.body.classList.contains('modify')) { if (nd._eqTxt) { nd.style.removeProperty('color'); nd._eqTxt = null; } return; } // MAIN: no EQ, so the display mode's own name colour, per direct request
   if (document.body.classList.contains('name-bg-clear')) {
     let txt = null; try { const c = _anyRgba(_rootCS().getPropertyValue('--bg').trim() || getComputedStyle(document.body).backgroundColor); if (c) txt = _relLum(c) > 0.18 ? '#111111' : '#ffffff'; } catch (e) {}
     if (txt) { if (nd._eqTxt !== txt) { nd.style.setProperty('color', txt, 'important'); nd._eqTxt = txt; } return; }
@@ -28444,7 +28452,7 @@ function snapshotDisplay() {
     ['#nameBar', 'SONG NAME', (x, y) => {
       const r = document.getElementById('nameBar').getBoundingClientRect();
       if (MOD() && y - r.top >= 56) return ['GRAPH', 'Hold and move: LEFT mutes notes, RIGHT adds them; DOWN takes effects away (and chops tracks with EN), UP adds random effects (drums too). The centre is the pattern as it was; With the PADLOCK off (default) it springs back to the centre when you let go; tap the padlock to lock it where you leave it. Double-tap the graph to reset it (with the right spool swell). Double-click >> to watch the new notes land below. The big number is the count.'];
-      return [MOD() ? 'SONG NAME (HYBRID / SQUARE)' : 'SONG NAME', 'Each new pattern gets a randomized name. Double-tap to keep it in the TAPE DRAWER (a heart floats up). Swipe RIGHT to add effects (and change the EQ type), LEFT to take them off. Hold to hide or show the name.'];
+      return [MOD() ? 'SONG NAME (HYBRID / SQUARE)' : 'SONG NAME', 'Each new pattern gets a randomized name. Double-tap to keep it in the TAPE DRAWER (a heart floats up). Swipe RIGHT to add effects (and change the EQ type), LEFT to bring back the effects you had before. Hold to hide or show the name.'];
     }],
     ['#slotBar', 'SLOTS', 'Up to six saved patterns. Tap one to switch to it on the next beat.'],
     ['#randBtn', '>>  RANDOMIZER', 'Tap for new instruments on the current pattern; double-tap for a brand-new groove on the next bar (and a new delay time and level). Hold for AUTO. Drag DOWN for the RANDO BUTTON menu — what a click, double-click and AUTO do. Locked tracks always stay as they are.'],
