@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-06 06:26:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-06 06:32:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1129,8 +1129,8 @@ html body .track-wrap:not(.track-empty) .track-vol-bar:not(.muted) .track-vol-fi
 /* STOPPED = GRAYSCALE, per direct request: the whole app (header, top row, name bar, tracks) drains to grey while playback is
    stopped and the colour comes back on PLAY. Filtered per section, not on <body>, so the menus / overlays (fixed-position,
    outside these) keep their colours and positions. */
-html body > header, html body > .transport, html body > #nameBar, html body > #seqWrap, html body > .footer { transition: filter 0.35s ease-out; }
-html body:not(.seq-playing) > header, html body:not(.seq-playing) > .transport, html body:not(.seq-playing) > #nameBar, html body:not(.seq-playing) > #seqWrap, html body:not(.seq-playing) > .footer { filter: grayscale(1); }
+html body > header, html body > .transport, html body > #nameBar, html body > #seqWrap, html body > #slotBar, html body > .footer { transition: filter 0.35s ease-out; }
+html body:not(.seq-playing) > header, html body:not(.seq-playing) > .transport, html body:not(.seq-playing) > #nameBar, html body:not(.seq-playing) > #seqWrap, html body:not(.seq-playing) > #slotBar, html body:not(.seq-playing) > .footer { filter: grayscale(1); } /* (+ the SAVE SLOTS, per direct request) */
 /* ...EXCEPT the >> button while a DOUBLE-CLICK new pattern loads (body.np-loading, during its brief stop), per direct request —
    everything else grey, >> in colour, as it used to be. */
 html body.np-loading:not(.seq-playing) > .transport { filter: none; }
@@ -1278,7 +1278,7 @@ html body.mortar-extra:not(.mortar-clear) .step-cell:not(.on):not(.soft):not(.le
 /* MASTER brightness (LOOK AND FEEL, under LIGHTNESS), per direct request — a brightness filter on every on-screen block (header,
    top row, song name, tracks, footer) but never the page background itself. Only applied when it's not 100%, since a filter on
    these big blocks costs graphics work every frame. */
-body.master-bright header, body.master-bright .transport, body.master-bright #nameBar, body.master-bright #seqWrap, body.master-bright .footer { filter: brightness(var(--master-bright, 1)); }
+body.master-bright header, body.master-bright .transport, body.master-bright #nameBar, body.master-bright #seqWrap, body.master-bright #slotBar, body.master-bright .footer { filter: brightness(var(--master-bright, 1)); }
 /* COLLAPSED TRACK SPACING, per direct request: no gap between tracks or between a track's buttons and its note lane */
 html body .seq-wrap { gap: 0; }
 html body .track-wrap { gap: 0; }
@@ -3106,7 +3106,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-06 06:26:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-06 06:32:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8440,7 +8440,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // touched. One lap every 4 bars at the current tempo (was 2). Leaving SQUARE re-arms it for next time.
   let orbitRaf = 0, orbitOff = false, orbitA = null, orbitR = 0, orbitLast = 0, orbitApplyAt = 0, orbitTargetR = 0.385;
   const orbiting = () => document.body.classList.contains('modify') && !orbitOff && !held; // MODIFY and SQUARE, per direct request
-  const orbitMoving = () => orbiting() && typeof playing !== 'undefined' && playing; // PAUSED while playback is stopped (AUTO stays on) — it picks up where it was when PLAY is pressed again, per direct request
+  const orbitMoving = () => orbiting() && typeof playing !== 'undefined' && playing && !window._spoolBraking; // + PAUSED while the LEFT SPOOL is held (playback braked), carrying on from the same spot on release, per direct request // PAUSED while playback is stopped (AUTO stays on) — it picks up where it was when PLAY is pressed again, per direct request
   // the A button: lit = AUTO on (circling). Only the A button switches it off / on — touching the graph just sizes the circle
   function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) a.classList.toggle('sp-mag-off', !!orbitOff); try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} } // (re-coloured straight away: inverted when engaged)
   function setOrbitAuto(on) { orbitOff = !on; if (!on) { try { setLatch(true); } catch (e) {} } /* AUTO off → the PADLOCK goes on (the ring stays put), per direct request */ syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; } }
