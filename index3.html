@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-06 05:38:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-06 06:26:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3106,7 +3106,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-06 05:38:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-06 06:26:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -7739,6 +7739,7 @@ function scheduler() {
         if (snap.currentScaleName) { currentScaleName = snap.currentScaleName; }
         const kd = document.getElementById('keyDisplayValue'); if (kd) kd.textContent = (getKeyName()||'').replace(/-/g,' ');
         updateSlotButtons();
+        try { window._padSetState && window._padSetState(snap.padState); } catch (e) {} // the GRAPH CURSOR back where it was, per direct request
       });
     }
     (window._stepAudioTime || (window._stepAudioTime = {}))[step] = t; // when this step actually sounds — the PERFORMANCE MODE count waits for it
@@ -8359,6 +8360,16 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     if (!window._padLatch && !held && pad) springHome(pad.x, pad.y); // magnet back on: springs home
   }
   window._setPadLatch = setLatch;
+  // SAVE SLOTS remember the GRAPH CURSOR, per direct request: the whole pad state (where the ring is + what it was built on) is
+  // kept with the slot and put back on recall, so the ring lands where it was and the pattern carries on from there
+  window._padGetState = () => { if (!pad) return null; try { return JSON.parse(JSON.stringify(pad)); } catch (e) { return null; } };
+  window._padSetState = st => {
+    if (!st) { window._padMute = null; pad = null; if (!orbitOff) { orbitA = null; } try { if (document.body.classList.contains('modify')) showDot(null); } catch (e) {} return; }
+    pad = JSON.parse(JSON.stringify(st)); pad.name = nameNow();
+    try { apply(pad.x, pad.y); } catch (e) {}
+    if (!orbitOff) { const dx = pad.x - 0.5, dy = pad.y - 0.5, R = Math.hypot(dx, dy); if (R > 0.01) { orbitA = Math.atan2(dy, dx); orbitR = R; orbitTargetR = R; orbitLast = 0; } }
+    try { if (document.body.classList.contains('modify')) showDot([pad.x, pad.y]); } catch (e) {}
+  };
   window._padDotRefresh = () => { if (document.body.classList.contains('modify')) showDot(pad ? [pad.x, pad.y] : null); };
   const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const fxOf = tr => ({ x: trackFx[tr] ? trackFx[tr].x : 0, y: trackFx[tr] ? trackFx[tr].y : 0, pump: !!trackPump[tr], chink: !!trackChink[tr] });
@@ -20605,7 +20616,7 @@ function slotPress(i) {
   }
   if (slots[i] === null) {
     // Empty slot — save current state immediately
-    slots[i] = snapshotState();
+    slots[i] = snapshotState(); try { slots[i].padState = window._padGetState ? window._padGetState() : null; } catch (e) {} // + the GRAPH CURSOR
     activeSlot = i;
     _pendingSlot = -1;
     updateSlotButtons();
@@ -20614,6 +20625,7 @@ function slotPress(i) {
     _pendingSlot = -1;
     _recallSnapB = snapshotState(); // capture what's about to be replaced, so RECALL can revert to it
     restoreState(slots[i]);
+    try { const ps = slots[i].padState; setTimeout(() => { try { window._padSetState && window._padSetState(ps); } catch (e) {} }, 0); } catch (e) {} // the GRAPH CURSOR back where it was
     activeSlot = i;
     updateSlotButtons();
   } else {
@@ -20645,7 +20657,7 @@ function _slotAdvanceOrRand() {
 function _saveCurrentPatternToNextSlot() {
   const idx = slots.findIndex(s => s === null);
   if (idx === -1) return;
-  slots[idx] = snapshotState();
+  slots[idx] = snapshotState(); try { slots[idx].padState = window._padGetState ? window._padGetState() : null; } catch (e) {} // + the GRAPH CURSOR
   activeSlot = idx;
   updateSlotButtons();
 }
