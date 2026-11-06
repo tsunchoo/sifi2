@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-05 19:41:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-06 01:27:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -136,6 +136,7 @@ html body.night-invert:not(.no-glow):not(.safe-gfx) #tapeReels { isolation: isol
 html body.night-invert #beatCount, html body.night-invert #modeLabel { --header-text-color: #ececec; }
 html body.night-invert #topTempoReadout { --header-text-color: var(--top-row-text-color, #ececec); }
 #beatCount { -webkit-tap-highlight-color: transparent; outline: none; } /* no iOS grey tap flash over the numeral's box, per direct request */
+@keyframes orbit-guide-spin { to { transform: rotate(360deg); } } /* the AUTO orbit's dotted path guide (SQUARE) */
 #beatCount:not(.beat-count-hidden) { opacity: var(--modify-count-op, 0.3); } /* the header COUNT uses the same opacity as the GRAPH COUNT (DEV > GRAPH COUNT OPACITY, 30%), per direct request */
 #beatCount.beat-count-hidden { opacity: 0; } /* hidden but still tappable to bring it back */
 /* BEAT COUNT PULSE (2nd tap), per direct request — each new beat flashes the
@@ -3102,7 +3103,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-05 19:41:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-06 01:27:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8435,14 +8436,18 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     const dt = Math.min(0.1, Math.max(0, (now - (orbitLast || now)) / 1000)); orbitLast = now;
     let per = 8; try { per = Math.max(4, Math.min(32, stepDuration() * 64)); } catch (e) {} // one lap every 4 bars (was 2 — half the speed), per direct request
     const asp = 1; // the track is set in the graph's OWN units: a circle on SQUARE, an OVAL across the full width on MODIFY's wide graph, per direct request
-    if (orbitA === null) { const dx = (pad.x - 0.5) * asp, dy = pad.y - 0.5; orbitA = Math.atan2(dy, dx); orbitR = Math.hypot(dx, dy); if (orbitR < 0.01) orbitA = -Math.PI / 2; }
+    if (orbitA === null) orbitStart(); // AUTO always STARTS at 3 o'clock on the circle, per direct request
     orbitA += 2 * Math.PI * dt / per; { const m = document.getElementById('modifyPadMarks'), hMax = m && m.clientHeight ? 0.5 - ringPx() / m.clientHeight : 0.44; orbitR += (Math.min(orbitTargetR, Math.max(0.05, hMax)) - orbitR) * Math.min(1, dt * 3); } // (never off the graph — MODIFY's short graph caps it) /* 77% of the graph's height (10% bigger than 70%), per direct request */ // (eases out to the circle from wherever it was)
     const x = 0.5 + orbitR * Math.cos(orbitA) / asp, y = 0.5 + orbitR * Math.sin(orbitA); // +angle with y pointing down = CLOCKWISE on screen
     pad.x = x; pad.y = y; showDot([x, y]);
     if (now - orbitApplyAt > 60) { orbitApplyAt = now; try { apply(x, y); } catch (e) {} } // the sound follows ~16x a second
     orbitRaf = requestAnimationFrame(orbitTick);
   }
+  // the orbit's START: the ring at the 3 O'CLOCK point of the circle (90° round from the top), per direct request
+  function orbitStart() { if (!pad) pad = capture(); const m = document.getElementById('modifyPadMarks'), hMax = m && m.clientHeight ? 0.5 - ringPx() / m.clientHeight : 0.44;
+    orbitA = 0; orbitR = Math.min(orbitTargetR, Math.max(0.05, hMax)); pad.x = 0.5 + orbitR; pad.y = 0.5; showDot([pad.x, pad.y]); try { apply(pad.x, pad.y); } catch (e) {} }
   setInterval(() => {
+    if (document.body.classList.contains('modify') && orbiting() && orbitA === null && !orbitGrab) { try { orbitStart(); } catch (e) {} } // (waiting there before PLAY too)
     if (!document.body.classList.contains('modify')) { if (orbitOff) { orbitOff = false; syncAutoBtn(); } orbitA = null; orbitLast = 0; orbitTargetR = 0.385; return; } // re-armed (AUTO on) for the next visit
     if (orbitMoving() && !orbitRaf) { springStop(); orbitLast = 0; orbitRaf = requestAnimationFrame(orbitTick); }
   }, 250);
@@ -8602,14 +8607,28 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // sets the SIZE of the circle (how far from the centre you are), kept inside the graph so the ring never goes off it
   let orbitGrab = false;
   const ringPx = () => document.body.classList.contains('modify-square') ? 24 : 13; // half the ring + a hair (SQUARE's big ring / MODIFY's normal one)
+  // ORBIT PATH GUIDE, per direct request: in SQUARE with AUTO on, while the circle is being sized, a DOTTED circle shows the path the
+  // cursor will take — slowly turning round the centre, following the drag live, in the TOP ROW HIGHLIGHT colour at 60% — then
+  // fading away over a QUARTER NOTE once the drag lets go.
+  const orbitGuide = (show) => { const m = document.getElementById('modifyPadMarks'); if (!m) return;
+    let g = document.getElementById('orbitGuide');
+    if (!show) { if (g) { let q = 0.5; try { q = stepDuration() * 4; } catch (e) {} g.style.transition = `opacity ${Math.max(0.05, q).toFixed(3)}s linear`; g.style.opacity = '0'; } return; }
+    if (!document.body.classList.contains('modify-square')) { if (g) g.style.opacity = '0'; return; }
+    if (!g) { g = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); g.id = 'orbitGuide'; g.setAttribute('aria-hidden', 'true');
+      g.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible;opacity:0;';
+      g.innerHTML = '<circle fill="none" stroke="var(--top-row-highlight-color, #f8ff00)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="0.1 9" style="transform-box:view-box;transform-origin:50% 50%;animation:orbit-guide-spin 24s linear infinite;"/>';
+      if (getComputedStyle(m).position === 'static') m.style.position = 'relative'; m.appendChild(g); }
+    const w = m.clientWidth, h = m.clientHeight; g.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    const c = g.firstChild; c.setAttribute('cx', w / 2); c.setAttribute('cy', h / 2); c.setAttribute('r', Math.max(1, orbitTargetR * h));
+    g.style.transition = 'none'; g.style.opacity = '0.6'; };
   const orbitSize = (cx, cy) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); const x = (cx - rc.left) / rc.width, y = (cy - rc.top) / rc.height;
-    const ringHalf = ringPx() / Math.max(40, rc.height); orbitTargetR = Math.max(0.04, Math.min(0.5 - ringHalf, Math.hypot(x - 0.5, y - 0.5))); }; // (never off the graph) // (graph-height units — the ring never leaves the graph)
+    const ringHalf = ringPx() / Math.max(40, rc.height); orbitTargetR = Math.max(0.04, Math.min(0.5 - ringHalf, Math.hypot(x - 0.5, y - 0.5))); try { orbitGuide(true); } catch (e) {} }; // (never off the graph) // (graph-height units — the ring never leaves the graph)
   window.addEventListener('touchstart', e => { if (!inPad(e)) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (orbiting()) { orbitGrab = true; const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (e.touches.length === 1 && isDouble()) { padReset(); return; } const t = e.touches[0]; start(t.clientX, t.clientY); }, { capture: true, passive: false });
   window.addEventListener('touchmove', e => { if (orbitGrab) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (!held) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; pos(t.clientX, t.clientY); }, { capture: true, passive: false });
-  ['touchend', 'touchcancel'].forEach(t => window.addEventListener(t, e => { if (orbitGrab) { e.stopPropagation(); if (!e.touches || !e.touches.length) orbitGrab = false; return; } if (!held) return; e.stopPropagation(); if (!e.touches || !e.touches.length) end(); }, { capture: true }));
+  ['touchend', 'touchcancel'].forEach(t => window.addEventListener(t, e => { if (orbitGrab) { e.stopPropagation(); if (!e.touches || !e.touches.length) { orbitGrab = false; try { orbitGuide(false); } catch (er) {} } return; } if (!held) return; e.stopPropagation(); if (!e.touches || !e.touches.length) end(); }, { capture: true }));
   window.addEventListener('mousedown', e => { if (!inPad(e)) return; e.stopPropagation(); e.preventDefault(); if (orbiting()) { orbitGrab = true; orbitSize(e.clientX, e.clientY); return; } if (isDouble()) { padReset(); return; } start(e.clientX, e.clientY); }, true);
   window.addEventListener('mousemove', e => { if (orbitGrab) { orbitSize(e.clientX, e.clientY); return; } if (held) pos(e.clientX, e.clientY); }, true);
-  window.addEventListener('mouseup', e => { if (orbitGrab) { e.stopPropagation(); orbitGrab = false; return; } if (held) { e.stopPropagation(); end(); } }, true);
+  window.addEventListener('mouseup', e => { if (orbitGrab) { e.stopPropagation(); orbitGrab = false; try { orbitGuide(false); } catch (er) {} return; } if (held) { e.stopPropagation(); end(); } }, true);
   ['click', 'dblclick'].forEach(t => window.addEventListener(t, e => { if (inPad(e)) { e.stopPropagation(); e.preventDefault(); } }, true));
   setInterval(() => {
     const sp = document.body.classList.contains('modify');
