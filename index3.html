@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-06 06:32:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-15 23:52:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3106,7 +3106,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-06 06:32:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-15 23:52:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -7722,7 +7722,7 @@ function scheduler() {
         if (snap.barColor) {
           _currentBarColor = snap.barColor;
           const barEl = document.querySelector('#nameDisplay')?.parentElement;
-          applyBarColor(_currentBarColor);
+          applyBarColor(_currentBarColor, true); window._barBase = snap.barBase || snap.barColor; window._barKey = snap.barKey || 0;
         }
         // Color palette — this deferred bar-boundary path is a separate,
         // partial state copy from restoreState() (built for glitch-free
@@ -8362,6 +8362,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   window._setPadLatch = setLatch;
   // SAVE SLOTS remember the GRAPH CURSOR, per direct request: the whole pad state (where the ring is + what it was built on) is
   // kept with the slot and put back on recall, so the ring lands where it was and the pattern carries on from there
+  window._padXY = () => pad ? [pad.x, pad.y] : null;
   window._padGetState = () => { if (!pad) return null; try { return JSON.parse(JSON.stringify(pad)); } catch (e) { return null; } };
   window._padSetState = st => {
     if (!st) { window._padMute = null; pad = null; if (!orbitOff) { orbitA = null; } try { if (document.body.classList.contains('modify')) showDot(null); } catch (e) {} return; }
@@ -8406,7 +8407,15 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     if (on && _revBlocked()) { if (pad && pad.base.rev[tr]) { trackDelay[tr] = true; const b = document.getElementById(`delaybtn-${tr}`); if (b) b.classList.add('on'); } return; }
     try { _setTrackReverb(tr, on); } catch (e) {}
   }
+  // MUTED TRACKS STAY MUTED, per direct request: nothing the graph cursor does — by hand or on AUTO — may unmute a track (turning
+  // AUTO NOTES on used to, through the track's own + button). Any track muted before a move is put straight back to muted after it.
   function apply(x, y) {
+    const was = typeof trackMuted !== 'undefined' ? trackMuted.slice() : null;
+    try { applyRaw(x, y); }
+    finally { if (was) for (let tr = 0; tr < NUM_TRACKS; tr++) if (was[tr] && !trackMuted[tr]) { trackMuted[tr] = true; try { updateTrackMute(tr); } catch (e) {} } }
+    try { _barVariantUpdate(); } catch (e) {} // the SONG NAME colour follows the cursor, per direct request
+  }
+  function applyRaw(x, y) {
     if (!pad) return; const B = pad.base; pad.x = x; pad.y = y;
     const dz = v => { const a = Math.abs(v); return a < 0.06 ? 0 : Math.sign(v) * Math.min(1, (a - 0.06) / 0.86); }; // a small dead zone round the centre so 'as it was' is easy to hit, and the last few % at each edge = all the way
     const X = dz(Math.max(-1, Math.min(1, x * 2 - 1))), Y = dz(Math.max(-1, Math.min(1, 1 - y * 2))); // Y FLIPPED, per direct request: the BOTTOM is now fewest effects and the TOP most (Y > 0 = more)
@@ -17329,7 +17338,8 @@ function barTextColor(hex) {
   const r=parseInt(c.slice(0,2),16), g=parseInt(c.slice(2,4),16), b=parseInt(c.slice(4,6),16);
   return (0.299*r + 0.587*g + 0.114*b) > 140 ? '#111' : '#fff';
 }
-function applyBarColor(color) {
+function applyBarColor(color, isVariant) {
+  if (!isVariant && color !== _currentBarColor) window._barBase = color; // the PATTERN's own colour (the SOUND VARIANT below is worked out from it)
   _currentBarColor = color;
   const barEl = document.querySelector('#nameDisplay')?.parentElement;
   if (barEl) { barEl.style.background = color; barEl.style.color = barTextColor(color); }
@@ -17339,6 +17349,29 @@ function applyBarColor(color) {
   // (RAND, WILD), not just the moment the toggle is switched on.
   if (window._bgFollowsBarColor) _applyBgColor(color);
 }
+// SONG NAME COLOUR FOLLOWS THE SOUND, per direct request: so every pattern that sounds noticeably different also LOOKS different
+// (two save slots of the same song with different effects / cursor no longer share a colour), the bar's colour is worked out from
+// the pattern's own colour plus:
+//   • the EFFECTS SET — each SWIPE RIGHT deals a new set and gets its own clear hue step; SWIPE LEFT brings back the set before it
+//     AND its colour exactly (the key travels with the swipe history);
+//   • the GRAPH CURSOR — left / right (fewer / more notes) turns the hue, down / up (fewer / more effects) lightens / deepens it,
+//     smoothly, the centre being the pattern's own colour.
+// Saved with the slot / tape (base + key), so a recall comes back exactly as it looked.
+window._barBase = null; window._barKey = 0;
+function _barKeyHue(k) { return k ? ((k % 6) + 1) * 51 : 0; } // 51°, 102° … 306° — six clearly different steps, never 0
+function _barNewKey() { const cur = _barKeyHue(window._barKey); let k; do { k = 1 + Math.floor(Math.random() * 1e6); } while (_barKeyHue(k) === cur); return k; }
+function _barVariantUpdate() {
+  try {
+    const base = window._barBase || _currentBarColor; if (!base || base[0] !== '#') return;
+    let [h, s, l] = _hexToHsl(base);
+    h += _barKeyHue(window._barKey || 0);
+    const xy = window._padXY ? window._padXY() : null;
+    if (xy) { const dx = xy[0] - 0.5, dy = 0.5 - xy[1]; h += dx * 90; l = Math.max(0.28, Math.min(0.82, l - dy * 0.28)); }
+    const hex = _hslToHex(((h % 360) + 360) % 360, s, l);
+    if (hex !== _currentBarColor) applyBarColor(hex, true);
+  } catch (e) {}
+}
+setInterval(() => { if (!document.hidden) _barVariantUpdate(); }, 300); // (catches the cursor easing home / a fresh start too)
 window._bgFollowsBarColor = false;
 function setBgFollowsBarColor(on) {
   window._bgFollowsBarColor = !!on;
@@ -18402,7 +18435,7 @@ function _snapCascadeGhosts() {
   window._cascadeGhostSnap = out;
 }
 function randAll(mode, opts) {
-  window._allocHistory = []; // a new pattern: the song-name FX/REVERB swipe history belongs to the old one
+  window._allocHistory = []; window._barKey = 0; // a new pattern: the song-name FX/REVERB swipe history belongs to the old one (and its colour starts from its own)
   { // RANDO BUTTON REVERB / FX rows OFF: every track keeps the R / FX it had before this new pattern
     const keepR = !!window._randoKeepRev, keepF = !!window._randoKeepFx; window._randoKeepRev = window._randoKeepFx = false;
     if (keepR || keepF) {
@@ -20203,7 +20236,7 @@ function snapshotState() {
     currentScaleName,
     bpm, masterVol,
     speciesName: _currentSpecies,
-    barColor: _currentBarColor,
+    barColor: _currentBarColor, barBase: window._barBase || _currentBarColor, barKey: window._barKey || 0, // (+ what the colour is worked out from, so a recall looks exactly as it did)
     beatPlaying: beatPlaying,
     beatType: _beatType,
     trackDelay: [...trackDelay],
@@ -20259,7 +20292,7 @@ function restoreState(snap, opts) {
       if (typeof rv.beatMix === 'number') { setBeatReverbMix(rv.beatMix); const b = document.getElementById('beatReverbMixBar'); if (b) b.value = Math.round(rv.beatMix * 100); const t = document.getElementById('beatReverbMixVal'); if (t) t.textContent = Math.round(rv.beatMix * 100); }
     }
   } catch (e) {}
-  window._allocHistory = []; // a new pattern: the song-name FX/REVERB swipe history belongs to the old one
+  window._allocHistory = []; window._barKey = 0; // a new pattern: the song-name FX/REVERB swipe history belongs to the old one (and its colour starts from its own)
   opts = opts || {};
   try { _randInstTimers.forEach(clearTimeout); _randInstTimers = []; } catch (e) {} // staggered instrument swaps still waiting must not land on top of a restored pattern
   _clearAllSolo(); // a restored pattern (RECALL, save slots, LOAD TAPE) replaces every track — same reasoning as randAll()
@@ -20391,7 +20424,7 @@ function restoreState(snap, opts) {
     _setSongNameDisplay(_currentSpecies);
   }
   if (snap.barColor) {
-    applyBarColor(snap.barColor);
+    applyBarColor(snap.barColor, true); window._barBase = snap.barBase || snap.barColor; window._barKey = snap.barKey || 0;
   }
   if (snap.trackDelay) { snap.trackDelay.forEach((d,i) => { _setTrackReverb(i, d); }); }
   // RECALL skips this entirely — BEAT on/off is a live mixing decision in
@@ -24762,14 +24795,16 @@ function _allocSwipeNew() {
     if (next[tr].chk || next[tr].fx) continue; // this track already has its FX-button stop
     next[tr].chk = k === 'chk'; next[tr].pump = k === 'blast'; next[tr].fx = k === 'blast' || k === 'fx'; placed++;
   }
-  window._allocHistory.push(before); if (window._allocHistory.length > 20) window._allocHistory.shift();
+  before.barKey = window._barKey || 0; window._allocHistory.push(before); if (window._allocHistory.length > 20) window._allocHistory.shift();
   _allocApply(next);
+  window._barKey = _barNewKey(); _barVariantUpdate(); // a NEW effects set = a new colour step
 }
 function _allocSwipeBack() { // SWIPE LEFT = RECALL the last set of effect assignments (from before the last SWIPE RIGHT), per direct request — repeatable, back through up to 20
   try { _nameSwipeFx(-1); } catch (e) {}
   const prev = window._allocHistory.pop();
   if (!prev) { try { _showNotice('NO EARLIER EFFECTS'); } catch (e) {} return; }
   _allocApply(prev); // (LOCKED tracks untouched, as ever; the ones that come back flash in)
+  window._barKey = prev.barKey || 0; _barVariantUpdate(); // …and that set's colour, exactly
 }
 function _allocSwipeRemoveOne() { // (was SWIPE LEFT: takes ONE effect (an FX-button stop or an R reverb) off the pattern each time — unlocked tracks only — until none are left
   try { _nameSwipeFx(-1); } catch (e) {}
