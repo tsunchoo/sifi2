@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-16 06:02:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-16 19:30:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3129,7 +3129,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 06:02:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 19:30:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4170,7 +4170,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">COUNT</div>
         <label class="wild-toggle">
-          <input autocomplete="off" type="checkbox" id="countToggle" onchange="_setBeatCountShown(this.checked)">
+          <input autocomplete="off" type="checkbox" id="countToggle" onchange="_countToggleChanged(this.checked)">
           <span class="wild-toggle-slider"></span>
         </label>
       </div>
@@ -7770,7 +7770,7 @@ function scheduler() {
         if (snap.currentScaleName) { currentScaleName = snap.currentScaleName; }
         const kd = document.getElementById('keyDisplayValue'); if (kd) kd.textContent = (getKeyName()||'').replace(/-/g,' ');
         updateSlotButtons();
-        try { window._padSetState && window._padSetState(snap.padState); } catch (e) {} // the GRAPH CURSOR back where it was, per direct request
+        try { if (snap.wasModulating && window._setOrbitAuto) window._setOrbitAuto(false); window._padSetState && window._padSetState(snap.padState); } catch (e) {} // the GRAPH CURSOR back where it was (saved WHILE MODULATING = frozen there, AUTO off), per direct request
       });
     }
     (window._stepAudioTime || (window._stepAudioTime = {}))[step] = t; // when this step actually sounds — the PERFORMANCE MODE count waits for it
@@ -8399,6 +8399,22 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // SAVE SLOTS remember the GRAPH CURSOR, per direct request: the whole pad state (where the ring is + what it was built on) is
   // kept with the slot and put back on recall, so the ring lands where it was and the pattern carries on from there
   window._orbitAutoOn = () => !orbitOff;
+  // A NEW PATTERN switches the MODULATE graph off and back to its defaults, per direct request: whatever the cursor had changed is
+  // put back first (so nothing modulated leaks into the new pattern), then AUTO OFF, cursor in the centre, padlock off, the orbit
+  // back to its normal size, nothing carrying on in MAIN. (The AXIS MENU's ticks are kept.)
+  window._padNewPattern = () => {
+    try { if (pad) restore(); } catch (e) {}
+    window._padMute = null; pad = null; padSaved = null; held = false;
+    try { springStop(); } catch (e) {}
+    orbitOff = true; orbitA = null; orbitLast = 0; orbitTargetR = 0.385; window._orbitMain = false;
+    if (orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; }
+    window._padLatch = false; { const lk = document.getElementById('modifyLock'); if (lk) { lk.innerHTML = LOCK_SVG(false); lk.classList.toggle('sp-mag-off', true); } }
+    try { djFilter(0); } catch (e) {}
+    try { syncAutoBtn(); if (document.body.classList.contains('modify')) { redraw(); showDot(null); } } catch (e) {}
+    document.body.classList.remove('orbit-auto');
+  };
+  window._orbitIsMoving = () => { try { return orbitMoving(); } catch (e) { return false; } };
+  window._setOrbitAuto = on => { try { setOrbitAuto(on); } catch (e) {} };
   window._padXY = () => pad ? [pad.x, pad.y] : null;
   window._padGetState = () => { if (!pad) return null; try { return JSON.parse(JSON.stringify(pad)); } catch (e) { return null; } };
   window._padSetState = st => {
@@ -18580,6 +18596,7 @@ function _snapCascadeGhosts() {
   window._cascadeGhostSnap = out;
 }
 function randAll(mode, opts) {
+  try { window._padNewPattern && window._padNewPattern(); } catch (e) {} // the MODULATE graph off + back to its defaults, per direct request
   window._allocHistory = []; window._barKey = 0; // a new pattern: the song-name FX/REVERB swipe history belongs to the old one (and its colour starts from its own)
   { // RANDO BUTTON REVERB / FX rows OFF: every track keeps the R / FX it had before this new pattern
     const keepR = !!window._randoKeepRev, keepF = !!window._randoKeepFx; window._randoKeepRev = window._randoKeepFx = false;
@@ -20796,7 +20813,7 @@ function slotPress(i) {
   }
   if (slots[i] === null) {
     // Empty slot — save current state immediately
-    slots[i] = snapshotState(); try { slots[i].padState = window._padGetState ? window._padGetState() : null; } catch (e) {} // + the GRAPH CURSOR
+    slots[i] = snapshotState(); try { slots[i].padState = window._padGetState ? window._padGetState() : null; slots[i].wasModulating = !!(window._orbitIsMoving && window._orbitIsMoving()); } catch (e) {} // + the GRAPH CURSOR (+ whether AUTO was modulating)
     activeSlot = i;
     _pendingSlot = -1;
     updateSlotButtons();
@@ -20805,7 +20822,7 @@ function slotPress(i) {
     _pendingSlot = -1;
     _recallSnapB = snapshotState(); // capture what's about to be replaced, so RECALL can revert to it
     restoreState(slots[i]);
-    try { const ps = slots[i].padState; setTimeout(() => { try { window._padSetState && window._padSetState(ps); } catch (e) {} }, 0); } catch (e) {} // the GRAPH CURSOR back where it was
+    try { const ps = slots[i].padState, wm = slots[i].wasModulating; setTimeout(() => { try { if (wm && window._setOrbitAuto) window._setOrbitAuto(false); window._padSetState && window._padSetState(ps); } catch (e) {} }, 0); } catch (e) {} // the GRAPH CURSOR back where it was — and a slot saved WHILE MODULATING comes back frozen at that moment, AUTO off, per direct request
     activeSlot = i;
     updateSlotButtons();
   } else {
@@ -20837,7 +20854,7 @@ function _slotAdvanceOrRand() {
 function _saveCurrentPatternToNextSlot() {
   const idx = slots.findIndex(s => s === null);
   if (idx === -1) return;
-  slots[idx] = snapshotState(); try { slots[idx].padState = window._padGetState ? window._padGetState() : null; } catch (e) {} // + the GRAPH CURSOR
+  slots[idx] = snapshotState(); try { slots[idx].padState = window._padGetState ? window._padGetState() : null; slots[idx].wasModulating = !!(window._orbitIsMoving && window._orbitIsMoving()); } catch (e) {} // + the GRAPH CURSOR (+ whether AUTO was modulating)
   activeSlot = idx;
   updateSlotButtons();
 }
@@ -21846,7 +21863,7 @@ function showSettings() {
   if (snd) snd.value = _currentSpecies || '';
   syncSettingsPanel();
   if (window._syncKeySelects) window._syncKeySelects();
-  { const bc = document.getElementById('beatCount'), ct = document.getElementById('countToggle'); if (bc && ct) ct.checked = !bc.classList.contains('beat-count-hidden'); }
+  try { _syncCountToggle(); } catch (e) {}
   _settingsOpenedAt = Date.now();
 }
 function hideSettings() {
@@ -26933,7 +26950,12 @@ function stopRecallLoop() {
 // COUNT toggle in SETTINGS — shows / hides the beat count (same states as tapping the count itself)
 // the COUNT toggle always shows what the count is actually doing — the graph modes force it on and MAIN puts back how it was,
 // which used to leave the toggle saying ON while the count was hidden, per direct report
-document.addEventListener('DOMContentLoaded', () => { const bc = document.getElementById('beatCount'); if (!bc) return; const sync = () => { const ct = document.getElementById('countToggle'); if (ct) ct.checked = !bc.classList.contains('beat-count-hidden'); }; new MutationObserver(sync).observe(bc, { attributes: true, attributeFilter: ['class'] }); sync(); });
+// COUNT in MODULATE, per direct report (the toggle was stuck ON there): MODULATE has no header count — its count is the big GRAPH
+// COUNT in the middle of the graph — so in MODULATE the SETTINGS COUNT toggle shows and switches THAT one (DEV > GRAPH COUNT too).
+function _syncCountToggle() { const ct = document.getElementById('countToggle'), bc = document.getElementById('beatCount'); if (!ct) return;
+  ct.checked = document.body.classList.contains('modify') ? !document.body.classList.contains('modify-count-off') : !!(bc && !bc.classList.contains('beat-count-hidden')); }
+document.addEventListener('DOMContentLoaded', () => { const bc = document.getElementById('beatCount'); if (!bc) return; new MutationObserver(_syncCountToggle).observe(bc, { attributes: true, attributeFilter: ['class'] }); new MutationObserver(_syncCountToggle).observe(document.body, { attributes: true, attributeFilter: ['class'] }); _syncCountToggle(); });
+function _countToggleChanged(on) { if (document.body.classList.contains('modify')) { try { setModifyCount(!!on); } catch (e) {} _syncCountToggle(); return; } _setBeatCountShown(on); } // (MODULATE: the GRAPH COUNT)
 function _setBeatCountShown(on) {
   const el = document.getElementById('beatCount'); if (!el) return;
   if (!on && document.body.classList.contains('live-layout')) on = true; // always shown in PERFORMANCE MODE
