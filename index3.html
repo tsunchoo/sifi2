@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-16 00:31:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-16 00:46:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3111,7 +3111,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 00:31:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 00:46:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -9312,6 +9312,7 @@ function reverseBuffer(buf, revLen) {
 }
 
 function playSynthKick(isAccent, time, tr) {
+  try { _scDuck(time); } catch (e) {} // SIDECHAIN: a KICK track ducks the music too
   if (!ctx) return;
   const dest = getSynthConnectNode(tr);
   duckSidechainTracks(time);
@@ -13352,6 +13353,7 @@ function fireBeatKick(t, velMult) {
   duckSidechainTracks(t);
 }
 function playKick(t, velMult) {
+  try { _scDuck(t); } catch (e) {} // SIDECHAIN: the DRUMS kick ducks the music
   if (!_renderTapBeat) return;
   // Matches playSynthKick — same character, slightly louder for the beat,
   // tightened up for a drier hit (shorter pitch ramp and decay, less boom)
@@ -26098,7 +26100,8 @@ window.masterLimiter = ctx.createDynamicsCompressor(); const masterLimiter = win
       const revTapD = ctx.createGain(); revTapD.gain.value = 0; window._trackDrumRevTap = window._trackDrumRevTap || []; window._trackDrumRevTap[i] = revTapD;
       const cg = ctx.createGain(); cg.gain.value = trackChink[i] ? 0 : 1; window._chinkGates[i] = cg; // CHOKE gate (open = normal)
       const mb = ctx.createGain(); mb.gain.value = _musicBusFor(i); (window._musicBusGains = window._musicBusGains || [])[i] = mb; // MUSIC BUS (see _syncMusicBus)
-      g.connect(mb); mb.connect(cg); cg.connect(ef); ef.connect(pan); pan.connect(masterGain); pan.connect(revTap); revTap.connect(window._masterReverbSend); pan.connect(revTapD); revTapD.connect(window._drumMasterRevSend); trackEnvFilters[i] = ef;
+      const dk = ctx.createGain(); dk.gain.value = 1; (window._scDuckGains = window._scDuckGains || [])[i] = dk; // SIDECHAIN duck (see _scDuck)
+      g.connect(mb); mb.connect(dk); dk.connect(cg); cg.connect(ef); ef.connect(pan); pan.connect(masterGain); pan.connect(revTap); revTap.connect(window._masterReverbSend); pan.connect(revTapD); revTapD.connect(window._drumMasterRevSend); trackEnvFilters[i] = ef;
       trackFxNodes[i] = buildFxChain(g);
       if (trackInstruments[i] === 'ngate') initNoiseGate(i);
       // Reflect any FX state already set in the data model (e.g. Track 1's
@@ -27270,6 +27273,30 @@ const _BEAT_ADDED_DRUM_KEYS = new Set(['ride', 'sidestick', 'ssnare', 'toms', 's
 // whenever instruments change (and twice a second as a backstop) since a track can swap between the two at any time.
 window._musicBus = 0.61; // default 61% (was 84%, 46%, 63%, 85% before that), per direct request
 function _musicBusFor(tr) { try { return _isDrumTrack(tr) ? 1 : window._musicBus * (_BASS_KEYS_FOR_TRIM.has(trackInstruments[tr]) ? 0.8913 /* basses -1dB (−0.5dB, then another −0.5dB per direct request) */ : 0.9661 /* tonal -0.3dB */); } catch (e) { return 1; } } // per direct request
+// SIDECHAIN, per direct request: every KICK (the DRUMS kick and any KICK track) ducks the whole mix EXCEPT the drums — every
+// melody / bass / pad track, their FX and what they send to the reverb — and it swells back over about an 8th note: the classic
+// pump. HOW MUCH comes from the GRAPH CURSOR: none at the centre or anywhere towards the bottom-left, building towards the TOP
+// RIGHT (more notes + more effects), where it's deep (about −16dB) and very obvious. Scheduled on the audio clock with each kick,
+// so it's sample-tight. (Not in BOUNCE renders.)
+function _scDepth() {
+  const xy = window._padXY ? window._padXY() : null; if (!xy) return 0;
+  return Math.max(0, Math.min(1, (xy[0] - 0.5) + (0.5 - xy[1])));
+}
+function _scDuck(t) {
+  const gs = window._scDuckGains; if (!gs || !ctx) return;
+  const d = _scDepth(); if (d < 0.03) return;
+  const floor = 1 - 0.84 * Math.pow(d, 1.2);
+  let rel = 0.25; try { rel = Math.max(0.08, stepDuration() * 2); } catch (e) {} // ~an 8th note back up
+  t = Math.max(t, ctx.currentTime);
+  for (let tr = 0; tr < gs.length; tr++) {
+    const g = gs[tr]; if (!g || g.context !== ctx) continue;
+    if (_isDrumTrack(tr)) continue; // the drums themselves never duck
+    const p = g.gain;
+    try { if (p.cancelAndHoldAtTime) p.cancelAndHoldAtTime(t); else { p.cancelScheduledValues(t); p.setValueAtTime(p.value, t); } } catch (e) {}
+    p.linearRampToValueAtTime(floor, t + 0.006);
+    p.setTargetAtTime(1, t + 0.012, rel / 3.5);
+  }
+}
 function _syncMusicBus() {
   const gs = window._musicBusGains; if (!gs || !ctx) return;
   for (let tr = 0; tr < gs.length; tr++) { const g = gs[tr]; if (!g || g.context !== ctx) continue; const v = _musicBusFor(tr); if (Math.abs(g.gain.value - v) > 0.002) g.gain.setTargetAtTime(v, ctx.currentTime, 0.03); }
