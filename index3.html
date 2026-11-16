@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-16 21:16:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-16 23:00:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -138,7 +138,13 @@ html body.night-invert #topTempoReadout { --header-text-color: var(--top-row-tex
 #beatCount { -webkit-tap-highlight-color: transparent; outline: none; } /* no iOS grey tap flash over the numeral's box, per direct request */
 /* SWEEP VISUAL, per direct request: while SWEEP is held and dragged, the whole screen goes PIXELLATED (5 steps, bigger blocks the
    further down) and DESATURATED with it; straight back to normal on release. Filters on the five screen blocks (see _sweepVis). */
-html body.sweep-vis > header, html body.sweep-vis > .transport, html body.sweep-vis > #nameBar, html body.sweep-vis > #seqWrap, html body.sweep-vis > #slotBar { filter: var(--sw-px, none) saturate(var(--sw-sat, 1)) !important; transition: none !important; }
+html body.sweep-vis > header, html body.sweep-vis > .transport, html body.sweep-vis > #nameBar, html body.sweep-vis > #seqWrap, html body.sweep-vis > #slotBar { filter: var(--sw-px, none) !important; transition: none !important; }
+/* (anything animating inside those blocks gets its own layer on the iPhone, which the pixel filter can't reach — the track names
+   were drawing themselves back on top, per direct report — so their animations rest while the sweep is held) */
+html body.sweep-vis > header *, html body.sweep-vis > .transport *, html body.sweep-vis > #nameBar *, html body.sweep-vis > #seqWrap *, html body.sweep-vis > #slotBar * { animation: none !important; will-change: auto !important; }
+/* DESATURATION as its own full-screen layer (a backdrop filter), so it reaches everything — getting stronger with the sweep / filter */
+#swDesat { position: fixed; inset: 0; pointer-events: none; z-index: 2147482000; display: none; -webkit-backdrop-filter: grayscale(var(--sw-gray, 0)); backdrop-filter: grayscale(var(--sw-gray, 0)); }
+html body.sweep-vis #swDesat { display: block; }
 @keyframes orbit-guide-spin { to { transform: rotate(360deg); } } /* the AUTO orbit's dotted path guide (MODULATE) */
 #beatCount:not(.beat-count-hidden) { opacity: var(--modify-count-op, 0.3); } /* the header COUNT uses the same opacity as the GRAPH COUNT (DEV > GRAPH COUNT OPACITY, 30%), per direct request */
 #beatCount.beat-count-hidden { opacity: 0; } /* hidden but still tappable to bring it back */
@@ -3132,7 +3138,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 21:16:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 23:00:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -26686,9 +26692,10 @@ async function hardResetAudioEngine() {
   // (same setTargetAtTime time constant as pitch already used).
   function _sweepVis(p) { // 0 … 1
     const b = document.body, lv = p < 0.06 ? 0 : Math.min(5, Math.ceil(p * 5));
-    if (!lv) { if (b.classList.contains('sweep-vis')) { b.classList.remove('sweep-vis'); b.style.removeProperty('--sw-px'); b.style.removeProperty('--sw-sat'); } b._swLv = 0; return; }
+    if (!lv) { if (b.classList.contains('sweep-vis')) { b.classList.remove('sweep-vis'); b.style.removeProperty('--sw-px'); b.style.removeProperty('--sw-gray'); } b._swLv = 0; return; }
+    if (!document.getElementById('swDesat')) { const d = document.createElement('div'); d.id = 'swDesat'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); }
     if (b._swLv !== lv) { b._swLv = lv; b.style.setProperty('--sw-px', `url(#swPx${lv})`); }
-    b.style.setProperty('--sw-sat', (1 - 0.9 * p).toFixed(2)); b.classList.add('sweep-vis');
+    b.style.setProperty('--sw-gray', Math.min(1, p * 1.1).toFixed(2)); b.classList.add('sweep-vis'); // grey all the way by the bottom of the drag
   }
   function _sweepUpdateFreqFromY(y) {
     if (!sweepNodes || !ctx) return;
