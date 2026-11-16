@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-16 00:46:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-16 00:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3111,7 +3111,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 00:46:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 00:50:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -24824,6 +24824,7 @@ function _nameSwipeFx(dir) {
 }
 function _allocSwipeNew() {
   try { _nameSwipeFx(1); } catch (e) {}
+  try { _gestureNotice('MORE EFFECTS'); } catch (e) {} // (same timing rule as the >> notices: half as long after the 5th time)
   // ...and the EQ METER moves on to its next style (BARS → LEDS → LINE → VERT → BARS), per direct request — unless it's OFF
   try { const order = ['bars', 'leds', 'vert'], i = order.indexOf(window._nameEqStyle); if (i >= 0) setNameEqStyle(order[(i + 1) % order.length]); } catch (e) {}
   const before = _allocSnap();
@@ -24859,6 +24860,7 @@ function _allocSwipeBack() { // SWIPE LEFT = RECALL the last set of effect assig
   try { _nameSwipeFx(-1); } catch (e) {}
   const prev = window._allocHistory.pop();
   if (!prev) { try { _showNotice('NO EARLIER EFFECTS'); } catch (e) {} return; }
+  try { _gestureNotice('PREVIOUS EFFECTS'); } catch (e) {}
   _allocApply(prev); // (LOCKED tracks untouched, as ever; the ones that come back flash in)
   window._barKey = prev.barKey || 0; _barVariantUpdate(); // …and that set's colour, exactly
 }
