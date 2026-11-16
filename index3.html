@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-16 01:16:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-16 06:02:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1652,6 +1652,14 @@ html body .track-ctrl-row .track-ctrl-icon-btn.solo-on .glyph { color: #000 !imp
 }
 html body .shift-btn.glyph-pop:not(.right) .track-offset-glyph,
 html body .rand-btn.glyph-pop .glyph { animation: track-glyph-pop 288ms ease-out; }
+/* TRACK + BUTTONS = >>, per direct request: the same two SiFiChevron '>'s as the main >> button, with the same overlap / padding
+   (in em, so they scale with the track button's own font size), and the same SCROLL-THROUGH on a tap (see doSingleTap). */
+html body .track-ctrl-icon-btn.rand-btn:not(#beatCtrlRand) { overflow: hidden; }
+html body .track-ctrl-icon-btn.rand-btn:not(#beatCtrlRand) .glyph { font-size: 0 !important; line-height: 0; display: inline-block !important; white-space: nowrap; }
+html body .track-ctrl-icon-btn.rand-btn:not(#beatCtrlRand) .glyph::before,
+html body .track-ctrl-icon-btn.rand-btn:not(#beatCtrlRand) .glyph::after { content: '>'; font-size: calc(1.3rem * var(--track-btn-font-scale, 1)); line-height: 1; display: inline-block; vertical-align: middle; padding: 0.1em 0.12em; font-family: 'SiFiChevron', 'DM Sans', sans-serif; font-weight: 900; }
+html body .track-ctrl-icon-btn.rand-btn:not(#beatCtrlRand) .glyph::after { margin-left: -0.44em; padding-right: 0.24em; margin-right: -0.12em; }
+html body .track-ctrl-icon-btn.rand-btn.trk-scroll:not(#beatCtrlRand) .glyph { animation: rand-glyph-scroll 1144ms cubic-bezier(0.45, 0, 0.25, 1) both; }
 /* ...and their background takes the FX button's own engaged colour while
    pressed, per direct request (lights mode: the top row's pressed shade;
    otherwise the normal track-button ON colour). */
@@ -2658,7 +2666,8 @@ html body.gray-mode #playBtnImg { filter: brightness(0) !important; } html body.
 html body.modify { --simple-fader-width: 0px !important; --vol-tip-h: 0% !important; } /* MODIFY: the vol FADER (width + height) at 0, per direct request — the meters alone */
 /* (MODIFY's forced transparent song-name background removed, per direct request — it keeps whatever the mode before it had) */
 html body.modify.name-bg-clear #nameBar { background: var(--name-bar-bg, #9fb9a2) !important; }
-:root { --modify-strip-h: 56.08px; } /* MODIFY's song name strip: 10px shorter than the bar on the MAIN page (66.08px), per direct request */
+:root { --modify-strip-h: 56.08px; }
+html body:not(.modify) #nameBar { box-sizing: border-box; min-height: var(--modify-strip-h) !important; height: var(--modify-strip-h); } /* MAIN's song name bar now the same height as MODULATE's strip, per direct request */ /* MODIFY's song name strip: 10px shorter than the bar on the MAIN page (66.08px), per direct request */
 html body.modify.modify #nameBar { background: linear-gradient(to bottom, var(--name-bar-bg, #9fb9a2) 0, var(--name-bar-bg, #9fb9a2) var(--modify-strip-h), transparent var(--modify-strip-h)) !important; } /* MODIFY: the graph is always see-through (the song name strip keeps its colour), per direct request — the option is gone */ /* MODIFY: the song name bar always has the display mode's own bar colour, even where the mode makes it see-through, per direct request */
 html body.modify #nameBar { min-height: calc(var(--modify-strip-h) + 4px + var(--modify-pad-h, 186px)) !important; /* + a 4px gap between the song name and the graph — the same 4px as top row → song name and graph → track 1, per direct request */ /* the graph is exactly the square note grid + its 20px margins (no wasted space above / below — given to the tracks' slim note rows), per direct request */ /* the pad is 20px shorter than the space the lanes freed, so the tracks never get pushed below the fold, per direct request */ touch-action: none; cursor: crosshair; }
 /* MODIFY XY PAD marks: a faint centre cross (= the pattern as it is) and the finger's dot */
@@ -3120,7 +3129,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 01:16:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 06:02:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8370,8 +8379,13 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
       b.appendChild(lk);
       const au = document.createElement('button'); au.id = 'modifyAuto'; au.type = 'button'; au.setAttribute('aria-label', 'auto');
       au.innerHTML = '<span style="display:block;font-family:\'DM Sans\',sans-serif;font-weight:700;font-size:23px;line-height:1;letter-spacing:0;pointer-events:none;">A</span>'; // a capital A in the TOP ROW buttons' font (DM Sans Bold), per direct request
-      au.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setOrbitAuto(orbitOff); try { playUiSound('tinyclick'); } catch (er) {} });
-      b.appendChild(au); syncAutoBtn();
+      au.style.webkitTouchCallout = 'none'; au.style.userSelect = 'none';
+      let auHoldT = 0, auHeld = false; // HOLD A = the AXIS MENU, per direct request (a plain click still switches AUTO)
+      au.addEventListener('pointerdown', () => { auHeld = false; clearTimeout(auHoldT); auHoldT = setTimeout(() => { auHeld = true; openAxisMenu(); try { playUiSound('tinyclick'); } catch (er) {} }, 500); });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => au.addEventListener(t, () => clearTimeout(auHoldT)));
+      au.addEventListener('contextmenu', e => e.preventDefault());
+      au.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (auHeld) { auHeld = false; return; } setOrbitAuto(orbitOff); try { playUiSound('tinyclick'); } catch (er) {} });
+      b.appendChild(au); syncAutoBtn(); try { axisLabels(); } catch (er) {}
       setTimeout(() => showDot(pad ? [pad.x, pad.y] : null), 0); // ring + colour showing from the start
     }
     return m;
@@ -8403,8 +8417,75 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // AUTO NOTES as a pad effect, per direct request
   const autoOn = tr => !!(typeof autoShiftStops !== 'undefined' && autoShiftStops[tr]);
   function setAuto(tr, on) { if (autoOn(tr) === !!on) return; try { if (on) { const rb = document.getElementById(`randbtn-${tr}`); if (rb && rb._restartAuto) rb._restartAuto(); } else autoShiftStops[tr](); } catch (e) {} }
+  // ── AXIS MENU, per direct request: HOLD the A button for a list of what the graph's two axes control. NOTES (left ↔ right) and
+  // EFFECTS (down ↕ up) are ticked by default; INSTRUMENTS, REVERB SIZE, DELAY TIME and FILTER can be ticked onto either axis
+  // too (one axis each), and anything can be unticked. The centre is always the pattern exactly as it was.
+  //   INSTRUMENTS — each unlocked track steps through 6 other instruments of its own kind (kit / perc / bass / pad / other) as
+  //                 the cursor moves out from the centre, the same ones each time for this pattern
+  //   REVERB SIZE — smaller towards − , bigger towards +          DELAY TIME — shorter / longer, in musical stops
+  //   FILTER      — a DJ filter on the whole output: low-pass sweeping down towards − , high-pass sweeping up towards +
+  const AXIS_PARAMS = [['notes', 'NOTES'], ['effects', 'EFFECTS'], ['inst', 'INSTRUMENTS'], ['rsize', 'REVERB SIZE'], ['dtime', 'DELAY TIME'], ['filter', 'FILTER']];
+  window._axisMap = { x: ['notes'], y: ['effects'] };
+  try { const v = JSON.parse(localStorage.getItem('sifiAxisMap') || 'null'); if (v && Array.isArray(v.x) && Array.isArray(v.y)) window._axisMap = { x: v.x.filter(k => AXIS_PARAMS.some(p => p[0] === k)), y: v.y.filter(k => AXIS_PARAMS.some(p => p[0] === k)) }; } catch (e) {}
+  const axOf = (k, X, Y) => window._axisMap.x.includes(k) ? X : window._axisMap.y.includes(k) ? Y : null;
+  const instCat = k => { if (!k || !INSTRUMENTS[k]) return ''; const g = INSTRUMENTS[k].group; if (g === 'kit' || g === 'perc') return g; if (['sbass', 'sbass3', 'sbass4', 'dbass', 'pbass', 'sludge'].includes(k)) return 'bass'; if (['fflute', 'blunt', 'sstring', 'sleg', 'opening', 'drone'].includes(k)) return 'pad'; return 'tonal'; };
+  function echoStop() { const sl = document.getElementById('fxEchoExtraSlider'); const v = sl ? +sl.value : 5; return isNaN(v) ? 5 : v; }
+  function axisLabels() { const m = document.getElementById('modifyPadMarks'); if (!m) return; const nm = k => (AXIS_PARAMS.find(p => p[0] === k) || [])[1] || '';
+    const xl = m.querySelector('.sp-xlab > span:not(.sp-g)'), yl = m.querySelector('.sp-ylab > span:not(.sp-g)');
+    if (xl) xl.textContent = window._axisMap.x.map(nm).join(' + ') || '—'; if (yl) yl.textContent = window._axisMap.y.map(nm).join(' + ') || '—'; }
+  function djFilter(v) { // −1 … 1: low-pass down to 300Hz … open … high-pass up to 1.5kHz
+    const lp = window._djLP, hp = window._djHP; if (!lp || !hp || !ctx) return; const t = ctx.currentTime;
+    const lf = v < 0 ? 20000 * Math.pow(300 / 20000, -v) : 20000, hf = v > 0 ? 20 * Math.pow(1500 / 20, v) : 20;
+    lp.frequency.setTargetAtTime(lf, t, 0.03); hp.frequency.setTargetAtTime(hf, t, 0.03); }
+  function soundAxes(X0, Y0) {
+    const B = pad ? pad.base : null; if (!B) return;
+    // INSTRUMENTS
+    const ai = axOf('inst', X0, Y0);
+    if (B.inst) for (let tr = 0; tr < NUM_TRACKS; tr++) { if (trackSweep[tr] || !B.inst[tr]) continue;
+      let want = B.inst[tr]; const z = ai === null ? 0 : Math.max(-3, Math.min(3, Math.round(ai * 3)));
+      if (z) { const L = pad.instPick && pad.instPick[tr]; if (L && L.length) want = L[(z < 0 ? -z - 1 : z + 2) % L.length]; }
+      if (want && trackInstruments[tr] !== want && INSTRUMENTS[want]) { selectSound(tr, want); try { redrawTrackCells(tr, true); } catch (e) {} } }
+    // REVERB SIZE (cached rooms, so moving back and forth is cheap)
+    const ar = axOf('rsize', X0, Y0), rb = B.rsize != null ? B.rsize : window._reverbIntensity;
+    { let v = ar === null ? rb : ar > 0 ? rb + ar * (1 - rb) : rb + ar * rb; v = Math.round(Math.max(0, Math.min(1, v)) * 20) / 20; if (ar === null || ar === 0) v = rb; // (the centre = exactly as it was)
+      if (Math.abs(v - (window._reverbIntensity || 0)) > 0.001 && ctx && window._reverbConv) { const c = (window._irCache = window._irCache && window._irCache.ctx === ctx ? window._irCache : { ctx }); const key = Math.round(v * 1000);
+        if (!c[key]) c[key] = _buildReverbIRBuffer(ctx, _reverbSizeFromSlider(v)); window._reverbConv.buffer = c[key]; window._reverbIntensity = v; } }
+    // DELAY TIME (musical stops)
+    const ad = axOf('dtime', X0, Y0), db = B.dtime != null ? B.dtime : echoStop();
+    { const v = ad === null ? db : Math.max(-4, Math.min(9, db + Math.round(ad * 5))); if (v !== echoStop()) { try { _setFxEchoExtra(v); } catch (e) {} } }
+    // FILTER
+    const af = axOf('filter', X0, Y0); if (af !== null || pad._filt) { djFilter(af || 0); pad._filt = af !== null && af !== 0; }
+  }
+  function closeAxisMenu() { const m = document.getElementById('axisMenu'); if (m) m.remove(); }
+  function openAxisMenu() {
+    closeAxisMenu(); const au = document.getElementById('modifyAuto'); if (!au) return; const r = au.getBoundingClientRect();
+    const mn = document.createElement('div'); mn.id = 'axisMenu';
+    mn.style.cssText = `position:fixed;top:${Math.round(r.bottom + 6)}px;right:${Math.max(8, Math.round(innerWidth - r.right))}px;z-index:9000;background:#111;color:#fff;padding:10px 12px 6px;border-radius:6px;font:700 0.66rem/1 'DM Sans',sans-serif;letter-spacing:1px;min-width:190px;box-shadow:0 6px 20px rgba(0,0,0,0.35);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;`;
+    const build = () => { mn.innerHTML = '';
+      [['x', 'LEFT ↔ RIGHT'], ['y', 'DOWN ↕ UP']].forEach(([ax, title]) => {
+        const h = document.createElement('div'); h.textContent = title; h.style.cssText = 'opacity:0.55;font-size:0.58rem;margin:4px 0 6px;'; mn.appendChild(h);
+        AXIS_PARAMS.forEach(([k, nm]) => { const on = window._axisMap[ax].includes(k);
+          const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;';
+          row.innerHTML = `<span style="width:14px;height:14px;border:2px solid #fff;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;${on ? 'background:#fff;color:#111;' : ''}">${on ? '✓' : ''}</span><span>${nm}</span>`;
+          row.addEventListener('click', e => { e.stopPropagation(); e.preventDefault();
+            const other = ax === 'x' ? 'y' : 'x';
+            if (on) window._axisMap[ax] = window._axisMap[ax].filter(q => q !== k);
+            else { window._axisMap[ax] = window._axisMap[ax].concat(k); window._axisMap[other] = window._axisMap[other].filter(q => q !== k); } // (one axis each)
+            try { localStorage.setItem('sifiAxisMap', JSON.stringify(window._axisMap)); } catch (er) {}
+            axisLabels(); try { playUiSound('tinyclick'); } catch (er) {}
+            if (pad) { try { apply(pad.x, pad.y); } catch (er) {} }
+            build(); });
+          mn.appendChild(row); });
+      }); };
+    build(); document.body.appendChild(mn); window._axisMenuOpen = true;
+  }
+  // the menu only closes on a tap OUTSIDE it — and that tap only closes it (the graph ignores it)
+  window.addEventListener('pointerdown', e => { if (window._axisMenuOpen !== true) return; const m = document.getElementById('axisMenu'); if (m && m.contains(e.target)) return; closeAxisMenu(); window._axisMenuOpen = 'closing'; }, true);
+  ['pointerup', 'pointercancel'].forEach(t => window.addEventListener(t, () => { if (window._axisMenuOpen === 'closing') setTimeout(() => { if (window._axisMenuOpen === 'closing') window._axisMenuOpen = false; }, 120); }, true));
+  window.addEventListener('click', e => { if (window._axisMenuOpen === 'closing') { e.stopPropagation(); e.preventDefault(); } }, true);
+  window._openAxisMenu = openAxisMenu;
   function capture() {
-    const base = { grid: grid.map(r => r.slice()), rev: trackDelay.slice(), fx: [], drums: drumsFx(), auto: [] }; for (let tr = 0; tr < NUM_TRACKS; tr++) { base.fx.push(fxOf(tr)); base.auto.push(autoOn(tr)); }
+    const base = { grid: grid.map(r => r.slice()), rev: trackDelay.slice(), fx: [], drums: drumsFx(), auto: [], inst: trackInstruments.slice(), rsize: window._reverbIntensity, dtime: echoStop() }; for (let tr = 0; tr < NUM_TRACKS; tr++) { base.fx.push(fxOf(tr)); base.auto.push(autoOn(tr)); }
     const notes = [], empties = [], effOn = [], effOff = [], pick = [];
     for (let tr = 0; tr < NUM_TRACKS; tr++) {
       for (let st = 0; st < NUM_STEPS; st++) (base.grid[tr][st] > 0 ? notes : empties).push([tr, st]);
@@ -8413,7 +8494,8 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
       pick.push(RAND_FX[Math.floor(Math.random() * RAND_FX.length)]); // this track's random effect when one gets added
     }
     const chk = shuffle([...Array(NUM_TRACKS).keys()]); // the order tracks go onto FX1 (CHK) as EFFECTS is pulled towards LESS
-    return { base, name: nameNow(), notes: shuffle(notes), empties: shuffle(empties), effOn: shuffle(effOn), effOnN: effOn.length, removed: 0, effOff: shuffle(effOff), pick, chk, x: 0.5, y: 0.5 };
+    const instPick = []; for (let tr = 0; tr < NUM_TRACKS; tr++) { const k = base.inst[tr], c = instCat(k); instPick.push(k ? shuffle(INSTRUMENT_KEYS.filter(o => o !== k && instCat(o) === c && !base.inst.some((u, t) => t !== tr && u === o))).slice(0, 6) : []); } // INSTRUMENTS axis: each track's own 6 alternatives (same kind of sound), fixed for this pattern
+    return { instPick, base, name: nameNow(), notes: shuffle(notes), empties: shuffle(empties), effOn: shuffle(effOn), effOnN: effOn.length, removed: 0, effOff: shuffle(effOff), pick, chk, x: 0.5, y: 0.5 };
   }
   // DRUMS' own FX in the pad too, per direct request — 0 off, 1 FX1 (CHK), 2 FX2 (BLAST), 3 DELAY (as the DRUMS FX button)
   function drumsFx() { try { return _beatChoke ? 1 : _beatPump ? 2 : _beatFx ? 3 : 0; } catch (e) { return 0; } }
@@ -8436,7 +8518,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     const was = typeof trackMuted !== 'undefined' ? trackMuted.slice() : null;
     try { absorbEdits(); } catch (e) {}
     const g0 = grid.map(r => r.join(''));
-    try { applyRaw(x, y); } finally { try { if (pad) { pad._lg = grid.map(r => r.slice()); pad._lf = []; for (let tr = 0; tr < NUM_TRACKS; tr++) pad._lf.push(fxOf(tr)); pad._lr = trackDelay.slice(); } } catch (e) {}
+    try { applyRaw(x, y); } finally { try { if (pad) { pad._lg = grid.map(r => r.slice()); pad._lf = []; for (let tr = 0; tr < NUM_TRACKS; tr++) pad._lf.push(fxOf(tr)); pad._lr = trackDelay.slice(); pad._li = trackInstruments.slice(); } } catch (e) {}
       if (!document.body.classList.contains('modify')) { for (let tr = 0; tr < NUM_TRACKS; tr++) if (grid[tr].join('') !== g0[tr]) { try { redrawTrackCells(tr, true); } catch (e) {} } try { _queueFxBtnSync(); } catch (e) {} } } // MAIN: the lanes follow the cursor
     { if (was) for (let tr = 0; tr < NUM_TRACKS; tr++) if (was[tr] && !trackMuted[tr]) { trackMuted[tr] = true; try { updateTrackMute(tr); } catch (e) {} } }
     try { _barVariantUpdate(); } catch (e) {} // the SONG NAME colour follows the cursor, per direct request
@@ -8451,12 +8533,14 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
         if (v > 0) { if (hasE >= 0) pad.empties.splice(hasE, 1); if (hasN < 0) pad.notes.push([tr, st]); } else { if (hasN >= 0) pad.notes.splice(hasN, 1); if (hasE < 0) pad.empties.push([tr, st]); } }
       const f = fxOf(tr), lf = pad._lf && pad._lf[tr]; if (lf && (f.x !== lf.x || f.y !== lf.y || f.pump !== lf.pump || f.chink !== lf.chink)) B.fx[tr] = f;
       if (pad._lr && !!trackDelay[tr] !== !!pad._lr[tr]) B.rev[tr] = !!trackDelay[tr];
+      if (pad._li && B.inst && trackInstruments[tr] !== pad._li[tr]) { const k = trackInstruments[tr]; B.inst[tr] = k; if (pad.instPick) { const c = instCat(k); pad.instPick[tr] = shuffle(INSTRUMENT_KEYS.filter(o => o !== k && instCat(o) === c && !B.inst.some((u, t) => t !== tr && u === o))).slice(0, 6); } } // an instrument picked by hand becomes this track's centre
     }
   }
   function applyRaw(x, y) {
     if (!pad) return; const B = pad.base; pad.x = x; pad.y = y;
     const dz = v => { const a = Math.abs(v); return a < 0.06 ? 0 : Math.sign(v) * Math.min(1, (a - 0.06) / 0.86); }; // a small dead zone round the centre so 'as it was' is easy to hit, and the last few % at each edge = all the way
-    const X = dz(Math.max(-1, Math.min(1, x * 2 - 1))), Y = dz(Math.max(-1, Math.min(1, 1 - y * 2))); // Y FLIPPED, per direct request: the BOTTOM is now fewest effects and the TOP most (Y > 0 = more)
+    const X0 = dz(Math.max(-1, Math.min(1, x * 2 - 1))), Y0 = dz(Math.max(-1, Math.min(1, 1 - y * 2)));
+    const X = axOf('notes', X0, Y0) ?? 0, Y = axOf('effects', X0, Y0) ?? 0; // AXIS MENU (hold A): NOTES / EFFECTS follow whichever axis they're ticked on (0 = left as the pattern is) // Y FLIPPED, per direct request: the BOTTOM is now fewest effects and the TOP most (Y > 0 = more)
     // NOTES — taking away = MUTING (the notes stay in the pattern); adding = real notes on empty steps
     const g = B.grid.map(r => r.slice()), mute = new Uint8Array(NUM_TRACKS * NUM_STEPS);
     if (X < 0) { const n = Math.round(pad.notes.length * -X); for (let i = 0; i < n; i++) { const [tr, st] = pad.notes[i]; mute[tr * NUM_STEPS + st] = 1; } }
@@ -8477,6 +8561,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     for (let tr = 0; tr < NUM_TRACKS; tr++) { if (!!trackDelay[tr] !== rev[tr]) setRev(tr, rev[tr]); setFx(tr, fx[tr]); if (B.auto && !trackSweep[tr]) setAuto(tr, auto[tr]); }
     // DRUMS: MORE effects = DELAY from ~40% down, then FX2 (BLAST) from ~75%; LESS effects = FX1 (CHK) from about halfway up
     setDrumsFx(Y >= 0.75 ? 2 : Y >= 0.4 ? 3 : Y <= -0.5 ? 1 : B.drums);
+    try { soundAxes(X0, Y0); } catch (e) {}
   }
   function redraw() { for (let tr = 0; tr < NUM_TRACKS; tr++) { try { redrawTrackCells(tr, true); } catch (e) {} } try { _queueFxBtnSync(); } catch (e) {} }
   // MAGNET, per direct request: let go and the ring glides back to the centre over an 8th note at the current tempo, the pattern
@@ -8532,6 +8617,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     if (!pad) return; const B = pad.base;
     for (let tr = 0; tr < NUM_TRACKS; tr++) { if (B.auto && !trackSweep[tr]) setAuto(tr, B.auto[tr]); if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) grid[tr][st] = B.grid[tr][st]; if (!!trackDelay[tr] !== B.rev[tr]) setRev(tr, B.rev[tr]); setFx(tr, B.fx[tr]); }
     setDrumsFx(B.drums);
+    try { soundAxes(0, 0); } catch (e) {} // INSTRUMENTS / REVERB SIZE / DELAY TIME / FILTER back as they were
     window._padMute = null; pad = null; redraw(); showDot(null); { const m = document.getElementById('modifyPadMarks'); if (m) m.classList.remove('sp-latched'); }
   }
   function bake() { // keep the latched result for real: muted notes become removed notes
@@ -8633,7 +8719,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   const inBar = e => document.body.classList.contains('modify') && nb() && nb().contains(e.target) && !(e.target.closest && e.target.closest('#modifyLock, #modifyAuto'));
   const evY = e => { const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || e; return t.clientY; };
   const inStrip = e => { if (!inBar(e)) return false; const r = nb().getBoundingClientRect(); return evY(e) - r.top < 56.08; }; // the SONG NAME strip (the top 66px — the same size as the bar everywhere else)
-  const inPad = e => inBar(e) && !inStrip(e);
+  const inPad = e => !window._axisMenuOpen && inBar(e) && !inStrip(e); // (not while the AXIS MENU is open / closing)
   // the SONG NAME strip is left to the song name's OWN gestures (double-tap = tape drawer + heart, SWIPES left/right, hold), per
   // direct request — only the pad below it is taken over here
   const start = (cx, cy) => {
@@ -8710,7 +8796,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     if (sp && !pad && padSaved) { const ps = padSaved; padSaved = null;
       if (ps.name === nameNow() && ps.sig === JSON.stringify(grid)) { pad = ps.pad; try { apply(pad.x, pad.y); redraw(); showDot([pad.x, pad.y]); } catch (e) {} } }
     if (sp && !held && !springRaf && !orbitRaf) { try { showDot(pad ? [pad.x, pad.y] : null); } catch (e) {} } /* (showDot: colour AND the aberration's colours) */ // RING COLOUR kept up to date while idle (display mode / MODULATE / page colour changes) — it used to only catch up once you touched the graph, per direct report
-    if (!pad) return;
+    if (!pad) { try { if (window._djLP && (window._djLP.frequency.value < 19000 || window._djHP.frequency.value > 30)) djFilter(0); } catch (e) {} return; } // (no graph state left = the FILTER opens back up)
     if (!sp && window._orbitMain) { held = false; if (pad.name !== nameNow()) { window._padMute = null; pad = null; } return; } // AUTO going on in MAIN: keep the pad live (a new pattern = start from it afresh)
     if (!sp) { held = false; springStop();
       if (window._padLatch) { const keep = pad; bake(); padSaved = { pad: keep, sig: JSON.stringify(grid), name: nameNow() }; } // left MODIFY: latched result kept for real — and REMEMBERED (where the ring was), per direct request
@@ -13735,6 +13821,9 @@ function refreshBeatMenuHighlight() {
   });
 }
 let _beatMenuOpen = false;
+// DRUM PATTERN CHANGED TO …, per direct request — once the DRUMS menu closes on a new pattern (or straight away, when the change
+// lands after it has closed, e.g. once a takeover question is answered)
+function _drumPatternNotice() { try { const it = document.querySelector(`#beatTypeMenu .beat-type-item[data-beat="${_beatType}"]`), nm = (it ? it.textContent : String(_beatType || '')).trim().toUpperCase(); if (nm) _gestureNotice('DRUM PATTERN CHANGED TO ' + nm); } catch (e) {} }
 let _beatCtrlRandHoldTimer = null, _beatCtrlRandHoldTarget = null, _beatCtrlRandHeldTriggered = false;
 function beatMenuHighlightUnder(clientX, clientY) {
   const menu = document.getElementById('beatTypeMenu');
@@ -13758,6 +13847,7 @@ function openBeatMenu() {
   const menu = document.getElementById('beatTypeMenu');
   const btn = document.getElementById('beatBtn');
   if (!menu || !btn) return;
+  window._beatTypeAtMenuOpen = _beatType; // (closing the menu on a NEW drum pattern says so, per direct request)
   window._beatAutoAtMenuOpen = !!_beatAutoRandActive; // remembered so closing the menu can announce a DRUMS AUTO change
   _beatMenuOpen = true;
   refreshBeatMenuHighlight();
@@ -13778,6 +13868,8 @@ function closeBeatMenu() {
   const btn = document.getElementById('beatBtn');
   // DRUMS AUTO switched on/off from inside the menu -> the little notice box once the menu closes, per direct request
   if (_beatMenuOpen && window._beatAutoAtMenuOpen !== undefined && window._beatAutoAtMenuOpen !== !!_beatAutoRandActive && typeof _showNotice === 'function') _showNotice(_beatAutoRandActive ? 'DRUMS AUTO ON' : 'DRUMS AUTO OFF');
+  if (_beatMenuOpen && window._beatTypeAtMenuOpen !== undefined && window._beatTypeAtMenuOpen !== _beatType) _drumPatternNotice();
+  window._beatTypeAtMenuOpen = undefined;
   window._beatAutoAtMenuOpen = undefined;
   _beatMenuOpen = false;
   if (menu) { menu.classList.remove('visible'); menu.querySelectorAll('.beat-type-item, .beat-ctrl-row button').forEach(it => it.classList.remove('drag-hover')); }
@@ -14403,7 +14495,7 @@ function openSoundPicker(tr) {
     opt.addEventListener('mouseenter', () => {
       list.querySelectorAll('.sound-option').forEach(o => o.classList.toggle('hover-preview', o.dataset.key === k));
     });
-    opt.addEventListener('mouseup', e => { e.stopPropagation(); selectSound(tr, k); });
+    opt.addEventListener('mouseup', e => { e.stopPropagation(); const was = trackInstruments[tr]; selectSound(tr, k); if (was !== k) { try { _instChangedNotice(tr); } catch (er) {} } });
     // touchend used to fire selectSound() (which always closes the whole
     // picker) unconditionally — including when the finger had actually
     // been scrolling the list and just happened to lift while still over
@@ -14420,7 +14512,7 @@ function openSoundPicker(tr) {
       const t = e.changedTouches[0];
       const moved = t ? Math.hypot(t.clientX - _optTouchStartX, t.clientY - _optTouchStartY) : 0;
       if (moved > 10) return; // scrolled, not tapped — leave the picker open
-      selectSound(tr, k);
+      const was = trackInstruments[tr]; selectSound(tr, k); if (was !== k) { try { _instChangedNotice(tr); } catch (er) {} }
     }, { passive: false });
     list.appendChild(opt);
   });
@@ -14592,6 +14684,7 @@ function attachVolMuteEvents() {}
 // Lock / unlock a track from RAND — the L button (when LOCK BUTTONS = NEW INST is off) and a left-to-right swipe on the track name.
 function _toggleTrackLock(tr) {
   trackSweep[tr] = !trackSweep[tr];
+  if (trackSweep[tr]) { try { _gestureNotice('TRACK LOCKED'); } catch (e) {} } // per direct request
   const sb = document.getElementById(`swpbtn-${tr}`); if (sb) sb.classList.toggle('sweep-on', !!trackSweep[tr]);
   // Pin this track's current root the moment it locks, so if it's individually re-randomized later via its own + (locking only
   // protects it from the whole-pattern RAND sweep), new notes still come from the key it actually had when it was locked.
@@ -14639,6 +14732,7 @@ function buildUI() {
         }
         swapTrackInstrumentInGroup(tr, dbl, dbl ? sweepBtnL._preSwapInst : undefined);
         try { playFlipSound(); } catch (e) {} // FLIP sound, once per asterisk press
+        try { _instChangedNotice(tr); } catch (e) {}
         return;
       }
       _toggleTrackLock(tr);
@@ -16783,6 +16877,7 @@ function _showNotice(text, ms) {
 // gesture actually does, in case the RANDO BUTTON settings swap them). Each one shows for HALF the time once it's been seen more
 // than 5 times this session.
 window._gestureNoticeN = {};
+function _instChangedNotice(tr) { const k = trackInstruments[tr], n = k && INSTRUMENTS[k] && INSTRUMENTS[k].name; if (n) _gestureNotice('INSTRUMENT CHANGED TO ' + n.toUpperCase()); } // INST menu + asterisk, per direct request
 function _gestureNotice(text) { const n = (window._gestureNoticeN[text] = (window._gestureNoticeN[text] || 0) + 1); _showNotice(text, n > 5 ? 700 : 1400); }
 // ABOUT box — HOLD on the Si•Fi logo, per direct request. Stays up until tapped (anywhere).
 function _showAboutBox() {
@@ -21592,6 +21687,9 @@ function wireRandomizeButton(btn, tr) {
   // Single tap: pulse red, randomize this track on next downbeat (or immediately if stopped)
   const doSingleTap = () => {
     if (autoInterval) { stopAuto(); return; }
+    try { const g = btn.querySelector('.glyph'), br = btn.getBoundingClientRect(), gr = g.getBoundingClientRect(); // the >> scrolls through, like the main >> button
+      btn.style.setProperty('--scr-out', Math.ceil(br.right - gr.left) + 'px'); btn.style.setProperty('--scr-in', -Math.ceil(gr.right - br.left) + 'px');
+      btn.classList.remove('trk-scroll'); void btn.offsetWidth; btn.classList.add('trk-scroll'); clearTimeout(btn._scrT); btn._scrT = setTimeout(() => btn.classList.remove('trk-scroll'), 1200); } catch (e) {}
     unmuteIfNeeded();
     _untagBeatOwned(tr); // re-rolled by hand — no longer the beat's
     // Tracks the manual N-button click count per track, specifically for
@@ -26069,7 +26167,8 @@ window.masterLimiter = ctx.createDynamicsCompressor(); const masterLimiter = win
     window._tonalRevIn = ctx.createGain(); window._tonalRevIn.gain.value = (window._globalDelayMix !== undefined) ? window._globalDelayMix : 0; window._tonalRevIn.connect(window._reverbSendBus);
     window._drumMasterRevSend = ctx.createGain(); window._drumMasterRevSend.gain.value = 1; window._drumMasterRevSend.connect(window._reverbSendBus); // drum tracks' whole-signal reverb (REVERB ON BEAT), bypassing OVERALL
     window._reverbSendBus.connect(window._reverbConv); window._reverbSendBus._sifiConvOn = true; window._reverbConv.connect(window._reverbOutGain); window._reverbOutGain.connect(window._normalTrackFadeGain);
-    masterGain.connect(window._normalTrackFadeGain); window._normalTrackFadeGain.connect(makeupGain); makeupGain.connect(window._duckGain); window._duckGain.connect(masterLimiter); masterLimiter.connect(window._safetyLimiter); window._safetyLimiter.connect(window._postLimiterGain); _connectEightBitOutput(ctx);
+    window._djLP = ctx.createBiquadFilter(); window._djLP.type = 'lowpass'; window._djLP.frequency.value = 20000; window._djLP.Q.value = 0.9; window._djHP = ctx.createBiquadFilter(); window._djHP.type = 'highpass'; window._djHP.frequency.value = 20; window._djHP.Q.value = 0.9; // the AXIS MENU's FILTER (open = no effect)
+    masterGain.connect(window._normalTrackFadeGain); window._normalTrackFadeGain.connect(window._djLP); window._djLP.connect(window._djHP); window._djHP.connect(makeupGain); makeupGain.connect(window._duckGain); window._duckGain.connect(masterLimiter); masterLimiter.connect(window._safetyLimiter); window._safetyLimiter.connect(window._postLimiterGain); _connectEightBitOutput(ctx);
     // REVERB MIX OVERALL send — a second, parallel reverb send tapping
     // every track's own fully-processed output (post FX/BLAST/pan, same
     // point that feeds masterGain), independent of and in addition to
@@ -26677,6 +26776,7 @@ function stopRecallLoop() {
   let _abIsA = true; // which pattern is currently "showing" — A or B, per that same alternation RECALL itself does (swap current <-> previous)
   window._toggleRecallAB = () => {
     _abIsA = !_abIsA;
+    try { _gestureNotice(_abIsA ? 'LAST PATTERN' : 'PREVIOUS PATTERN'); } catch (e) {} // A/B notice, per direct request
     if (aEl) aEl.classList.toggle('ab-current', _abIsA);
     if (bEl) bEl.classList.toggle('ab-current', !_abIsA);
   };
@@ -27582,6 +27682,7 @@ function _setBeatTypeInner(type, fromUser, _rolled) {
   const _wasBossa = _beatType === 'bossa';
   const _wasSamba = _beatType === 'samba';
   _beatType = type;
+  if (fromUser && _beatChanged && !_beatMenuOpen) _drumPatternNotice();
   // Every beat type now uses the one lower-pitched/mid-EQ DMX-style snare
   // (playDmxSnareLow) consistently — the old fresh-50/50-per-selection
   // choice between a regular and a brighter DMX snare is gone; that
