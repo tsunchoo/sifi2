@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-16 20:08:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-16 21:16:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -136,6 +136,9 @@ html body.night-invert:not(.no-glow):not(.safe-gfx) #tapeReels { isolation: isol
 html body.night-invert #beatCount, html body.night-invert #modeLabel { --header-text-color: #ececec; }
 html body.night-invert #topTempoReadout { --header-text-color: var(--top-row-text-color, #ececec); }
 #beatCount { -webkit-tap-highlight-color: transparent; outline: none; } /* no iOS grey tap flash over the numeral's box, per direct request */
+/* SWEEP VISUAL, per direct request: while SWEEP is held and dragged, the whole screen goes PIXELLATED (5 steps, bigger blocks the
+   further down) and DESATURATED with it; straight back to normal on release. Filters on the five screen blocks (see _sweepVis). */
+html body.sweep-vis > header, html body.sweep-vis > .transport, html body.sweep-vis > #nameBar, html body.sweep-vis > #seqWrap, html body.sweep-vis > #slotBar { filter: var(--sw-px, none) saturate(var(--sw-sat, 1)) !important; transition: none !important; }
 @keyframes orbit-guide-spin { to { transform: rotate(360deg); } } /* the AUTO orbit's dotted path guide (MODULATE) */
 #beatCount:not(.beat-count-hidden) { opacity: var(--modify-count-op, 0.3); } /* the header COUNT uses the same opacity as the GRAPH COUNT (DEV > GRAPH COUNT OPACITY, 30%), per direct request */
 #beatCount.beat-count-hidden { opacity: 0; } /* hidden but still tappable to bring it back */
@@ -3129,7 +3132,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 20:08:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 21:16:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -3195,6 +3198,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
   <!-- BEAT COUNT (1-2-3-4), per direct request: left side, same size and
        height as the tempo number; "-" when stopped; tap to hide (it stays
        tappable while hidden, so another tap brings it back). -->
+  <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true"><defs><filter id="swPx1" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood x="1" y="1" height="1" width="1"/><feComposite width="2" height="2"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="1"/></filter><filter id="swPx2" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood x="2" y="2" height="1" width="1"/><feComposite width="4" height="4"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="2"/></filter><filter id="swPx3" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood x="3" y="3" height="1" width="1"/><feComposite width="6" height="6"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="3"/></filter><filter id="swPx4" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood x="4" y="4" height="1" width="1"/><feComposite width="8" height="8"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="4"/></filter><filter id="swPx5" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood x="6" y="6" height="1" width="1"/><feComposite width="12" height="12"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="6"/></filter></defs></svg>
   <div id="beatCount" class="beat-count-hidden" onclick="_cycleBeatCountMode()" style="position:absolute;left:6px;top:0;font-family:'DM Sans',sans-serif;font-size:2.016rem;font-weight:700;line-height:1;color:var(--header-text-color,#111);font-variant-numeric:tabular-nums;width:1.2em;text-align:center;padding:4px 0 4px 0;cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation;z-index:3;">-</div>
   <div id="tapeReels" class="tape-reels">
     <div class="reel-wrap" id="leftReelWrap" style="-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;">
@@ -26654,7 +26658,8 @@ async function hardResetAudioEngine() {
     // A plain tap (no drag at all) doesn't play it.
     const _wasSweeping = !!sweepNodes, _py = window._swDepthY || 0, _px = window._swDepthX || 0;
     stopSweep();
-    try { window._djFilterRelease && window._djFilterRelease(); } catch (e) {} // the FILTER opens back up (or back to wherever the graph has it)
+    try { window._djFilterRelease && window._djFilterRelease(); } catch (e) {}
+    try { _sweepVis(0); } catch (e) {} // the screen back to normal // the FILTER opens back up (or back to wherever the graph has it)
     if (_wasSweeping && ctx && (_py > 0.01 || _px > 0.01)) { try { playRandReleaseSweep(ctx.currentTime + 0.01, Math.pow(10, -12 * (1 - Math.min(1, _py)) / 20)); } catch (e) {} }
   };
 
@@ -26679,6 +26684,12 @@ async function hardResetAudioEngine() {
   // maps to SWEEP_CEILING_LEVEL, linearly — swipe down sweeps both pitch
   // and volume up together, swipe back up brings both back down, smoothly
   // (same setTargetAtTime time constant as pitch already used).
+  function _sweepVis(p) { // 0 … 1
+    const b = document.body, lv = p < 0.06 ? 0 : Math.min(5, Math.ceil(p * 5));
+    if (!lv) { if (b.classList.contains('sweep-vis')) { b.classList.remove('sweep-vis'); b.style.removeProperty('--sw-px'); b.style.removeProperty('--sw-sat'); } b._swLv = 0; return; }
+    if (b._swLv !== lv) { b._swLv = lv; b.style.setProperty('--sw-px', `url(#swPx${lv})`); }
+    b.style.setProperty('--sw-sat', (1 - 0.9 * p).toFixed(2)); b.classList.add('sweep-vis');
+  }
   function _sweepUpdateFreqFromY(y) {
     if (!sweepNodes || !ctx) return;
     const dragDist = Math.max(0, y - window._sweepDragStartY);
@@ -26698,7 +26709,8 @@ async function hardResetAudioEngine() {
     // drag that brings SWEEP up. SWEEP itself is past this fade (see startSweep), so its own level is untouched.
     try { window._normalTrackFadeGain.gain.setTargetAtTime(Math.pow(10, -6 * progress / 20), ctx.currentTime, 0.03); } catch (e) {}
     window._swDepthY = progress; _sweepCrushWet(); _sweepApplyOwnLevel();
-    try { window._djFilter && window._djFilter(-progress, 0.015); } catch (e) {} // + the FILTER: low-pass closing as the drag goes down (SWEEP's own noise is after it, so stays bright) // SWEEP's own −7dB at full drag-down (0dB if also full right)
+    try { window._djFilter && window._djFilter(-progress, 0.015); } catch (e) {}
+    try { _sweepVis(progress); } catch (e) {} // + the screen pixellates / desaturates with it // + the FILTER: low-pass closing as the drag goes down (SWEEP's own noise is after it, so stays bright) // SWEEP's own −7dB at full drag-down (0dB if also full right)
   }
   document.addEventListener('mousemove', e => { if (window._sweepGestureActive) { _sweepUpdateFreqFromY(e.clientY); _sweepUpdateX(e.clientX); } });
 
