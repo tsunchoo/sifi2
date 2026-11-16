@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-16 00:50:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-16 01:16:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -367,6 +367,18 @@ header .sub { font-size: 0.44rem; color: var(--dim); letter-spacing: 2px; text-t
   25% { transform: translateX(-50%) translateX(-1.5px); }
   75% { transform: translateX(-50%) translateX(1.5px); }
 }
+/* SONG NAME WOBBLE while the graph's AUTO orbit is moving, per direct request: every letter wobbles on its own, TWICE as far as the
+   tape window (±1px vs its ±0.5px), on its own timing. Uses the separate `translate` property so it never fights the name's other
+   (transform) animations — compositor-only, so it costs next to nothing. */
+@keyframes name-wob-a { 0%, 100% { translate: 0 0; } 25% { translate: -1px 0.5px; } 50% { translate: 0.5px -1px; } 75% { translate: 1px 0.5px; } }
+@keyframes name-wob-b { 0%, 100% { translate: 0 0; } 25% { translate: 1px -0.5px; } 50% { translate: -0.5px 1px; } 75% { translate: -1px -0.5px; } }
+html body.orbit-auto #nameDisplay > span { animation: name-wob-a 1.4s ease-in-out infinite; }
+html body.orbit-auto #nameDisplay > span:nth-child(2n) { animation-name: name-wob-b; animation-duration: 1.15s; }
+html body.orbit-auto #nameDisplay > span:nth-child(3n) { animation-duration: 1.7s; }
+html body.orbit-auto #nameDisplay > span:nth-child(5n+1) { animation-delay: -0.35s; }
+html body.orbit-auto #nameDisplay > span:nth-child(5n+2) { animation-delay: -0.8s; }
+html body.orbit-auto #nameDisplay > span:nth-child(5n+3) { animation-delay: -0.15s; }
+html body.orbit-auto #nameDisplay > span:nth-child(5n+4) { animation-delay: -1.05s; }
 .tape-reels:has(.reel-wrap.spinning) #tapeWindowImg {
   animation: tape-wobble 1.4s ease-in-out infinite;
 }
@@ -2628,7 +2640,7 @@ html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) svg [fill]:not([fill="non
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) svg [stroke]:not([stroke="none"]) { stroke: currentColor !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #nameBar, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .track-row, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .track-ctrl-row { background: #fff !important; box-shadow: none !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyPadMarks .sp-tint, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyPadMarks .sp-glow { display: none !important; } /* no colour wash in the graph */
-html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .mod-note-row, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #nameEq { opacity: 1 !important; } /* no see-through (grey) markers / EQ */
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #nameEq { opacity: 1 !important; } /* no see-through (grey) markers / EQ */
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *::before, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *::after { text-shadow: none !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .step-cell::before, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .step-cell::after { opacity: 1 !important; box-shadow: none !important; filter: none !important; } /* note markers solid black (no soft / see-through greys, no glow) */
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #_hamBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #devMenuBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #randomizeReverbIconBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #markerStyleIconBtn { box-shadow: none !important; background: transparent !important; } /* the header icons (menu, rainbow, reverb, marker style) stay plain icons — no black box round them, per direct report */
@@ -2643,10 +2655,7 @@ html body.gray-mode svg [fill]:not([fill="none"]) { fill: #000 !important; }
 html body.gray-mode svg [stroke]:not([stroke="none"]) { stroke: #000 !important; }
 html body.gray-mode #installBanner, html body.gray-mode #_helpBtn, html body.gray-mode #_noticeToast, html body.gray-mode #tapeDrawerPlayAll, html body.gray-mode #devMenuOverlay button { background: #cfcfcf !important; } /* the few dark boxes get a light grey so the black text reads */
 html body.gray-mode #playBtnImg { filter: brightness(0) !important; } html body.gray-mode #playBtnMask { background: #000 !important; } html body.gray-mode #playBtnGlowWrap { filter: none !important; } /* the play / stop glyph black too */
-.mod-note-row { display: none; }
-html body.modify.modulate-mode .mod-note-row { display: none !important; } /* MODULATE mode (logo drag from MODIFY), per direct request: no note-marker rows — just the track name + vol slider rows under a square graph */
 html body.modify { --simple-fader-width: 0px !important; --vol-tip-h: 0% !important; } /* MODIFY: the vol FADER (width + height) at 0, per direct request — the meters alone */
-html body.modify .mod-note-row { display: block; width: 100vw; margin-left: calc(50% - 50vw); /* the FULL screen width — the track list itself sits 4px in from each edge, per direct report */ height: calc(16px + 40px / 6); /* 16px + an equal share of the graph's freed top/bottom margins, per direct request */ pointer-events: none; opacity: var(--modify-notes-op, 0.4); }
 /* (MODIFY's forced transparent song-name background removed, per direct request — it keeps whatever the mode before it had) */
 html body.modify.name-bg-clear #nameBar { background: var(--name-bar-bg, #9fb9a2) !important; }
 :root { --modify-strip-h: 56.08px; } /* MODIFY's song name strip: 10px shorter than the bar on the MAIN page (66.08px), per direct request */
@@ -3111,7 +3120,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 00:50:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 01:16:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4170,6 +4179,14 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
       </div>
 
       <button id="turboBtn" onclick="toggleTurbo()" style="width:100%;background:#555;color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:14px 0;cursor:pointer;">BOOST</button>
+      <!-- GLUE, per direct request: how hard the SIDECHAIN pump (kicks ducking the music) hits — 50% = the original setting -->
+      <div style="display:flex;flex-direction:column;gap:15px;">
+        <div style="display:flex;justify-content:space-between;">
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">GLUE</div>
+          <div id="glueReadout" style="font-size:0.85rem;font-weight:700;color:#111;">50%</div>
+        </div>
+        <input autocomplete="off" type="range" id="glueSlider" min="0" max="100" value="50" oninput="setGlue(this.value)" onchange="setGlue(this.value)" class="master-vol-slider" style="width:100%;">
+      </div>
       <button id="batterySaverBtn" onclick="toggleBatterySaver()" style="width:100%;background:#555;color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:14px 0;cursor:pointer;">BATTERY SAVER</button>
       <!-- UPDATES moved here, below BATTERY SAVER, per direct request -->
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -8492,6 +8509,8 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     orbitA = 0; orbitR = Math.min(orbitTargetR, Math.max(0.05, hMax)); pad.x = 0.5 + orbitR; pad.y = 0.5; if (document.body.classList.contains('modify')) showDot([pad.x, pad.y]); try { apply(pad.x, pad.y); } catch (e) {} }
   setInterval(() => {
     if (document.body.classList.contains('modify') && orbiting() && orbitA === null && !orbitGrab) { try { orbitStart(); } catch (e) {} } // (waiting there before PLAY too)
+    { const on = orbitMoving(); if (document.body.classList.contains('orbit-auto') !== on) document.body.classList.toggle('orbit-auto', on);
+      if (on) { const nd = document.getElementById('nameDisplay'); if (nd && !nd.firstElementChild && nd.textContent) { const t = nd.textContent; nd.textContent = ''; [...t].forEach(ch => { const sp = document.createElement('span'); sp.textContent = ch; sp.style.cssText = ch === ' ' ? 'white-space:pre;' : 'display:inline-block;white-space:pre;'; nd.appendChild(sp); }); } } } // (each letter its own span, so each can wobble on its own — the text itself is unchanged) // the SONG NAME wobbles while AUTO circles
     if (!document.body.classList.contains('modify') && window._orbitMain) { if (orbitMoving() && !orbitRaf) { springStop(); orbitLast = 0; orbitRaf = requestAnimationFrame(orbitTick); } return; } // AUTO carrying on in MAIN
     if (!document.body.classList.contains('modify')) { if (orbitOff) { orbitOff = false; syncAutoBtn(); } orbitA = null; orbitLast = 0; orbitTargetR = 0.385; return; } // re-armed (AUTO on) for the next visit
     if (orbitMoving() && !orbitRaf) { springStop(); orbitLast = 0; orbitRaf = requestAnimationFrame(orbitTick); }
@@ -8651,7 +8670,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // MODULATE + AUTO, per direct request: touching the graph no longer stops the orbit (only the A button does) — a touch / drag just
   // sets the SIZE of the circle (how far from the centre you are), kept inside the graph so the ring never goes off it
   let orbitGrab = false;
-  const ringPx = () => document.body.classList.contains('modulate-mode') ? 24 : 13; // half the ring + a hair (MODULATE's big ring / MODIFY's normal one)
+  const ringPx = () => 24; // MODULATE's big ring (HYBRID's smaller one went with HYBRID mode) // half the ring + a hair (MODULATE's big ring / MODIFY's normal one)
   // ORBIT PATH GUIDE, per direct request: in MODULATE with AUTO on, while the circle is being sized, a DOTTED circle shows the path the
   // cursor will take — slowly turning round the centre, following the drag live, in the TOP ROW HIGHLIGHT colour at 60% — then
   // fading away over a QUARTER NOTE once the drag lets go.
@@ -8719,32 +8738,15 @@ function _modifyMeasure() {
   let h = 0; document.querySelectorAll('.track-row').forEach(r => { const rr = r.getBoundingClientRect(); if (rr.height) h += rr.height + 4; }); // + the 4px gap under each
   if (had) b.classList.add('modify');
   document.documentElement.style.setProperty('--modify-extra', Math.round(h) + 'px');
-  const W = document.documentElement.clientWidth || innerWidth; document.documentElement.style.setProperty('--modify-pad-h', (b.classList.contains('modulate-mode') ? Math.round(W) : Math.round(6 * ((W - 40) / 16))) + 'px'); // MODULATE mode: the graph as tall as it is wide, per direct request // 6 square rows of a 16-wide grid — no empty margin above / below the EQ any more (given to the slim note rows), per direct request
+  const W = document.documentElement.clientWidth || innerWidth; document.documentElement.style.setProperty('--modify-pad-h', Math.round(W) /* (HYBRID's shorter graph went with HYBRID mode) */ + 'px'); // MODULATE mode: the graph as tall as it is wide, per direct request // 6 square rows of a 16-wide grid — no empty margin above / below the EQ any more (given to the slim note rows), per direct request
 }
 // the slim rows are drawn here (~15fps while MODIFY is on): one rectangle per sounding note, 2px apart, full row height
-window._modifyRowColours = true; // true = each track's own colour (DEFAULT now — grayscale OFF, per direct request), false = grey — SETTINGS toggle
+// the graph's NOTES / EFFECTS labels read against what's behind the graph (HYBRID's note rows that used to be drawn here are gone)
 function _modifyRowsTick() {
   if (!document.body.classList.contains('modify') || document.hidden) return;
-  const dpr = Math.min(2, window.devicePixelRatio || 1), mute = window._padMute;
-  let grey = '#777';
-  try { const c = _anyRgba(getComputedStyle(document.body).backgroundColor); grey = c && _relLum(c) > 0.3 ? '#5a5a5a' : '#b0b0b0';
-    const m = document.getElementById('modifyPadMarks'); if (m && c) { const lab = _relLum(c) > 0.3 ? '#111111' : '#ffffff'; if (m._labCol !== lab) { m.style.setProperty('--mod-lab-col', lab); m._labCol = lab; } } } catch (e) {} // the axis labels read against the page behind the (see-through) graph
-  for (let tr = 0; tr < NUM_TRACKS; tr++) {
-    const cv = document.getElementById(`modrow-${tr}`); if (!cv) continue;
-    const W = Math.round(cv.clientWidth * dpr), H = Math.round(cv.clientHeight * dpr); if (!W || !H) continue;
-    if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
-    const c = cv.getContext('2d'); c.clearRect(0, 0, W, H);
-    let col = grey; if (window._modifyRowColours) { const tb = document.getElementById(`tbtn-${tr}`); if (tb) col = getComputedStyle(tb).backgroundColor; }
-    // full screen width, and the gap at each edge = the 2px gap between markers, per direct request
-    const gap = 2 * dpr; c.fillStyle = col; const cw = (W - gap * (NUM_STEPS + 1)) / NUM_STEPS;
-    for (let gs = 0; gs < NUM_STEPS; gs++) {
-      if (!(grid[tr][gs] > 0) || (mute && mute[tr * NUM_STEPS + gs])) continue;
-      const ds = (gs + (trackOffset[tr] || 0)) % NUM_STEPS, x0 = Math.round(gap + ds * (cw + gap)), x1 = Math.round(gap + ds * (cw + gap) + cw);
-      const sh = Math.round(3 * dpr); c.fillRect(x0 + Math.round(sh / 2), Math.round(sh / 2), Math.max(1, x1 - x0 - sh), Math.max(1, H - sh)); // each marker 3px narrower and 3px shorter than its slot (1px, then another 1px off each side), centred, per direct request
-    }
-  }
+  try { const c = _anyRgba(getComputedStyle(document.body).backgroundColor); const m = document.getElementById('modifyPadMarks'); if (m && c) { const lab = _relLum(c) > 0.3 ? '#111111' : '#ffffff'; if (m._labCol !== lab) { m.style.setProperty('--mod-lab-col', lab); m._labCol = lab; } } } catch (e) {}
 }
-setInterval(_modifyRowsTick, 66);
+setInterval(_modifyRowsTick, 250);
 // MAIN MODE notes come and go like HYBRID's, per direct request: a note the graph cursor has silenced fades OUT of its lane, and fades
 // back IN when it sounds again (notes the cursor ADDS already appear — they're real notes). Same mask the sound uses (_padMute).
 setInterval(() => {
@@ -8772,14 +8774,9 @@ function _setModify(on, quiet) {
   // EQ OPACITY 60% in MODIFY by default, per direct request — whatever it was comes back on leaving
   try { if (on) { if (window._eqOpBeforeModify === undefined) window._eqOpBeforeModify = window._nameEqOpacity; setNameEqOpacity(60); } else if (window._eqOpBeforeModify !== undefined) { const v = window._eqOpBeforeModify; window._eqOpBeforeModify = undefined; setNameEqOpacity(v); } } catch (e) {}
   b.classList.toggle('hide-tape', !on && b.classList.contains('live-layout')); // MODIFY keeps the TAPE graphic (LIVE hides it), per direct request
-  if (quiet) return;
-  try { playUiSound('tinyclick'); } catch (e) {}
-  _showNotice(on ? 'HYBRID MODE' : 'LIVE MODE');
 }
 function setCaSymMix(v) { v = Math.max(0, Math.min(100, +v || 0)); window._caSymMix = v / 100; try { window._padDotRefresh && window._padDotRefresh(); } catch (e) {} const r = document.getElementById('caSymVal'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('caSymSlider'); if (sl && +sl.value !== v) sl.value = v; try { localStorage.setItem('sifiCaSym', String(v)); } catch (e) {} }
 window._caSymMix = 0.5; // ABERRATION COLOUR fixed at 50%, per direct request (the slider was removed)
-function setModifyRowColours(on) { window._modifyRowColours = !!on; const cb = document.getElementById('modifyRowColoursToggle'); if (cb) cb.checked = !!on; try { localStorage.setItem('sifiModifyRowCol', on ? '1' : '0'); } catch (e) {} }
-document.addEventListener('DOMContentLoaded', () => { setModifyRowColours(true); }); // always ON (track colours) — the SETTINGS switch was removed, per direct request
 // MODIFY COUNT settings (SETTINGS), per direct request — remembered on this device
 function setModifyCount(on) { document.body.classList.toggle('modify-count-off', !on); const cb = document.getElementById('modifyCountToggle'); if (cb) cb.checked = !!on; try { localStorage.setItem('sifiModifyCount', on ? '1' : '0'); } catch (e) {} }
 function setModifyNotesOpacity(v, fromMode) { v = Math.max(0, Math.min(100, +v || 0)); document.documentElement.style.setProperty('--modify-notes-op', (v / 100).toFixed(2)); const r = document.getElementById('modifyNotesOpVal'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('modifyNotesOpSlider'); if (sl && +sl.value !== v) sl.value = v; if (!fromMode) { try { localStorage.setItem('sifiModifyNotesOp', String(v)); } catch (e) {} } }
@@ -8806,7 +8803,6 @@ function _modifyVolBanger(on) {
     }
   } catch (e) {}
 }
-function _toggleModify() { _setModify(!document.body.classList.contains('modify')); }
 window.addEventListener('resize', () => { if (document.body.classList.contains('modify')) _modifyMeasure(); });
 setInterval(() => { const b = document.body; if (b.classList.contains('modify') && !b.classList.contains('live-layout')) { b.classList.remove('modify'); _modifyVolBanger(false); }
   if (b.classList.contains('modify') && _rootCS().getPropertyValue('--vol-fill-h').trim() !== '20%') { try { setVolFillHeightPct(20); const sl = document.getElementById('volFillHeightSlider'); if (sl) sl.value = 20; } catch (e) {} } }, 300); // (a display-mode change in MODIFY mustn't change the fill height) // left LIVE some other way → MODIFY goes too
@@ -14830,7 +14826,7 @@ function buildUI() {
     lane.appendChild(cells);
     row.appendChild(lane);
     trackWrap.appendChild(row);
-    { const mr = document.createElement('canvas'); mr.className = 'mod-note-row'; mr.id = `modrow-${tr}`; mr.setAttribute('aria-hidden', 'true'); trackWrap.appendChild(mr); } // MODIFY's slim, non-clickable note row (see _modifyRowsTick)
+    /* (HYBRID's slim note rows removed with HYBRID mode, per direct request) */ // MODIFY's slim, non-clickable note row (see _modifyRowsTick)
     seqWrap.appendChild(trackWrap);
   }
 
@@ -24652,11 +24648,7 @@ function setTonalPercBalance(v) {
     const toggleLive = window._toggleLiveMode = () => {
       playUiSound('tinyclick');
       const b = document.body;
-      // MAIN → MODULATE → HYBRID (was MODIFY) → MAIN, per direct request (the order swapped: MODULATE comes first now)
-      if (b.classList.contains('modify') && b.classList.contains('modulate-mode')) { // MODULATE → HYBRID
-        b.classList.remove('modulate-mode'); try { _modifyMeasure(); } catch (e) {}
-        _showNotice('HYBRID MODE'); return;
-      }
+      // MAIN → MODULATE → MAIN — HYBRID mode removed, per direct request
       if (b.classList.contains('modify') || b.classList.contains('live-layout')) {
         b.classList.remove('modulate-mode');
         b.classList.remove('live-layout'); // (first — so leaving doesn't put LIVE's hidden tape back)
@@ -27284,11 +27276,17 @@ function _scDepth() {
   const xy = window._padXY ? window._padXY() : null; if (!xy) return 0;
   return Math.max(0, Math.min(1, (xy[0] - 0.5) + (0.5 - xy[1])));
 }
+// GLUE (SETTINGS, under BOOST): the pump's POWER — 0 = off, 50% = the original (default), 100% = twice as hard. It scales both
+// how DEEP each duck goes (−13dB at 50% in the top-right corner → about −30dB at 100%) and how LONG it takes to swell back
+// (an 8th note at 50%, half that at 0, 1.5x at 100%) — together that's what makes a sidechain feel weak or heavy.
+window._glue = 0.5;
+function setGlue(v) { v = Math.max(0, Math.min(100, +v || 0)); window._glue = v / 100; const r = document.getElementById('glueReadout'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('glueSlider'); if (sl && +sl.value !== v) sl.value = v; }
 function _scDuck(t) {
   const gs = window._scDuckGains; if (!gs || !ctx) return;
+  const pw = (window._glue != null ? window._glue : 0.5) * 2; if (pw < 0.01) return; // GLUE power (1 = the original)
   const d = _scDepth(); if (d < 0.03) return;
-  const floor = 1 - 0.84 * Math.pow(d, 1.2);
-  let rel = 0.25; try { rel = Math.max(0.08, stepDuration() * 2); } catch (e) {} // ~an 8th note back up
+  const floor = 1 - Math.min(0.97, 0.84 * pw) * Math.pow(d, 1.2);
+  let rel = 0.25; try { rel = Math.max(0.05, stepDuration() * 2 * (0.5 + 0.5 * pw)); } catch (e) {} // ~an 8th note back up at the default
   t = Math.max(t, ctx.currentTime);
   for (let tr = 0; tr < gs.length; tr++) {
     const g = gs[tr]; if (!g || g.context !== ctx) continue;
@@ -28572,7 +28570,7 @@ function snapshotDisplay() {
   // where you tapped, so shared parts describe MODIFY when you're in MODIFY); LIVE left out while it's hidden.
   const MOD = () => document.body.classList.contains('modify');
   const H = [
-    ['#siFiTitle', 'Si•Fi LOGO', 'Tap to toggle the 8-bit mix. Drag DOWN to step through the main modes: MAIN, MODULATE, HYBRID, then back to MAIN. Hold for a short description of Si•Fi.'],
+    ['#siFiTitle', 'Si•Fi LOGO', 'Tap to toggle the 8-bit mix. Drag DOWN to switch between MAIN and MODULATE. Hold for a short description of Si•Fi.'],
     ['#_helpBtn', 'HELP MODE - click anything to see what it does', ''],
     ['#_hamBtn', 'MENU', 'Shows or hides the rainbow (look and feel), reverb and help icons. Tap again to tuck them away.'],
     ['#devMenuBtn', 'RAINBOW · DISPLAY MODES', 'Swipe DOWN to cycle through the display modes (the look — colours, glows, meters) in either main mode. Tap to open LOOK AND FEEL for the visual settings.'],
@@ -28585,7 +28583,7 @@ function snapshotDisplay() {
     ['#nameBar', 'SONG NAME', (x, y) => {
       const r = document.getElementById('nameBar').getBoundingClientRect();
       if (MOD() && y - r.top >= 56) return ['GRAPH', 'Hold and move: LEFT mutes notes, RIGHT adds them; DOWN takes effects away (and chops tracks with EN), UP adds random effects (drums too). The centre is the pattern as it was; With the PADLOCK off (default) it springs back to the centre when you let go; tap the padlock to lock it where you leave it. Double-tap the graph to reset it (with the right spool swell). Double-click >> to watch the new notes land below. The big number is the count.'];
-      return [MOD() ? 'SONG NAME (HYBRID / MODULATE)' : 'SONG NAME', 'Each new pattern gets a randomized name. Double-tap to keep it in the TAPE DRAWER (a heart floats up). Swipe RIGHT to add effects (and change the EQ type), LEFT to bring back the effects you had before. Hold to hide or show the name.'];
+      return [MOD() ? 'SONG NAME (MODULATE)' : 'SONG NAME', 'Each new pattern gets a randomized name. Double-tap to keep it in the TAPE DRAWER (a heart floats up). Swipe RIGHT to add effects (and change the EQ type), LEFT to bring back the effects you had before. Hold to hide or show the name.'];
     }],
     ['#slotBar', 'SLOTS', 'Up to six saved patterns. Tap one to switch to it on the next beat.'],
     ['#randBtn', '>>  RANDOMIZER', 'Tap for new instruments on the current pattern; double-tap for a brand-new groove on the next bar (and a new delay time and level). Hold for AUTO. Drag DOWN for the RANDO BUTTON menu — what a click, double-click and AUTO do. Locked tracks always stay as they are.'],
@@ -28596,7 +28594,7 @@ function snapshotDisplay() {
     ['#saveBtn', 'RECORD', 'Tap to start recording in real time. Hold for the RECORD menu: real time, bounce loops or stems, save a tape, or send a tape link.'],
     ['.track-name-btn', 'INSTRUMENT NAME', 'The instrument on this track. Tap to mute / unmute, hold for the instrument menu, swipe LEFT for a new instrument, RIGHT to go back to the one before (with the lock buttons set to NEW INST, swipe RIGHT locks the track instead).'],
     ['.lock-btn', 'INSTRUMENT RANDOMIZER', 'Tap for a new instrument in the same family. Double-tap to switch between tonal and drums.'],
-    ['.track-vol-bar', 'TRACK VOLUME', () => MOD() ? 'Drag to change level — in HYBRID and MODULATE only the live level meter shows (no fader).' : 'Drag to change level. With VOL BANGER on, the fill bounces with the track\'s live level.'],
+    ['.track-vol-bar', 'TRACK VOLUME', () => MOD() ? 'Drag to change level — in MODULATE only the live level meter shows (no fader).' : 'Drag to change level. With VOL BANGER on, the fill bounces with the track\'s live level.'],
     ['.shift-btn', '<  OFFSET', 'Moves the track\'s notes a step earlier. The step size is set in LOOK AND FEEL under DEV / BEHAVIOUR.'],
     ['.fx-btn', 'FX', 'Tap to cycle: FX (off) → EN (FX1, an envelope that chops each hit) → DS (FX2, distortion) → DL (delay, set in the REVERB menu) → off.'],
     ['[id^="delaybtn-"]', 'R  REVERB', 'Sends this track into the reverb. Tap to switch on or off.'],
@@ -28605,7 +28603,7 @@ function snapshotDisplay() {
     ['.step-cell', 'NOTE STEP', 'One 16th note of the bar. Tap to add or remove a note, drag right for a longer note, hold to pull notes to that point.'],
     ['.step-lane', 'PATTERN ROW', 'This track\'s 16 steps — big markers are accents, small ones softer notes, bars are held notes.'],
     ['.track-ctrl-row', 'TRACK CONTROLS', 'Volume, offset, FX, reverb, new notes and solo for this track.'],
-    ['.track-wrap', 'TRACK', () => MOD() ? ['NOTE ROW (HYBRID)', 'This track\'s notes, just to see — they follow the pad live (muted ones disappear). Colour and opacity are in SETTINGS.'] : ['TRACK', 'One track: its controls and its 16 steps.']],
+    ['.track-wrap', 'TRACK', () => ['TRACK', 'One track: its controls and its 16 steps.']],
     ['header', 'TOP BAR', 'Logo, count, tape, tempo and the menu icons.'],
   ];
   let on = false, ov = null, box = null, hl = null, btn = null;
