@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-16 23:00:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-17 04:09:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -136,17 +136,8 @@ html body.night-invert:not(.no-glow):not(.safe-gfx) #tapeReels { isolation: isol
 html body.night-invert #beatCount, html body.night-invert #modeLabel { --header-text-color: #ececec; }
 html body.night-invert #topTempoReadout { --header-text-color: var(--top-row-text-color, #ececec); }
 #beatCount { -webkit-tap-highlight-color: transparent; outline: none; } /* no iOS grey tap flash over the numeral's box, per direct request */
-/* SWEEP VISUAL, per direct request: while SWEEP is held and dragged, the whole screen goes PIXELLATED (5 steps, bigger blocks the
-   further down) and DESATURATED with it; straight back to normal on release. Filters on the five screen blocks (see _sweepVis). */
-html body.sweep-vis > header, html body.sweep-vis > .transport, html body.sweep-vis > #nameBar, html body.sweep-vis > #seqWrap, html body.sweep-vis > #slotBar { filter: var(--sw-px, none) !important; transition: none !important; }
-/* (anything animating inside those blocks gets its own layer on the iPhone, which the pixel filter can't reach — the track names
-   were drawing themselves back on top, per direct report — so their animations rest while the sweep is held) */
-html body.sweep-vis > header *, html body.sweep-vis > .transport *, html body.sweep-vis > #nameBar *, html body.sweep-vis > #seqWrap *, html body.sweep-vis > #slotBar * { animation: none !important; will-change: auto !important; }
-/* DESATURATION as its own full-screen layer (a backdrop filter), so it reaches everything — getting stronger with the sweep / filter */
-#swDesat { position: fixed; inset: 0; pointer-events: none; z-index: 2147482000; display: none; -webkit-backdrop-filter: grayscale(var(--sw-gray, 0)); backdrop-filter: grayscale(var(--sw-gray, 0)); }
-html body.sweep-vis #swDesat { display: block; }
 @keyframes orbit-guide-spin { to { transform: rotate(360deg); } } /* the AUTO orbit's dotted path guide (MODULATE) */
-#beatCount:not(.beat-count-hidden) { opacity: var(--modify-count-op, 0.3); } /* the header COUNT uses the same opacity as the GRAPH COUNT (DEV > GRAPH COUNT OPACITY, 30%), per direct request */
+#beatCount:not(.beat-count-hidden) { opacity: var(--modify-count-op, 0.22); } /* the header COUNT uses the same opacity as the GRAPH COUNT (DEV > GRAPH COUNT OPACITY, 30%), per direct request */
 #beatCount.beat-count-hidden { opacity: 0; } /* hidden but still tappable to bring it back */
 /* BEAT COUNT PULSE (2nd tap), per direct request — each new beat flashes the
    numeral up to the PLAY FLASH colour (white by default) with a glow, then it
@@ -3138,7 +3129,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-16 23:00:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-17 04:09:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -3204,7 +3195,6 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
   <!-- BEAT COUNT (1-2-3-4), per direct request: left side, same size and
        height as the tempo number; "-" when stopped; tap to hide (it stays
        tappable while hidden, so another tap brings it back). -->
-  <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true"><defs><filter id="swPx1" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood x="1" y="1" height="1" width="1"/><feComposite width="2" height="2"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="1"/></filter><filter id="swPx2" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood x="2" y="2" height="1" width="1"/><feComposite width="4" height="4"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="2"/></filter><filter id="swPx3" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood x="3" y="3" height="1" width="1"/><feComposite width="6" height="6"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="3"/></filter><filter id="swPx4" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood x="4" y="4" height="1" width="1"/><feComposite width="8" height="8"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="4"/></filter><filter id="swPx5" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood x="6" y="6" height="1" width="1"/><feComposite width="12" height="12"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="6"/></filter></defs></svg>
   <div id="beatCount" class="beat-count-hidden" onclick="_cycleBeatCountMode()" style="position:absolute;left:6px;top:0;font-family:'DM Sans',sans-serif;font-size:2.016rem;font-weight:700;line-height:1;color:var(--header-text-color,#111);font-variant-numeric:tabular-nums;width:1.2em;text-align:center;padding:4px 0 4px 0;cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation;z-index:3;">-</div>
   <div id="tapeReels" class="tape-reels">
     <div class="reel-wrap" id="leftReelWrap" style="-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;">
@@ -3848,11 +3838,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
           <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;">GRAPH COUNT</div>
           <label class="wild-toggle"><input autocomplete="off" type="checkbox" id="modifyCountToggle" checked onchange="setModifyCount(this.checked)"><span class="wild-toggle-slider"></span></label>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#555;">OPACITY</div>
-          <div id="modifyCountOpVal" style="font-size:0.75rem;font-weight:700;color:#111;">30%</div>
-        </div>
-        <input autocomplete="off" type="range" id="modifyCountOpSlider" min="0" max="100" step="1" value="30" class="master-vol-slider" oninput="setModifyCountOpacity(this.value)" onchange="setModifyCountOpacity(this.value)" style="width:100%;">
+        <!-- (COUNT OPACITY hard-coded at 22%, slider removed, per direct request) -->
       </div>
     </div>
 
@@ -4183,14 +4169,6 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
           <input autocomplete="off" type="checkbox" id="countToggle" onchange="_countToggleChanged(this.checked)">
           <span class="wild-toggle-slider"></span>
         </label>
-      </div>
-      <!-- COUNT OPACITY, right under COUNT, per direct request (the same setting as DEV > GRAPH COUNT OPACITY — both counts use it) -->
-      <div style="display:flex;flex-direction:column;gap:15px;">
-        <div style="display:flex;justify-content:space-between;">
-          <div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);">COUNT OPACITY</div>
-          <div id="countOpReadout" style="font-size:0.85rem;font-weight:700;color:#111;">30%</div>
-        </div>
-        <input autocomplete="off" type="range" id="countOpSlider" min="0" max="100" step="1" value="30" oninput="setModifyCountOpacity(this.value)" onchange="setModifyCountOpacity(this.value)" class="master-vol-slider" style="width:100%;">
       </div>
 
 
@@ -8612,7 +8590,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   const orbitMoving = () => orbiting() && typeof playing !== 'undefined' && playing && !window._spoolBraking; // + PAUSED while the LEFT SPOOL is held (playback braked), carrying on from the same spot on release, per direct request // PAUSED while playback is stopped (AUTO stays on) — it picks up where it was when PLAY is pressed again, per direct request
   // the A button: lit = AUTO on (circling). Only the A button switches it off / on — touching the graph just sizes the circle
   function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) a.classList.toggle('sp-mag-off', !!orbitOff); try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} } // (re-coloured straight away: inverted when engaged)
-  function setOrbitAuto(on) { orbitOff = !on; if (!on) { try { setLatch(true); } catch (e) {} } /* AUTO off → the PADLOCK goes on (the ring stays put), per direct request */ syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; } }
+  function setOrbitAuto(on) { orbitOff = !on; if (!on) { try { setLatch(true); } catch (e) {} } /* AUTO off → the PADLOCK goes on (the ring stays put), per direct request */ syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; if (pad) { const dx = pad.x - 0.5, dy = pad.y - 0.5, R = Math.hypot(dx, dy); if (R > 0.01) { orbitA = Math.atan2(dy, dx); orbitR = R; orbitTargetR = R; } } /* A pressed: circle from WHERE THE CURSOR IS (that distance = the circle's size), per direct request — from the centre it still starts at 3 o'clock */; } }
   function orbitTick(now) {
     orbitRaf = 0; if (!orbitMoving()) return;
     if (!pad) { pad = capture(); }
@@ -8904,8 +8882,8 @@ window._caSymMix = 0.5; // ABERRATION COLOUR fixed at 50%, per direct request (t
 function setModifyCount(on) { document.body.classList.toggle('modify-count-off', !on); const cb = document.getElementById('modifyCountToggle'); if (cb) cb.checked = !!on; try { localStorage.setItem('sifiModifyCount', on ? '1' : '0'); } catch (e) {} }
 function setModifyNotesOpacity(v, fromMode) { v = Math.max(0, Math.min(100, +v || 0)); document.documentElement.style.setProperty('--modify-notes-op', (v / 100).toFixed(2)); const r = document.getElementById('modifyNotesOpVal'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('modifyNotesOpSlider'); if (sl && +sl.value !== v) sl.value = v; if (!fromMode) { try { localStorage.setItem('sifiModifyNotesOp', String(v)); } catch (e) {} } }
 document.addEventListener('DOMContentLoaded', () => { let op = 30; try { if (localStorage.getItem('sifiModifyNotesOpV3') !== '1') { localStorage.setItem('sifiModifyNotesOpV3', '1'); localStorage.removeItem('sifiModifyNotesOp'); } /* NOTE MARKERS OPACITY 30% default, applied once to every phone, per direct request (was 40%) */ const o = localStorage.getItem('sifiModifyNotesOp'); if (o !== null) op = +o; } catch (e) {} setModifyNotesOpacity(op); });
-function setModifyCountOpacity(v) { v = Math.max(0, Math.min(100, +v || 0)); { const r2 = document.getElementById('countOpReadout'); if (r2) r2.textContent = Math.round(v) + '%'; const s2 = document.getElementById('countOpSlider'); if (s2 && +s2.value !== v) s2.value = v; } /* (the SETTINGS copy) */ document.documentElement.style.setProperty('--modify-count-op', (v / 100).toFixed(2)); const r = document.getElementById('modifyCountOpVal'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('modifyCountOpSlider'); if (sl && +sl.value !== v) sl.value = v; try { localStorage.setItem('sifiModifyCountOp', String(v)); } catch (e) {} }
-document.addEventListener('DOMContentLoaded', () => { let on = true, op = 30; try { on = localStorage.getItem('sifiModifyCount') !== '0'; if (localStorage.getItem('sifiModifyCountOpV2') !== '1') { localStorage.setItem('sifiModifyCountOpV2', '1'); localStorage.removeItem('sifiModifyCountOp'); } /* COUNT OPACITY 30% default, applied once to every phone, per direct request */ const o = localStorage.getItem('sifiModifyCountOp'); if (o !== null) op = +o; } catch (e) {} setModifyCount(on); setModifyCountOpacity(op); });
+function setModifyCountOpacity(v) { v = Math.max(0, Math.min(100, +v || 0)); document.documentElement.style.setProperty('--modify-count-op', (v / 100).toFixed(2)); } // COUNT OPACITY: fixed at 22% now (sliders removed), per direct request
+document.addEventListener('DOMContentLoaded', () => { let on = true, op = 30; try { on = localStorage.getItem('sifiModifyCount') !== '0'; if (localStorage.getItem('sifiModifyCountOpV2') !== '1') { localStorage.setItem('sifiModifyCountOpV2', '1'); localStorage.removeItem('sifiModifyCountOp'); } /* COUNT OPACITY 30% default, applied once to every phone, per direct request */ const o = localStorage.getItem('sifiModifyCountOp'); if (o !== null) op = +o; } catch (e) {} setModifyCount(on); setModifyCountOpacity(22); /* COUNT OPACITY fixed at 22%, per direct request */ });
 // the MODIFY pad's COUNT mirrors #beatCount's text as it changes
 (function () { const go = () => { const bc = document.getElementById('beatCount'); if (!bc) return;
   const sync = () => { const m = document.getElementById('modifyCount'); if (m && document.body.classList.contains('modify')) { const t = bc.textContent; if (m.textContent !== t) { m.textContent = t;
@@ -26664,8 +26642,7 @@ async function hardResetAudioEngine() {
     // A plain tap (no drag at all) doesn't play it.
     const _wasSweeping = !!sweepNodes, _py = window._swDepthY || 0, _px = window._swDepthX || 0;
     stopSweep();
-    try { window._djFilterRelease && window._djFilterRelease(); } catch (e) {}
-    try { _sweepVis(0); } catch (e) {} // the screen back to normal // the FILTER opens back up (or back to wherever the graph has it)
+    try { window._djFilterRelease && window._djFilterRelease(); } catch (e) {} // the FILTER opens back up (or back to wherever the graph has it)
     if (_wasSweeping && ctx && (_py > 0.01 || _px > 0.01)) { try { playRandReleaseSweep(ctx.currentTime + 0.01, Math.pow(10, -12 * (1 - Math.min(1, _py)) / 20)); } catch (e) {} }
   };
 
@@ -26690,13 +26667,6 @@ async function hardResetAudioEngine() {
   // maps to SWEEP_CEILING_LEVEL, linearly — swipe down sweeps both pitch
   // and volume up together, swipe back up brings both back down, smoothly
   // (same setTargetAtTime time constant as pitch already used).
-  function _sweepVis(p) { // 0 … 1
-    const b = document.body, lv = p < 0.06 ? 0 : Math.min(5, Math.ceil(p * 5));
-    if (!lv) { if (b.classList.contains('sweep-vis')) { b.classList.remove('sweep-vis'); b.style.removeProperty('--sw-px'); b.style.removeProperty('--sw-gray'); } b._swLv = 0; return; }
-    if (!document.getElementById('swDesat')) { const d = document.createElement('div'); d.id = 'swDesat'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); }
-    if (b._swLv !== lv) { b._swLv = lv; b.style.setProperty('--sw-px', `url(#swPx${lv})`); }
-    b.style.setProperty('--sw-gray', Math.min(1, p * 1.1).toFixed(2)); b.classList.add('sweep-vis'); // grey all the way by the bottom of the drag
-  }
   function _sweepUpdateFreqFromY(y) {
     if (!sweepNodes || !ctx) return;
     const dragDist = Math.max(0, y - window._sweepDragStartY);
@@ -26716,8 +26686,7 @@ async function hardResetAudioEngine() {
     // drag that brings SWEEP up. SWEEP itself is past this fade (see startSweep), so its own level is untouched.
     try { window._normalTrackFadeGain.gain.setTargetAtTime(Math.pow(10, -6 * progress / 20), ctx.currentTime, 0.03); } catch (e) {}
     window._swDepthY = progress; _sweepCrushWet(); _sweepApplyOwnLevel();
-    try { window._djFilter && window._djFilter(-progress, 0.015); } catch (e) {}
-    try { _sweepVis(progress); } catch (e) {} // + the screen pixellates / desaturates with it // + the FILTER: low-pass closing as the drag goes down (SWEEP's own noise is after it, so stays bright) // SWEEP's own −7dB at full drag-down (0dB if also full right)
+    try { window._djFilter && window._djFilter(-progress, 0.015); } catch (e) {} // + the FILTER: low-pass closing as the drag goes down (SWEEP's own noise is after it, so stays bright) // SWEEP's own −7dB at full drag-down (0dB if also full right)
   }
   document.addEventListener('mousemove', e => { if (window._sweepGestureActive) { _sweepUpdateFreqFromY(e.clientY); _sweepUpdateX(e.clientX); } });
 
@@ -28377,7 +28346,7 @@ let _reelHoldTimer = null;
   // direct request. (SETTINGS keeps deferring only its sliders.)
   const lookMenu = document.getElementById('devMenuOverlay');
   const DEFER_TYPES = new Set(['checkbox', 'radio', 'color']);
-  const LIVE_IDS = new Set(['nameEqRangeSlider', 'nameEqOpSlider', 'masterVolBar', 'eightBitMixSlider', 'musicBusBar', 'beatVolBar', 'fxEchoExtraSlider', 'fxEchoLevelSlider', 'modifyCountOpSlider', 'modifyNotesOpSlider', 'swingBar', 'clickLevelSlider']);
+  const LIVE_IDS = new Set(['nameEqRangeSlider', 'nameEqOpSlider', 'masterVolBar', 'eightBitMixSlider', 'musicBusBar', 'beatVolBar', 'fxEchoExtraSlider', 'fxEchoLevelSlider', 'modifyNotesOpSlider', 'swingBar', 'clickLevelSlider']);
   const radioPending = new Map(); // group name -> the radio in it that was clicked
   const onEv = e => {
     const el = e.target;
@@ -28477,6 +28446,29 @@ let _reelHoldTimer = null;
 </script>
 
 <script>
+/* IDLE AUDIO SLEEP, per direct report (a crash with the app just sitting there, stopped, untouched for minutes — the audio engine
+   was still running the whole time, plus an idle spare engine, with ~70 old sounds iOS never reported as finished): after 30s
+   stopped with no taps, the audio engine is put to SLEEP (suspended) and the spare engine is closed, so nothing on the phone's
+   audio side is ticking over while the app waits. The next tap wakes it (PLAY does anyway); a new spare is made on a later tap. */
+(function () {
+  let lastTouch = performance.now();
+  const wake = () => { lastTouch = performance.now();
+    if (window._idleAsleep && typeof ctx !== 'undefined' && ctx && !(ctx instanceof OfflineAudioContext) && ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
+    window._idleAsleep = false; };
+  ['pointerdown', 'keydown', 'touchstart'].forEach(t => document.addEventListener(t, wake, true));
+  setInterval(() => {
+    try {
+      if (window._idleAsleep || typeof ctx === 'undefined' || !ctx || ctx instanceof OfflineAudioContext) return;
+      if ((typeof playing !== 'undefined' && playing) || window._audioRefreshing || window._sweepGestureActive) { lastTouch = performance.now(); return; }
+      if (typeof _mediaRecorder !== 'undefined' && _mediaRecorder && _mediaRecorder.state === 'recording') return;
+      if (performance.now() - lastTouch < 30000 || ctx.state !== 'running') return;
+      window._idleAsleep = true;
+      try { ctx.suspend(); } catch (e) {}
+      try { if (window._spareCtx) { window._spareCtx.close(); window._spareCtx = null; } } catch (e) {}
+      try { window._crashCrumb && window._crashCrumb('idle 30s: audio asleep, spare engine closed'); } catch (e) {}
+    } catch (e) {}
+  }, 5000);
+})();
 /* OVERLOAD GUARD, per direct request: when the audio looks like it's about to fall over, playback STOPS and an OVERLOAD!!!
    box comes up with a progress bar while everything gets its breath back; then OK starts playback again (OK is a tap, so iOS
    lets the audio restart). The warning signs are guesses from the crash reports (nothing in them climbs steadily before a
