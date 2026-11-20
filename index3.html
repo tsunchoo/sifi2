@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-20 04:29:38 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-20 04:35:01 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3146,7 +3146,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 04:29:38 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 04:35:01 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -27488,16 +27488,16 @@ function _scDepth() {
   const xy = window._padXY ? window._padXY() : null; if (!xy) return 0;
   return Math.max(0, Math.min(1, (xy[0] - 0.5) + (0.5 - xy[1])));
 }
-// GLUE (SETTINGS, under BOOST): the pump's POWER — 0 = off, 50% = the original (default), 100% = twice as hard. It scales both
+// GLUE (SETTINGS, under BOOST): the pump's POWER — 0 = off, 50% = the default (what used to be 100%), 25% = the original, 100% = twice the new default. It scales both
 // how DEEP each duck goes (−13dB at 50% in the top-right corner → about −30dB at 100%) and how LONG it takes to swell back
 // (an 8th note at 50%, half that at 0, 1.5x at 100%) — together that's what makes a sidechain feel weak or heavy.
 window._glue = 0.5;
 function setGlue(v) { v = Math.max(0, Math.min(100, +v || 0)); window._glue = v / 100; const r = document.getElementById('glueReadout'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('glueSlider'); if (sl && +sl.value !== v) sl.value = v; }
 function _scDuck(t) {
   const gs = window._scDuckGains; if (!gs || !ctx) return;
-  const pw = (window._glue != null ? window._glue : 0.5) * 2; if (pw < 0.01) return; // GLUE power (1 = the original)
+  const pw = (window._glue != null ? window._glue : 0.5) * 4; if (pw < 0.01) return; // GLUE power — RESCALED, per direct request: the old 100% (power 2) is the new 50% (the default); 100% now = power 4 (the original setting is 25%)
   const d = _scDepth(); if (d < 0.03) return;
-  const floor = 1 - Math.min(0.97, 0.84 * pw) * Math.pow(d, 1.2);
+  const floor = 1 - Math.min(pw <= 2 ? 0.97 : 0.97 + (Math.min(4, pw) - 2) / 2 * 0.025, 0.84 * pw) * Math.pow(d, 1.2); // (above the new 50% it can go a bit deeper still: about −30dB → −46dB at 100%)
   let rel = 0.25; try { rel = Math.max(0.05, stepDuration() * 2 * (0.5 + 0.5 * pw)); } catch (e) {} // ~an 8th note back up at the default
   t = Math.max(t, ctx.currentTime);
   for (let tr = 0; tr < gs.length; tr++) {
