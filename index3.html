@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-20 03:54:58 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-20 04:11:03 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2724,9 +2724,10 @@ html body.modify #modifyPadMarks { display: block; }
 html body.modify #modifyLock { display: flex; } /* the MAGNET (was the padlock), per direct request — ON by default: let go and the ring springs back to the centre */
 #modifyLock.sp-mag-off { opacity: 0.45; }
 /* AUTO (the MODULATE orbit) button, per direct request: same footprint and colours as the padlock, just to its left — MODULATE only */
-#modifyAuto { display: none; position: absolute; right: 46px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+#modifyAuto { display: none; position: absolute; right: 6px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 html body.modify #modifyAuto { display: flex; } /* MODIFY too now (was MODULATE only), per direct request */
-#modifyAuto.sp-mag-off { opacity: 0.45; }
+#modifyAuto.sp-mag-off { opacity: 1; } /* (the MODE button: SPRING / HOLD plain, ORBIT / JUMP inverted — never dimmed) */
+html body.modify #modifyLock, html body.modify #modifyOrbit { display: none !important; } /* the PADLOCK, ORBIT and A buttons are now ONE MODE button (#modifyAuto), per direct request */
 #modifyAuto:not(.sp-mag-off) { opacity: 1; }
 /* GEAR (top-LEFT of the graph), per direct request: opens the AXIS MENU (what the graph's axes control) — that used to be a hold on A */
 #modifyGear { display: none; position: absolute; left: 6px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; opacity: 0.45; }
@@ -3145,7 +3146,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 03:54:58 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 04:11:03 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8384,6 +8385,8 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   let jumpOn = false, jumpBars = 0, jumpRaf = 0; // A = JUMP (see setJump below)
   let jumpEvery = 4; try { const v = +localStorage.getItem('sifiJumpBars'); if ([1, 2, 4, 8, 16].includes(v)) jumpEvery = v; } catch (e) {} // HOLD A to change it
   const nb = () => document.getElementById('nameBar');
+  const ORBIT_SVG = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><path d="M19.48 11.41 A7.5 7.5 0 1 1 12.59 4.52" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17.3" cy="6.7" r="2.9" fill="currentColor"/></svg>';
+  const JUMP_SVG = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><circle cx="5.8" cy="18.2" r="2.4" stroke="currentColor" stroke-width="1.8"/><path d="M6.6 14.2 Q7.6 5.8 14 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="1.6 2.6"/><circle cx="18.2" cy="5.8" r="3" fill="currentColor"/></svg>'; // JUMP: from one place to the next
   const LOCK_SVG = on => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="display:block;"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="${on ? 'M8 11V7a4 4 0 0 1 8 0v4' : 'M8 11V7a4 4 0 0 1 7.6-1.8'}" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`; // PADLOCK again (was the magnet), per direct request — closed = LOCKED (the ring stays where you leave it), open = OFF (springs back to the centre)
   const marks = () => {
     let m = document.getElementById('modifyPadMarks'), b = nb();
@@ -8392,17 +8395,16 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
       const lk = document.createElement('button'); lk.id = 'modifyLock'; lk.type = 'button'; lk.setAttribute('aria-label', 'lock'); lk.innerHTML = LOCK_SVG(window._padLatch); lk.classList.toggle('sp-mag-off', !window._padLatch);
       lk.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setLatch(!window._padLatch); });
       b.appendChild(lk);
-      const au = document.createElement('button'); au.id = 'modifyAuto'; au.type = 'button'; au.setAttribute('aria-label', 'auto');
-      au.innerHTML = '<span style="display:block;font-family:\'DM Sans\',sans-serif;font-weight:700;font-size:23px;line-height:1;letter-spacing:0;pointer-events:none;">A</span>'; // a capital A in the TOP ROW buttons' font (DM Sans Bold), per direct request
+      const au = document.createElement('button'); au.id = 'modifyAuto'; au.type = 'button'; au.setAttribute('aria-label', 'mode'); // the MODE button (its icon is set by syncAutoBtn)
       au.style.webkitTouchCallout = 'none'; au.style.userSelect = 'none';
-      let auHoldT = 0, auHeld = false; // HOLD A = how often it JUMPS (1 / 2 / 4 / 8 / 16 bars), per direct request (the AXIS MENU moved to the GEAR)
-      au.addEventListener('pointerdown', () => { auHeld = false; clearTimeout(auHoldT); auHoldT = setTimeout(() => { auHeld = true; openJumpMenu(); try { playUiSound('tinyclick'); } catch (er) {} }, 500); });
+      let auHoldT = 0, auHeld = false; // HOLD = the current mode's settings (JUMP: how often, 1 / 2 / 4 / 8 / 16 bars)
+      au.addEventListener('pointerdown', () => { auHeld = false; clearTimeout(auHoldT); auHoldT = setTimeout(() => { if (padMode() !== 'jump') return; auHeld = true; openJumpMenu(); try { playUiSound('tinyclick'); } catch (er) {} }, 500); });
       ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => au.addEventListener(t, () => clearTimeout(auHoldT)));
       au.addEventListener('contextmenu', e => e.preventDefault());
-      au.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (auHeld) { auHeld = false; return; } setJump(!jumpOn); try { playUiSound('tinyclick'); } catch (er) {} }); // A now = JUMP (a new cursor position every 4 bars), per direct request — the orbit has its own button
+      au.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (auHeld) { auHeld = false; return; } const md = padMode(); setPadMode(MODES[(MODES.indexOf(md) + 1) % MODES.length]); try { playUiSound('tinyclick'); } catch (er) {} }); // TAP = the next mode: SPRING → HOLD → ORBIT → JUMP → SPRING, per direct request
       b.appendChild(au);
       const ob = document.createElement('button'); ob.id = 'modifyOrbit'; ob.type = 'button'; ob.setAttribute('aria-label', 'orbit'); // ORBIT on / off, per direct request
-      ob.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="2.9" fill="currentColor"/></svg>'; // a circle with a little node on its path
+      ob.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><path d="M19.48 11.41 A7.5 7.5 0 1 1 12.59 4.52" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17.3" cy="6.7" r="2.9" fill="currentColor"/></svg>'; // a circle with a little node on its path — the track stops short either side of the node (a clear gap), per direct request: it looked like a ring
       ob.style.webkitTouchCallout = 'none'; ob.style.userSelect = 'none'; ob.addEventListener('contextmenu', e => e.preventDefault());
       ob.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setOrbitAuto(orbitOff); try { playUiSound('tinyclick'); } catch (er) {} });
       b.appendChild(ob);
@@ -8415,10 +8417,11 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     }
     return m;
   };
-  function setLatch(on) {
+  function setLatch(on, quiet) {
     window._padLatch = !!on; const lk = document.getElementById('modifyLock'); if (lk) { lk.innerHTML = LOCK_SVG(window._padLatch); lk.classList.toggle('sp-mag-off', !window._padLatch); } try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} // (re-coloured straight away)
-    try { playUiSound('tinyclick'); } catch (e) {}
+    if (!quiet) { try { playUiSound('tinyclick'); } catch (e) {} }
     if (!window._padLatch && !held && pad) springHome(pad.x, pad.y); // magnet back on: springs home
+    try { syncAutoBtn(); } catch (e) {} // (the MODE button shows SPRING / HOLD)
   }
   window._setPadLatch = setLatch;
   // SAVE SLOTS remember the GRAPH CURSOR, per direct request: the whole pad state (where the ring is + what it was built on) is
@@ -8688,8 +8691,8 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   const orbiting = () => (document.body.classList.contains('modify') || window._orbitMain) && !orbitOff && !held; // + MAIN, when AUTO was on on leaving MODULATE / HYBRID, per direct request // MODIFY and MODULATE, per direct request
   const orbitMoving = () => orbiting() && typeof playing !== 'undefined' && playing && !window._spoolBraking; // + PAUSED while the LEFT SPOOL is held (playback braked), carrying on from the same spot on release, per direct request // PAUSED while playback is stopped (AUTO stays on) — it picks up where it was when PLAY is pressed again, per direct request
   // the A button: lit = AUTO on (circling). Only the A button switches it off / on — touching the graph just sizes the circle
-  function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) a.classList.toggle('sp-mag-off', !jumpOn); const ob = document.getElementById('modifyOrbit'); if (ob) ob.classList.toggle('sp-mag-off', !!orbitOff); try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} } // (re-coloured straight away: inverted when engaged)
-  function setOrbitAuto(on) { orbitOff = !on; if (on) { jumpOn = false; } /* the orbit and A's JUMP never run together — whichever goes on turns the other off */ if (!on) { try { setLatch(true); } catch (e) {} } /* AUTO off → the PADLOCK goes on (the ring stays put), per direct request */ syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; if (pad) { const dx = pad.x - 0.5, dy = pad.y - 0.5, R = Math.hypot(dx, dy); if (R > 0.01) { orbitThrough(dx, dy); orbitRX = orbitTargetRX; orbitRY = orbitTargetRY; orbitA = Math.atan2(dy / orbitRY, dx / orbitRX); } } /* (an oval keeps its shape, scaled to pass through the cursor) */ /* A pressed: circle from WHERE THE CURSOR IS (that distance = the circle's size), per direct request — from the centre it still starts at 3 o'clock */; } }
+  function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) { const md = padMode(); if (a._md !== md) { a._md = md; a.innerHTML = md === 'orbit' ? ORBIT_SVG : md === 'jump' ? JUMP_SVG : LOCK_SVG(md === 'hold'); a.setAttribute('aria-label', md); } a.classList.toggle('sp-mag-off', md === 'spring' || md === 'hold'); } /* the MODE button: its icon = the mode; ORBIT / JUMP (moving on their own) inverted */ const ob = document.getElementById('modifyOrbit'); if (ob) ob.classList.toggle('sp-mag-off', !!orbitOff); try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} } // (re-coloured straight away: inverted when engaged)
+  function setOrbitAuto(on) { orbitOff = !on; if (on) { jumpOn = false; } /* the orbit and A's JUMP never run together — whichever goes on turns the other off */ if (!on) { try { setLatch(true, true); } catch (e) {} } /* AUTO off → the PADLOCK goes on (the ring stays put), per direct request */ syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; if (pad) { const dx = pad.x - 0.5, dy = pad.y - 0.5, R = Math.hypot(dx, dy); if (R > 0.01) { orbitThrough(dx, dy); orbitRX = orbitTargetRX; orbitRY = orbitTargetRY; orbitA = Math.atan2(dy / orbitRY, dx / orbitRX); } } /* (an oval keeps its shape, scaled to pass through the cursor) */ /* A pressed: circle from WHERE THE CURSOR IS (that distance = the circle's size), per direct request — from the centre it still starts at 3 o'clock */; } }
   function orbitTick(now) {
     orbitRaf = 0; if (!orbitMoving()) return;
     if (!pad) { pad = capture(); }
@@ -8709,6 +8712,18 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   // A = JUMP, per direct request: while A is engaged the cursor moves to a NEW RANDOM POSITION on the graph every 4 BARS, on the
   // downbeat (the first one straight after A goes on). The ring glides there; the sound lands with the bar. Only while playing.
   // (HOLD A for 1 / 2 / 4 / 8 / 16 bars. The new place is chosen and set up a 16th AHEAD of the 1, not at the last moment.)
+  // ONE MODE BUTTON, per direct request (was PADLOCK + ORBIT + A — only one of them could ever really be in charge):
+  //   SPRING — drag, and it springs back to the centre   HOLD — drag, and it stays where you leave it (the default)
+  //   ORBIT  — it circles on its own                      JUMP — a new place every N bars (HOLD the button for N)
+  const MODES = ['spring', 'hold', 'orbit', 'jump'];
+  function padMode() { return jumpOn ? 'jump' : !orbitOff ? 'orbit' : window._padLatch ? 'hold' : 'spring'; }
+  function setPadMode(m) {
+    if (m === 'orbit') { setLatch(true, true); setOrbitAuto(true); }
+    else if (m === 'jump') { setLatch(true, true); setJump(true); }
+    else { if (jumpOn) { jumpOn = false; jumpBars = 0; } if (!orbitOff) setOrbitAuto(false); setLatch(m === 'hold', true); }
+    syncAutoBtn();
+  }
+  window._setPadMode = setPadMode; window._padMode = () => { try { return padMode(); } catch (e) { return 'hold'; } };
   function setJump(on) { jumpOn = !!on; jumpBars = 0; if (jumpOn && !orbitOff) setOrbitAuto(false); syncAutoBtn(); } // (the orbit stops, the padlock goes on — the ring stays wherever it jumps to)
   function jumpTo(at) {
     if (!jumpOn || held || orbiting() || !document.body.classList.contains('modify')) return;
