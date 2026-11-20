@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-20 04:11:03 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-20 04:17:37 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3146,7 +3146,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 04:11:03 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 04:17:37 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4431,6 +4431,7 @@ const INSTRUMENTS = {
   dulc:   { name: 'BROOTH',      soft: null, accent: null, group: 'tonal' }, // BOOBOO's slot, now BROOTH (a breathier YAMASK an octave down), per direct request
   opening:{ name: 'OPENING',     soft: null, accent: null, group: 'tonal' },
   satk:   { name: 'TALK BOX',    soft: null, accent: null, group: 'tonal' },
+  bittrl: { name: 'BIT TRILL',   soft: null, accent: null, group: 'tonal' }, // 8-BIT octave trill that slows as the note goes on, per direct request — see playBitTrill
   amlgm:  { name: 'TEXTURE',     soft: null, accent: null, group: 'tonal' },
   drone:  { name: 'STRINGS',     soft: null, accent: null, group: 'tonal' },
   dronePlus: { name: 'ZINGS', soft: null, accent: null, group: 'tonal' }, // same voice as STRINGS, but every note is legato+contiguous (sustains exactly until the next note begins, however far that is) with true portamento gliding into each new pitch — see playAtmosPortamento and the contiguous-legato pass in randAll
@@ -7123,6 +7124,7 @@ function playBuffer(key, isAccent, time, tr, stepIdx) {
   if (key === 'sflute')   { return; }
   if (key === 'spiano')   { return; }
   if (key === 'satk')     { return; }
+  if (key === 'bittrl')   { return; } // handled in scheduler
   if (key === 'boog')     { return; }
   if (key === 'magic')    { return; }
   if (key === 'jcmgtr')   { return; }
@@ -7870,7 +7872,7 @@ function fireStepAudio(step, t) {
         if (trackChink[tr]) _chinkHit(tr, t, val === 2, gs); // CHOKE: open the gate for just a blip on this hit
         if (tr !== 0) duckEchoTrack(t); // TEXTURE gets pumped by everything else going on
         const key = trackInstruments[tr];
-        if (key === 'sbass' || key === 'sbass3' || key === 'sbass4' || key === 'dbass' || key === 'pbass' || key === 'sludge' || key === 'stab' || key === 'chug' || key === 'bashp' || key === 'denial' || key === 'jcmgtr' || key === 'sprkls' || key === 'clar' || key === 'sstring' || key === 'sleg' || key === 'sparkle' || key === 'rhodes' || key === 'rhodes2' || key === 'sflute' || key === 'spiano' || key === 'satk' || key === 'boog' || key === 'magic' || key === 'fflute' || key === 'blunt' || key === 'damask' || key === 'yamask' || key === 'dulc' || (key === 'opening' || key === 'tralaarp' || key === 'ballsac') || key === 'drone' || key === 'dronePlus' || key === 'underpass') {
+        if (key === 'bittrl' || key === 'sbass' || key === 'sbass3' || key === 'sbass4' || key === 'dbass' || key === 'pbass' || key === 'sludge' || key === 'stab' || key === 'chug' || key === 'bashp' || key === 'denial' || key === 'jcmgtr' || key === 'sprkls' || key === 'clar' || key === 'sstring' || key === 'sleg' || key === 'sparkle' || key === 'rhodes' || key === 'rhodes2' || key === 'sflute' || key === 'spiano' || key === 'satk' || key === 'boog' || key === 'magic' || key === 'fflute' || key === 'blunt' || key === 'damask' || key === 'yamask' || key === 'dulc' || (key === 'opening' || key === 'tralaarp' || key === 'ballsac') || key === 'drone' || key === 'dronePlus' || key === 'underpass') {
           const scale = trackBassScale[tr] || [110];
           const noteIdx = gs % scale.length;
           const freq = (trackPitchOverride[tr] && trackPitchOverride[tr][gs] !== undefined) ? trackPitchOverride[tr][gs] : scale[noteIdx];
@@ -7930,6 +7932,7 @@ function fireStepAudio(step, t) {
           if (key === 'underpass') playUnderpass(freq, dur, val === 2, t, tr);
           if (key === 'spiano')  playSchoolPiano(freq, dur, val === 2, t, tr);
           if (key === 'satk')    playSynthAttack(freq, dur, val === 2, t, tr);
+          if (key === 'bittrl')  playBitTrill(freq, dur, val === 2, t, tr);
           if (key === 'boog')    playPrimePiano(freq, dur, val === 2, t, tr);
           if (key === 'magic')   playMagic(freq, dur, val === 2, t, tr);
           if (key === 'damask')  playDamask(freq, dur, val === 2, t, tr);
@@ -8027,6 +8030,7 @@ function fireStepAudio(step, t) {
             if (key === 'underpass') playUnderpass(freq2, dur2, false, t2, tr);
             if (key === 'spiano')  playSchoolPiano(freq2, dur2, false, t2, tr);
             if (key === 'satk')    playSynthAttack(freq2, dur2, false, t2, tr);
+            if (key === 'bittrl')  playBitTrill(freq2, dur2, false, t2, tr);
             if (key === 'boog')    playPrimePiano(freq2, dur2, false, t2, tr);
             if (key === 'magic')   playMagic(freq2, dur2, false, t2, tr);
             if (key === 'fflute')  playGlassBell(freq2, dur2, false, t2, tr);
@@ -8383,6 +8387,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
 (function () {
   let pad = null, raf = 0, pend = null, held = false;
   let jumpOn = false, jumpBars = 0, jumpRaf = 0; // A = JUMP (see setJump below)
+  let orbitBars = 4; try { const v = +localStorage.getItem('sifiOrbitBars'); if ([1, 2, 4, 8, 16].includes(v)) orbitBars = v; } catch (e) {} // ORBIT: one lap every N bars (HOLD the MODE button in ORBIT), per direct request
   let jumpEvery = 4; try { const v = +localStorage.getItem('sifiJumpBars'); if ([1, 2, 4, 8, 16].includes(v)) jumpEvery = v; } catch (e) {} // HOLD A to change it
   const nb = () => document.getElementById('nameBar');
   const ORBIT_SVG = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><path d="M19.48 11.41 A7.5 7.5 0 1 1 12.59 4.52" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17.3" cy="6.7" r="2.9" fill="currentColor"/></svg>';
@@ -8398,7 +8403,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
       const au = document.createElement('button'); au.id = 'modifyAuto'; au.type = 'button'; au.setAttribute('aria-label', 'mode'); // the MODE button (its icon is set by syncAutoBtn)
       au.style.webkitTouchCallout = 'none'; au.style.userSelect = 'none';
       let auHoldT = 0, auHeld = false; // HOLD = the current mode's settings (JUMP: how often, 1 / 2 / 4 / 8 / 16 bars)
-      au.addEventListener('pointerdown', () => { auHeld = false; clearTimeout(auHoldT); auHoldT = setTimeout(() => { if (padMode() !== 'jump') return; auHeld = true; openJumpMenu(); try { playUiSound('tinyclick'); } catch (er) {} }, 500); });
+      au.addEventListener('pointerdown', () => { auHeld = false; clearTimeout(auHoldT); auHoldT = setTimeout(() => { const md = padMode(); if (md !== 'jump' && md !== 'orbit') return; auHeld = true; openJumpMenu(md); try { playUiSound('tinyclick'); } catch (er) {} }, 500); });
       ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => au.addEventListener(t, () => clearTimeout(auHoldT)));
       au.addEventListener('contextmenu', e => e.preventDefault());
       au.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (auHeld) { auHeld = false; return; } const md = padMode(); setPadMode(MODES[(MODES.indexOf(md) + 1) % MODES.length]); try { playUiSound('tinyclick'); } catch (er) {} }); // TAP = the next mode: SPRING → HOLD → ORBIT → JUMP → SPRING, per direct request
@@ -8580,16 +8585,16 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   window.addEventListener('click', e => { if (window._axisMenuOpen === 'closing') { e.stopPropagation(); e.preventDefault(); } }, true);
   window._openAxisMenu = openAxisMenu;
   // HOLD A: how often A's JUMP picks a new place — every 1 / 2 / 4 / 8 / 16 bars (remembered), per direct request
-  function openJumpMenu() {
+  function openJumpMenu(md) { const isOrb = md === 'orbit'; // (ORBIT: how long one lap takes — the same menu, per direct request)
     closeAxisMenu(); const au = document.getElementById('modifyAuto'); if (!au) return; const r = au.getBoundingClientRect();
     const mn = document.createElement('div'); mn.id = 'axisMenu'; // (the same menu slot — so it closes the same way, on a tap outside)
     mn.style.cssText = `position:fixed;top:${Math.round(r.bottom + 6)}px;right:${Math.max(8, Math.round(innerWidth - r.right))}px;z-index:9000;background:#111;color:#fff;padding:10px 12px 6px;border-radius:6px;font:700 0.66rem/1 'DM Sans',sans-serif;letter-spacing:1px;min-width:150px;box-shadow:0 6px 20px rgba(0,0,0,0.35);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;`;
     const build = () => { mn.innerHTML = '';
-      const h = document.createElement('div'); h.textContent = 'NEW POSITION EVERY'; h.style.cssText = 'opacity:0.55;font-size:0.58rem;margin:4px 0 6px;'; mn.appendChild(h);
-      [1, 2, 4, 8, 16].forEach(n => { const on = jumpEvery === n;
+      const h = document.createElement('div'); h.textContent = isOrb ? 'ONE ORBIT EVERY' : 'NEW POSITION EVERY'; h.style.cssText = 'opacity:0.55;font-size:0.58rem;margin:4px 0 6px;'; mn.appendChild(h);
+      [1, 2, 4, 8, 16].forEach(n => { const on = (isOrb ? orbitBars : jumpEvery) === n;
         const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;';
         row.innerHTML = `<span style="width:14px;height:14px;border:2px solid #fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;${on ? 'background:#fff;color:#111;' : ''}">${on ? '✓' : ''}</span><span>${n} BAR${n > 1 ? 'S' : ''}</span>`;
-        row.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); jumpEvery = n; jumpBars = 0; try { localStorage.setItem('sifiJumpBars', String(n)); } catch (er) {} try { playUiSound('tinyclick'); } catch (er) {} build(); });
+        row.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (isOrb) { orbitBars = n; try { localStorage.setItem('sifiOrbitBars', String(n)); } catch (er) {} } else { jumpEvery = n; jumpBars = 0; try { localStorage.setItem('sifiJumpBars', String(n)); } catch (er) {} } try { playUiSound('tinyclick'); } catch (er) {} build(); });
         mn.appendChild(row); }); };
     build(); document.body.appendChild(mn); window._axisMenuOpen = true;
   }
@@ -8697,7 +8702,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     orbitRaf = 0; if (!orbitMoving()) return;
     if (!pad) { pad = capture(); }
     const dt = Math.min(0.1, Math.max(0, (now - (orbitLast || now)) / 1000)); orbitLast = now;
-    let per = 8; try { per = Math.max(4, Math.min(32, stepDuration() * 64)); } catch (e) {} // one lap every 4 bars (was 2 — half the speed), per direct request
+    let per = 8; try { per = Math.max(0.5, Math.min(120, stepDuration() * 16 * orbitBars)); } catch (e) {} // one lap every ORBIT bars (1 / 2 / 4 / 8 / 16 — HOLD the MODE button in ORBIT; 4 by default) // one lap every 4 bars (was 2 — half the speed), per direct request
     const asp = 1; // the track is set in the graph's OWN units: a circle on MODULATE, an OVAL across the full width on MODIFY's wide graph, per direct request
     if (orbitA === null) orbitStart(); // AUTO always STARTS at 3 o'clock on the circle, per direct request
     orbitA += 2 * Math.PI * dt / per; { const k = Math.min(1, dt * 3); orbitRX += (Math.min(orbitTargetRX, orbitMaxX()) - orbitRX) * k; orbitRY += (Math.min(orbitTargetRY, orbitMaxY()) - orbitRY) * k; } // (never off the graph — MODIFY's short graph caps it) /* 77% of the graph's height (10% bigger than 70%), per direct request */ // (eases out to the circle from wherever it was)
@@ -9971,7 +9976,7 @@ let globalScaleRoot = null;
 // an all-music pattern still has 6 music tracks but can't overload iOS audio.
 const HEAVY_TONAL_KEYS = new Set(['denial', 'fflute','blunt','sstring','sleg','opening','tralaarp', 'ballsac','drone','dronePlus','magic','sparkle','clar','rhodes2','underpass','sflute','boog']);
 const HEAVY_TONAL_MAX = 2;
-const TONAL_KEYS = new Set(['sbass','sbass3','sbass4','dbass','pbass','sludge','stab','chug','bashp','denial','jcmgtr','sprkls','clar','sstring','sleg','sparkle','rhodes','rhodes2','sflute','spiano','satk','boog','fflute','blunt','damask','yamask','dulc','opening','tralaarp', 'ballsac','drone','dronePlus','magic','amlgm','underpass']);
+const TONAL_KEYS = new Set(['bittrl','sbass','sbass3','sbass4','dbass','pbass','sludge','stab','chug','bashp','denial','jcmgtr','sprkls','clar','sstring','sleg','sparkle','rhodes','rhodes2','sflute','spiano','satk','boog','fflute','blunt','damask','yamask','dulc','opening','tralaarp', 'ballsac','drone','dronePlus','magic','amlgm','underpass']);
 
 function buildScaleFromRoot(root, scaleOverride, tr) {
   const scaleArr = scaleOverride || PENTA_MINOR;
@@ -10009,7 +10014,7 @@ function getRangeRoots(key) {
   if (key === 'boog' || key === 'fflute' || key === 'magic') return HIGH_ROOTS;
   if (key === 'blunt') return MID_ROOTS;
   if (key === 'chug') return CHUG_ROOTS;
-  if (key === 'stab' || key === 'bashp') return MID_ROOTS;
+  if (key === 'stab' || key === 'bashp' || key === 'bittrl') return MID_ROOTS;
   if (key === 'sstring' || key === 'sleg' || key === 'rhodes' || key === 'rhodes2' || key === 'clar' || key === 'jcmgtr' || key === 'denial' || key === 'damask' || key === 'yamask' || (key === 'opening' || key === 'tralaarp' || key === 'ballsac') || key === 'spiano' || key === 'dulc' || key === 'drone' || key === 'dronePlus' || key === 'sflute') return MELODY_ROOTS; // sflute (CLUNG) moved here from HIGH_ROOTS above — same root pool as STRINGS+, per direct request to match its auto-generation criteria
   return BASS_ROOTS;
 }
@@ -10200,6 +10205,7 @@ function randomizeBassTrack(tr, level) {
     fflute: [[2,4,0.60],[3,6,0.70],[5,9,0.80]],   // SLAY — medium notes, no FX
     sleg:    [[1,2,0.10],[2,3,0.20],[2,5,0.30]],   // Strings — fewest
     satk:    [[1,2,0.25],[2,3,0.40],[2,3,0.50]],   // Syn Attack — max 3
+    bittrl:  [[2,3,0.30],[2,4,0.45],[3,5,0.55]],   // BIT TRILL — a few notes, room to hear each trill unwind
     rhodes:  [[2,3,0.15],[3,6,0.30],[5,8,0.45]],   // Piano — medium
     rhodes2: [[2,3,0.15],[3,6,0.30],[5,8,0.45]],   // Rhodes — medium
     sprkls:  [[2,3,0.30],[3,4,0.40],[3,5,0.50]],   // Sparkles — a few twinkles
@@ -11732,6 +11738,30 @@ function playKathedra(freq, durSec, isAccent, time, tr) {
   o0.onended = () => { try { prevEnd && prevEnd(); rootG.disconnect(); octG.disconnect(); lp.disconnect(); out.disconnect(); } catch (e) {} };
 }
 // ── Stab: short sharp synth chord stab, fast tail ──
+// BIT TRILL, per direct request: an 8-bit (square-wave) voice that flips between the note and the octave above, very fast at
+// first and slowing as the note goes on — each low/high PAIR the same length, every pair DOUBLE the one before:
+// 2ms, 4ms, 8ms, 16ms, 32ms, 64ms, 128ms, 256ms… (a buzz that opens out into a trill) until the note ends.
+// BIT_TRILL_FAST_FIRST = false turns it round: starting slow (from the longest pair that fits) and speeding up to 2ms at the end.
+const BIT_TRILL_FAST_FIRST = true;
+function playBitTrill(freq, durSec, isAccent, time, tr) {
+  if (!ctx || !freq) return;
+  const dest = getSynthConnectNode(tr);
+  const dur = Math.max(0.03, durSec), rel = 0.025, vel = isAccent ? 0.075 : 0.06;
+  const osc = ctx.createOscillator(); osc.type = 'square';
+  // the segment lengths (each used twice: low, then high)
+  const segs = []; { let L = 0.002, tot = 0; while (tot < dur) { segs.push(L); tot += L * 2; L *= 2; } if (!BIT_TRILL_FAST_FIRST) segs.reverse(); }
+  let t = time; const hi = freq * 2;
+  for (let i = 0; i < segs.length && t < time + dur; i++) { osc.frequency.setValueAtTime(freq, t); t += segs[i]; if (t >= time + dur) break; osc.frequency.setValueAtTime(hi, t); t += segs[i]; }
+  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7000; lp.Q.value = 0.5; // (just the harshest top off)
+  const env = ctx.createGain();
+  env.gain.setValueAtTime(0, time);
+  env.gain.linearRampToValueAtTime(vel, time + 0.002);
+  env.gain.setValueAtTime(vel, time + dur);
+  env.gain.linearRampToValueAtTime(0, time + dur + rel);
+  osc.connect(lp); lp.connect(env); env.connect(dest); // (the square wave IS the 8-bit sound — the 8-BIT MIX / FX crunch it further if wanted)
+  osc.start(time); osc.stop(time + dur + rel + 0.02);
+  osc.onended = () => { try { env.disconnect(); lp.disconnect(); } catch (e) {} };
+}
 function playStab(freq, durSec, isAccent, time, tr) {
   // Rhythm guitar: short muted strum — sawtooth stack through fast LP sweep + mild crunch
   if (!ctx || !freq) return;
@@ -15424,6 +15454,7 @@ function previewNote(tr, isAccent) {
     else if (key === 'underpass') playUnderpass(freq, dur, isAccent, t, tr);
     else if (key === 'spiano')  playSchoolPiano(freq, dur, isAccent, t, tr);
     else if (key === 'satk')    playSynthAttack(freq, dur, isAccent, t, tr);
+    else if (key === 'bittrl')  playBitTrill(freq, dur, isAccent, t, tr);
     else if (key === 'boog')    playPrimePiano(freq, dur, isAccent, t, tr);
     else if (key === 'magic')   playMagic(freq, dur, isAccent, t, tr);
     else if (key === 'damask')  playDamask(freq, dur, isAccent, t, tr);
