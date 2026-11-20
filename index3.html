@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-17 04:09:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-20 03:29:37 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -136,7 +136,7 @@ html body.night-invert:not(.no-glow):not(.safe-gfx) #tapeReels { isolation: isol
 html body.night-invert #beatCount, html body.night-invert #modeLabel { --header-text-color: #ececec; }
 html body.night-invert #topTempoReadout { --header-text-color: var(--top-row-text-color, #ececec); }
 #beatCount { -webkit-tap-highlight-color: transparent; outline: none; } /* no iOS grey tap flash over the numeral's box, per direct request */
-@keyframes orbit-guide-spin { to { transform: rotate(360deg); } } /* the AUTO orbit's dotted path guide (MODULATE) */
+@keyframes orbit-guide-spin { to { transform: rotate(360deg); } } @keyframes orbit-guide-dash { to { stroke-dashoffset: -16.5; } } /* the AUTO orbit's dotted path guide (MODULATE) */
 #beatCount:not(.beat-count-hidden) { opacity: var(--modify-count-op, 0.22); } /* the header COUNT uses the same opacity as the GRAPH COUNT (DEV > GRAPH COUNT OPACITY, 30%), per direct request */
 #beatCount.beat-count-hidden { opacity: 0; } /* hidden but still tappable to bring it back */
 /* BEAT COUNT PULSE (2nd tap), per direct request — each new beat flashes the
@@ -2725,6 +2725,15 @@ html body.modify #modifyLock { display: flex; } /* the MAGNET (was the padlock),
 html body.modify #modifyAuto { display: flex; } /* MODIFY too now (was MODULATE only), per direct request */
 #modifyAuto.sp-mag-off { opacity: 0.45; }
 #modifyAuto:not(.sp-mag-off) { opacity: 1; }
+/* ORBIT button (a circle with a node on its path), per direct request: switches the orbit on / off — same footprint and colours as A, just to its left */
+#modifyOrbit { display: none; position: absolute; right: 86px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+html body.modify #modifyOrbit { display: flex; }
+#modifyOrbit.sp-mag-off { opacity: 0.45; }
+#modifyOrbit:not(.sp-mag-off) { opacity: 1; }
+html body.gray-mode #modifyOrbit:not(.sp-mag-off), html body.gray-mode #modifyOrbit:not(.sp-mag-off) * { color: #f2f2f2 !important; }
+html body.gray-mode #modifyOrbit:not(.sp-mag-off) svg [stroke]:not([stroke="none"]) { stroke: #f2f2f2 !important; }
+html body.gray-mode #modifyOrbit:not(.sp-mag-off) svg [fill]:not([fill="none"]) { fill: #f2f2f2 !important; }
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyOrbit:not(.sp-mag-off), html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyOrbit:not(.sp-mag-off) * { background: #000 !important; color: #fff !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyLock:not(.sp-mag-off) * { color: #fff !important; } /* the locked padlock's glyph white on black (not a solid block) */
 /* GRAY: the engaged (inverted) A and padlock keep their light glyph — GRAY forces all text black, which made them solid blocks, per direct report */
 html body.gray-mode #modifyAuto:not(.sp-mag-off), html body.gray-mode #modifyAuto:not(.sp-mag-off) *, html body.gray-mode #modifyLock:not(.sp-mag-off), html body.gray-mode #modifyLock:not(.sp-mag-off) * { color: #f2f2f2 !important; }
@@ -3129,7 +3138,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-17 04:09:00 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 03:29:37 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -7569,6 +7578,7 @@ function scheduler() {
     // that must not happen to it.
     // Fire pending auto-rand on downbeat
     if (step === 0) {
+      try { if (window._padBarTick) window._padBarTick(); } catch (e) {} // MODULATE's A = JUMP: a new cursor position every 4 bars, on the downbeat
       try { const w = performance.now() + Math.max(0, (t - ctx.currentTime) * 1000); (window._barStartWall = window._barStartWall || []).push(w); if (window._barStartWall.length > 8) window._barStartWall.shift(); } catch (e) {} // wall-clock time each bar actually STARTS sounding (used by SHAKE's one-bar rest)
       // RECALL only ever gets updated at two explicit moments — a new
       // whole-pattern RAND landing (top-row + button, single press or its
@@ -8361,9 +8371,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // UNLOCKED = it springs back to the pattern as it was, like SWEEP. Leaving MODIFY with it latched keeps the result for real
 // (muted notes become removed notes); a new pattern starts the pad afresh.
 window._padMute = null; // per-step mute mask (tr * NUM_STEPS + step) — read by fireStepAudio
-window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs back to the centre), per direct request
+window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where you leave it), per direct request
 (function () {
   let pad = null, raf = 0, pend = null, held = false;
+  let jumpOn = false, jumpBars = 0, jumpRaf = 0; // A = JUMP (see setJump below)
   const nb = () => document.getElementById('nameBar');
   const LOCK_SVG = on => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="display:block;"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="${on ? 'M8 11V7a4 4 0 0 1 8 0v4' : 'M8 11V7a4 4 0 0 1 7.6-1.8'}" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`; // PADLOCK again (was the magnet), per direct request — closed = LOCKED (the ring stays where you leave it), open = OFF (springs back to the centre)
   const marks = () => {
@@ -8380,8 +8391,13 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
       au.addEventListener('pointerdown', () => { auHeld = false; clearTimeout(auHoldT); auHoldT = setTimeout(() => { auHeld = true; openAxisMenu(); try { playUiSound('tinyclick'); } catch (er) {} }, 500); });
       ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => au.addEventListener(t, () => clearTimeout(auHoldT)));
       au.addEventListener('contextmenu', e => e.preventDefault());
-      au.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (auHeld) { auHeld = false; return; } setOrbitAuto(orbitOff); try { playUiSound('tinyclick'); } catch (er) {} });
-      b.appendChild(au); syncAutoBtn(); try { axisLabels(); } catch (er) {}
+      au.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (auHeld) { auHeld = false; return; } setJump(!jumpOn); try { playUiSound('tinyclick'); } catch (er) {} }); // A now = JUMP (a new cursor position every 4 bars), per direct request — the orbit has its own button
+      b.appendChild(au);
+      const ob = document.createElement('button'); ob.id = 'modifyOrbit'; ob.type = 'button'; ob.setAttribute('aria-label', 'orbit'); // ORBIT on / off, per direct request
+      ob.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="2.9" fill="currentColor"/></svg>'; // a circle with a little node on its path
+      ob.style.webkitTouchCallout = 'none'; ob.style.userSelect = 'none'; ob.addEventListener('contextmenu', e => e.preventDefault());
+      ob.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setOrbitAuto(orbitOff); try { playUiSound('tinyclick'); } catch (er) {} });
+      b.appendChild(ob); syncAutoBtn(); try { axisLabels(); } catch (er) {}
       setTimeout(() => showDot(pad ? [pad.x, pad.y] : null), 0); // ring + colour showing from the start
     }
     return m;
@@ -8397,14 +8413,14 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   window._orbitAutoOn = () => !orbitOff;
   // A NEW PATTERN switches the MODULATE graph off and back to its defaults, per direct request: whatever the cursor had changed is
   // put back first (so nothing modulated leaks into the new pattern), then AUTO OFF, cursor in the centre, padlock off, the orbit
-  // back to its normal size, nothing carrying on in MAIN. (The AXIS MENU's ticks are kept.)
+  // back to its normal size (a circle again), padlock back ON, nothing carrying on in MAIN. (The AXIS MENU's ticks are kept.)
   window._padNewPattern = () => {
     try { if (pad) restore(); } catch (e) {}
     window._padMute = null; pad = null; padSaved = null; held = false;
     try { springStop(); } catch (e) {}
-    orbitOff = true; orbitA = null; orbitLast = 0; orbitTargetR = 0.385; window._orbitMain = false;
+    orbitOff = true; jumpOn = false; jumpBars = 0; orbitA = null; orbitLast = 0; orbitTargetRX = orbitTargetRY = 0.385; window._orbitMain = false; // (an OVAL goes back to the normal circle)
     if (orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; }
-    window._padLatch = false; { const lk = document.getElementById('modifyLock'); if (lk) { lk.innerHTML = LOCK_SVG(false); lk.classList.toggle('sp-mag-off', true); } }
+    window._padLatch = true; { const lk = document.getElementById('modifyLock'); if (lk) { lk.innerHTML = LOCK_SVG(true); lk.classList.toggle('sp-mag-off', false); } } // padlock ON by default, per direct request
     try { if (!window._sweepGestureActive) djFilter(0); } catch (e) {} // (a held SWEEP keeps its filter)
     try { syncAutoBtn(); if (document.body.classList.contains('modify')) { redraw(); showDot(null); } } catch (e) {}
     document.body.classList.remove('orbit-auto');
@@ -8417,7 +8433,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     if (!st) { window._padMute = null; pad = null; if (!orbitOff) { orbitA = null; } try { if (document.body.classList.contains('modify')) showDot(null); } catch (e) {} return; }
     pad = JSON.parse(JSON.stringify(st)); pad.name = nameNow();
     try { apply(pad.x, pad.y); } catch (e) {}
-    if (!orbitOff) { const dx = pad.x - 0.5, dy = pad.y - 0.5, R = Math.hypot(dx, dy); if (R > 0.01) { orbitA = Math.atan2(dy, dx); orbitR = R; orbitTargetR = R; orbitLast = 0; } }
+    if (!orbitOff) { const dx = pad.x - 0.5, dy = pad.y - 0.5; if (Math.hypot(dx, dy) > 0.01) { orbitThrough(dx, dy); orbitRX = orbitTargetRX; orbitRY = orbitTargetRY; orbitA = Math.atan2(dy / orbitRY, dx / orbitRX); orbitLast = 0; } }
     try { if (document.body.classList.contains('modify')) showDot([pad.x, pad.y]); } catch (e) {}
   };
   window._padDotRefresh = () => { if (document.body.classList.contains('modify')) showDot(pad ? [pad.x, pad.y] : null); };
@@ -8436,7 +8452,10 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   //                 the cursor moves out from the centre, the same ones each time for this pattern
   //   REVERB SIZE — smaller towards − , bigger towards +          DELAY TIME — shorter / longer, in musical stops
   //   FILTER      — a DJ filter on the whole output: low-pass sweeping down towards − , high-pass sweeping up towards +
-  const AXIS_PARAMS = [['notes', 'NOTES'], ['effects', 'EFFECTS'], ['inst', 'INSTRUMENTS'], ['rsize', 'REVERB SIZE'], ['dtime', 'DELAY TIME'], ['filter', 'FILTER']];
+  //   BITCRUSH    — the 8-BIT MIX: more crushed the further out from the centre (either way), up to fully crushed at the edge
+  //   DRUM PATTERN — every beat type has its own place along the axis: the pattern's own beat in the centre, the rest laid out
+  //                 either side of it (always in the same order, so the same neighbours each time)
+  const AXIS_PARAMS = [['notes', 'NOTES'], ['effects', 'EFFECTS'], ['inst', 'INSTRUMENTS'], ['rsize', 'REVERB SIZE'], ['dtime', 'DELAY TIME'], ['filter', 'FILTER'], ['crush', 'BITCRUSH'], ['beat', 'DRUM PATTERN']];
   window._axisMap = { x: ['notes'], y: ['effects'] };
   try { const v = JSON.parse(localStorage.getItem('sifiAxisMap') || 'null'); if (v && Array.isArray(v.x) && Array.isArray(v.y)) window._axisMap = { x: v.x.filter(k => AXIS_PARAMS.some(p => p[0] === k)), y: v.y.filter(k => AXIS_PARAMS.some(p => p[0] === k)) }; } catch (e) {}
   const axOf = (k, X, Y) => window._axisMap.x.includes(k) ? X : window._axisMap.y.includes(k) ? Y : null;
@@ -8470,6 +8489,50 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     { const v = ad === null ? db : Math.max(-4, Math.min(9, db + Math.round(ad * 5))); if (v !== echoStop()) { try { _setFxEchoExtra(v); } catch (e) {} } }
     // FILTER
     const af = axOf('filter', X0, Y0); if (af !== null || pad._filt) { djFilter(af || 0); pad._filt = af !== null && af !== 0; }
+    // BITCRUSH, per direct request: the 8-BIT MIX, from where it was at the centre up to 100% at the graph's edge (either direction)
+    const ac = axOf('crush', X0, Y0), cb = B.crush != null ? B.crush : (window._eightBitMix || 0);
+    if (ac !== null || pad._crush) { const v = Math.round((ac ? cb + Math.min(1, Math.abs(ac)) * (1 - cb) : cb) * 100); if (v !== Math.round((window._eightBitMix || 0) * 100)) { try { setEightBitMix(v); } catch (e) {} } pad._crush = ac !== null && ac !== 0; }
+  }
+  // DRUM PATTERN on the graph, per direct request. Each beat type, once visited, is remembered for this pattern (its drums exactly as
+  // they came out), so going back to a place — or to the centre — brings back the SAME drums, not a fresh roll.
+  const BEAT_ORDER = ['disco', 'bounce', 'breaks', 'charlie', 'soca', 'drive', 'swagger', 'halftime', 'reggae', 'reggae2', 'mozambique', 'doubledown', 'samba', 'cumbia', 'afrobeat', 'boogie', 'bossa', 'jazz'];
+  function beatAt(home, a) { // a = −1 … 1 along the axis → the beat type there (0 = home)
+    if (!a) return home; const b = BEAT_ORDER.indexOf(home), o = [];
+    for (let i = 1; i < BEAT_ORDER.length + (b < 0 ? 1 : 0); i++) o.push(BEAT_ORDER[((b < 0 ? -1 : b) + i) % BEAT_ORDER.length]);
+    const half = Math.ceil(o.length / 2), side = a > 0 ? o.slice(0, half) : o.slice(half).reverse(); // + side: the ones after it, − side: the ones before it (nearest first)
+    return side[Math.min(side.length - 1, Math.floor(Math.abs(a) * side.length))];
+  }
+  function beatSnap() { const B = pad.base; return { grid: B.grid.map(r => r.slice()), inst: B.inst.slice(), notes: pad.notes.map(a => a.slice()), empties: pad.empties.map(a => a.slice()), muted: trackMuted.slice() }; }
+  function beatGo(type) {
+    if (!pad || type === _beatType) return; const B = pad.base;
+    try { absorbEdits(); } catch (e) {}
+    if (!pad.beats) { pad.beats = {}; pad.beatHome = _beatType; }
+    pad.beats[_beatType] = beatSnap(); // remember the drums as they are now
+    const pre = grid.map(r => r.slice());
+    try { setBeatType(type, false); } catch (e) {}
+    const S = pad.beats[type];
+    if (S) { // been here before: exactly the same drums back
+      B.grid = S.grid.map(r => r.slice()); B.inst = S.inst.slice(); pad.notes = S.notes.map(a => a.slice()); pad.empties = S.empties.map(a => a.slice());
+      for (let tr = 0; tr < NUM_TRACKS; tr++) {
+        if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) grid[tr][st] = B.grid[tr][st];
+        if (B.inst[tr] && trackInstruments[tr] !== B.inst[tr] && INSTRUMENTS[B.inst[tr]]) { try { selectSound(tr, B.inst[tr]); } catch (e) {} }
+        if (!!trackMuted[tr] !== !!S.muted[tr]) { trackMuted[tr] = !!S.muted[tr]; try { updateTrackMute(tr); } catch (e) {} }
+        try { redrawTrackCells(tr, true); } catch (e) {} }
+    } else { // first visit: whatever the beat type wrote becomes this place's pattern (tracks it didn't touch keep the pad's own base)
+      const ch = []; for (let tr = 0; tr < NUM_TRACKS; tr++) if (grid[tr].join('') !== pre[tr].join('')) { ch.push(tr); B.grid[tr] = grid[tr].slice(); }
+      for (let tr = 0; tr < NUM_TRACKS; tr++) if (trackInstruments[tr] !== B.inst[tr]) B.inst[tr] = trackInstruments[tr];
+      if (ch.length) { const keep = l => l.filter(a => !ch.includes(a[0])), ins = (l, v) => l.splice(Math.floor(Math.random() * (l.length + 1)), 0, v);
+        pad.notes = keep(pad.notes); pad.empties = keep(pad.empties);
+        ch.forEach(tr => { for (let st = 0; st < NUM_STEPS; st++) ins(B.grid[tr][st] > 0 ? pad.notes : pad.empties, [tr, st]); }); }
+    }
+    pad._lg = grid.map(r => r.slice()); pad._li = trackInstruments.slice(); // (so none of this is mistaken for a hand edit)
+    try { refreshBeatMenuHighlight(); } catch (e) {}
+  }
+  function padBeat(x, y) {
+    if (!pad) return; const dz = v => { const a = Math.abs(v); return a < 0.06 ? 0 : Math.sign(v) * Math.min(1, (a - 0.06) / 0.86); }; // (the same dead zone as everything else)
+    const ab = axOf('beat', dz(Math.max(-1, Math.min(1, x * 2 - 1))), dz(Math.max(-1, Math.min(1, 1 - y * 2))));
+    if (ab === null && !pad.beats) return;
+    const home = pad.beatHome || _beatType; beatGo(ab === null ? home : beatAt(home, ab));
   }
   function closeAxisMenu() { const m = document.getElementById('axisMenu'); if (m) m.remove(); }
   function openAxisMenu() {
@@ -8500,7 +8563,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   window.addEventListener('click', e => { if (window._axisMenuOpen === 'closing') { e.stopPropagation(); e.preventDefault(); } }, true);
   window._openAxisMenu = openAxisMenu;
   function capture() {
-    const base = { grid: grid.map(r => r.slice()), rev: trackDelay.slice(), fx: [], drums: drumsFx(), auto: [], inst: trackInstruments.slice(), rsize: window._reverbIntensity, dtime: echoStop() }; for (let tr = 0; tr < NUM_TRACKS; tr++) { base.fx.push(fxOf(tr)); base.auto.push(autoOn(tr)); }
+    const base = { grid: grid.map(r => r.slice()), rev: trackDelay.slice(), fx: [], drums: drumsFx(), auto: [], inst: trackInstruments.slice(), rsize: window._reverbIntensity, dtime: echoStop(), crush: window._eightBitMix || 0 }; for (let tr = 0; tr < NUM_TRACKS; tr++) { base.fx.push(fxOf(tr)); base.auto.push(autoOn(tr)); }
     const notes = [], empties = [], effOn = [], effOff = [], pick = [];
     for (let tr = 0; tr < NUM_TRACKS; tr++) {
       for (let st = 0; st < NUM_STEPS; st++) (base.grid[tr][st] > 0 ? notes : empties).push([tr, st]);
@@ -8530,6 +8593,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // MUTED TRACKS STAY MUTED, per direct request: nothing the graph cursor does — by hand or on AUTO — may unmute a track (turning
   // AUTO NOTES on used to, through the track's own + button). Any track muted before a move is put straight back to muted after it.
   function apply(x, y) {
+    try { padBeat(x, y); } catch (e) {} // DRUM PATTERN (AXIS MENU) first — it can rewrite the drum tracks
     const was = typeof trackMuted !== 'undefined' ? trackMuted.slice() : null;
     try { absorbEdits(); } catch (e) {}
     const g0 = grid.map(r => r.join(''));
@@ -8585,12 +8649,19 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // MODULATE ORBIT, per direct request: in MODULATE the ring circles the graph CLOCKWISE on its own — a circle 77% of the graph's
   // height — driving the pad as it goes (so you HEAR it: notes and effects come and go round the circle), until the graph is
   // touched. One lap every 4 bars at the current tempo (was 2). Leaving MODULATE re-arms it for next time.
-  let orbitRaf = 0, orbitOff = false, orbitA = null, orbitR = 0, orbitLast = 0, orbitApplyAt = 0, orbitTargetR = 0.385;
+  let orbitRaf = 0, orbitOff = true, orbitA = null, orbitRX = 0, orbitRY = 0, orbitLast = 0, orbitApplyAt = 0, orbitTargetRX = 0.385, orbitTargetRY = 0.385; // AUTO OFF by default, per direct request
+  // the orbit can be an OVAL, per direct request (two-finger pinch on the graph): its half-width (orbitRX, graph-width units) and
+  // half-height (orbitRY, graph-height units) are kept separately — equal = the normal circle
+  const orbitMaxX = () => { const m = document.getElementById('modifyPadMarks'); return m && m.clientWidth ? Math.max(0.05, 0.5 - ringPx() / m.clientWidth) : 0.44; }; // (never off the graph)
+  const orbitMaxY = () => { const m = document.getElementById('modifyPadMarks'); return m && m.clientHeight ? Math.max(0.05, 0.5 - ringPx() / m.clientHeight) : 0.44; };
+  // resize the orbit (keeping its shape — circle or oval) so its path runs through the point (dx, dy) from the centre
+  function orbitThrough(dx, dy) { const sc = Math.hypot(dx / orbitTargetRX, dy / orbitTargetRY); if (!(sc > 0) || !isFinite(sc)) return;
+    orbitTargetRX = Math.max(0.04, Math.min(orbitMaxX(), orbitTargetRX * sc)); orbitTargetRY = Math.max(0.04, Math.min(orbitMaxY(), orbitTargetRY * sc)); }
   const orbiting = () => (document.body.classList.contains('modify') || window._orbitMain) && !orbitOff && !held; // + MAIN, when AUTO was on on leaving MODULATE / HYBRID, per direct request // MODIFY and MODULATE, per direct request
   const orbitMoving = () => orbiting() && typeof playing !== 'undefined' && playing && !window._spoolBraking; // + PAUSED while the LEFT SPOOL is held (playback braked), carrying on from the same spot on release, per direct request // PAUSED while playback is stopped (AUTO stays on) — it picks up where it was when PLAY is pressed again, per direct request
   // the A button: lit = AUTO on (circling). Only the A button switches it off / on — touching the graph just sizes the circle
-  function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) a.classList.toggle('sp-mag-off', !!orbitOff); try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} } // (re-coloured straight away: inverted when engaged)
-  function setOrbitAuto(on) { orbitOff = !on; if (!on) { try { setLatch(true); } catch (e) {} } /* AUTO off → the PADLOCK goes on (the ring stays put), per direct request */ syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; if (pad) { const dx = pad.x - 0.5, dy = pad.y - 0.5, R = Math.hypot(dx, dy); if (R > 0.01) { orbitA = Math.atan2(dy, dx); orbitR = R; orbitTargetR = R; } } /* A pressed: circle from WHERE THE CURSOR IS (that distance = the circle's size), per direct request — from the centre it still starts at 3 o'clock */; } }
+  function syncAutoBtn() { const a = document.getElementById('modifyAuto'); if (a) a.classList.toggle('sp-mag-off', !jumpOn); const ob = document.getElementById('modifyOrbit'); if (ob) ob.classList.toggle('sp-mag-off', !!orbitOff); try { tint(pad ? pad.x : 0.5, pad ? pad.y : 0.5); } catch (e) {} } // (re-coloured straight away: inverted when engaged)
+  function setOrbitAuto(on) { orbitOff = !on; if (on) { jumpOn = false; } /* the orbit and A's JUMP never run together — whichever goes on turns the other off */ if (!on) { try { setLatch(true); } catch (e) {} } /* AUTO off → the PADLOCK goes on (the ring stays put), per direct request */ syncAutoBtn(); if (!on && orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; } if (on) { orbitA = null; orbitLast = 0; if (pad) { const dx = pad.x - 0.5, dy = pad.y - 0.5, R = Math.hypot(dx, dy); if (R > 0.01) { orbitThrough(dx, dy); orbitRX = orbitTargetRX; orbitRY = orbitTargetRY; orbitA = Math.atan2(dy / orbitRY, dx / orbitRX); } } /* (an oval keeps its shape, scaled to pass through the cursor) */ /* A pressed: circle from WHERE THE CURSOR IS (that distance = the circle's size), per direct request — from the centre it still starts at 3 o'clock */; } }
   function orbitTick(now) {
     orbitRaf = 0; if (!orbitMoving()) return;
     if (!pad) { pad = capture(); }
@@ -8598,21 +8669,36 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     let per = 8; try { per = Math.max(4, Math.min(32, stepDuration() * 64)); } catch (e) {} // one lap every 4 bars (was 2 — half the speed), per direct request
     const asp = 1; // the track is set in the graph's OWN units: a circle on MODULATE, an OVAL across the full width on MODIFY's wide graph, per direct request
     if (orbitA === null) orbitStart(); // AUTO always STARTS at 3 o'clock on the circle, per direct request
-    orbitA += 2 * Math.PI * dt / per; { const m = document.getElementById('modifyPadMarks'), hMax = m && m.clientHeight ? 0.5 - ringPx() / m.clientHeight : 0.44; orbitR += (Math.min(orbitTargetR, Math.max(0.05, hMax)) - orbitR) * Math.min(1, dt * 3); } // (never off the graph — MODIFY's short graph caps it) /* 77% of the graph's height (10% bigger than 70%), per direct request */ // (eases out to the circle from wherever it was)
-    const x = 0.5 + orbitR * Math.cos(orbitA) / asp, y = 0.5 + orbitR * Math.sin(orbitA); // +angle with y pointing down = CLOCKWISE on screen
+    orbitA += 2 * Math.PI * dt / per; { const k = Math.min(1, dt * 3); orbitRX += (Math.min(orbitTargetRX, orbitMaxX()) - orbitRX) * k; orbitRY += (Math.min(orbitTargetRY, orbitMaxY()) - orbitRY) * k; } // (never off the graph — MODIFY's short graph caps it) /* 77% of the graph's height (10% bigger than 70%), per direct request */ // (eases out to the circle from wherever it was)
+    const x = 0.5 + orbitRX * Math.cos(orbitA) / asp, y = 0.5 + orbitRY * Math.sin(orbitA); // +angle with y pointing down = CLOCKWISE on screen
     pad.x = x; pad.y = y; if (document.body.classList.contains('modify')) showDot([x, y]);
     if (now - orbitApplyAt > 60) { orbitApplyAt = now; try { apply(x, y); } catch (e) {} } // the sound follows ~16x a second
     orbitRaf = requestAnimationFrame(orbitTick);
   }
   // the orbit's START: the ring at the 3 O'CLOCK point of the circle (90° round from the top), per direct request
-  function orbitStart() { if (!pad) pad = capture(); const m = document.getElementById('modifyPadMarks'), hMax = m && m.clientHeight ? 0.5 - ringPx() / m.clientHeight : 0.44;
-    orbitA = 0; orbitR = Math.min(orbitTargetR, Math.max(0.05, hMax)); pad.x = 0.5 + orbitR; pad.y = 0.5; if (document.body.classList.contains('modify')) showDot([pad.x, pad.y]); try { apply(pad.x, pad.y); } catch (e) {} }
+  function orbitStart() { if (!pad) pad = capture();
+    orbitA = 0; orbitRX = Math.min(orbitTargetRX, orbitMaxX()); orbitRY = Math.min(orbitTargetRY, orbitMaxY()); pad.x = 0.5 + orbitRX; pad.y = 0.5; if (document.body.classList.contains('modify')) showDot([pad.x, pad.y]); try { apply(pad.x, pad.y); } catch (e) {} }
+  // A = JUMP, per direct request: while A is engaged the cursor moves to a NEW RANDOM POSITION on the graph every 4 BARS, on the
+  // downbeat (the first one straight after A goes on). The ring glides there; the sound lands with the bar. Only while playing.
+  function setJump(on) { jumpOn = !!on; jumpBars = 0; if (jumpOn && !orbitOff) setOrbitAuto(false); syncAutoBtn(); } // (the orbit stops, the padlock goes on — the ring stays wherever it jumps to)
+  function jumpTo() {
+    if (!jumpOn || held || orbiting() || !document.body.classList.contains('modify')) return;
+    if (!pad) pad = capture();
+    const mx = 0.5 - orbitMaxX(), my = 0.5 - orbitMaxY(); // (kept far enough in that the ring never goes off the graph)
+    let x, y, n = 0; do { x = mx + Math.random() * (1 - 2 * mx); y = my + Math.random() * (1 - 2 * my); } while (++n < 12 && Math.hypot(x - pad.x, y - pad.y) < 0.25); // somewhere properly new
+    const x0 = pad.x, y0 = pad.y; try { springStop(); } catch (e) {}
+    apply(x, y);
+    cancelAnimationFrame(jumpRaf); const t0 = performance.now(), D = 220;
+    const step = now => { if (held || orbiting()) { jumpRaf = 0; return; } const k = Math.min(1, (now - t0) / D), q = 1 - Math.pow(1 - k, 3); showDot([x0 + (x - x0) * q, y0 + (y - y0) * q]); jumpRaf = k < 1 ? requestAnimationFrame(step) : 0; };
+    jumpRaf = requestAnimationFrame(step);
+  }
+  window._padBarTick = () => { if (!jumpOn) return; if (jumpBars % 4 === 0) { try { jumpTo(); } catch (e) {} } jumpBars++; }; // called by the scheduler at each bar's downbeat
   setInterval(() => {
     if (document.body.classList.contains('modify') && orbiting() && orbitA === null && !orbitGrab) { try { orbitStart(); } catch (e) {} } // (waiting there before PLAY too)
     { const on = orbitMoving(); if (document.body.classList.contains('orbit-auto') !== on) document.body.classList.toggle('orbit-auto', on);
       if (on) { const nd = document.getElementById('nameDisplay'); if (nd && !nd.firstElementChild && nd.textContent) { const t = nd.textContent; nd.textContent = ''; [...t].forEach(ch => { const sp = document.createElement('span'); sp.textContent = ch; sp.style.cssText = ch === ' ' ? 'white-space:pre;' : 'display:inline-block;white-space:pre;'; nd.appendChild(sp); }); } } } // (each letter its own span, so each can wobble on its own — the text itself is unchanged) // the SONG NAME wobbles while AUTO circles
     if (!document.body.classList.contains('modify') && window._orbitMain) { if (orbitMoving() && !orbitRaf) { springStop(); orbitLast = 0; orbitRaf = requestAnimationFrame(orbitTick); } return; } // AUTO carrying on in MAIN
-    if (!document.body.classList.contains('modify')) { if (orbitOff) { orbitOff = false; syncAutoBtn(); } orbitA = null; orbitLast = 0; orbitTargetR = 0.385; return; } // re-armed (AUTO on) for the next visit
+    if (!document.body.classList.contains('modify')) { if (!orbitOff || jumpOn) { orbitOff = true; jumpOn = false; syncAutoBtn(); } orbitA = null; orbitLast = 0; orbitTargetRX = orbitTargetRY = 0.385; return; } // AUTO back OFF for the next visit (off by default now, per direct request)
     if (orbitMoving() && !orbitRaf) { springStop(); orbitLast = 0; orbitRaf = requestAnimationFrame(orbitTick); }
   }, 250);
   function springStop() { if (springRaf) { cancelAnimationFrame(springRaf); springRaf = 0; } }
@@ -8629,7 +8715,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     springRaf = requestAnimationFrame(step);
   }
   function restore() { // back to the pattern as it was
-    if (!pad) return; const B = pad.base;
+    if (!pad) return; if (pad.beats && pad.beatHome) { try { beatGo(pad.beatHome); } catch (e) {} } const B = pad.base; // (the pattern's own DRUM PATTERN back first)
     for (let tr = 0; tr < NUM_TRACKS; tr++) { if (B.auto && !trackSweep[tr]) setAuto(tr, B.auto[tr]); if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) grid[tr][st] = B.grid[tr][st]; if (!!trackDelay[tr] !== B.rev[tr]) setRev(tr, B.rev[tr]); setFx(tr, B.fx[tr]); }
     setDrumsFx(B.drums);
     try { soundAxes(0, 0); } catch (e) {} // INSTRUMENTS / REVERB SIZE / DELAY TIME / FILTER back as they were
@@ -8680,7 +8766,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     }
     // MAGNET colour from the page background too (very light / very dark, whichever stands out more), so it can't get lost, per direct request
     { const lk = document.getElementById('modifyLock'); if (lk) { try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.5), 0.95), dkC = _hslRgb(hh, Math.min(ss, 0.6), 0.1), useLt = _contrast(lt, bg) >= _contrast(dkC, bg); const fgS = `rgb(${(useLt ? lt : dkC).join(',')})`, invS = `rgb(${(useLt ? dkC : lt).join(',')})`, plainBg = useLt ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)';
-      if (lk.classList.contains('sp-mag-off')) { lk.style.color = fgS; lk.style.background = plainBg; } else { lk.style.background = fgS; lk.style.color = invS; } /* the PADLOCK: LOCKED = INVERTED, exactly like the A button, per direct request */ const au = document.getElementById('modifyAuto'); if (au) { if (au.classList.contains('sp-mag-off')) { au.style.color = fgS; au.style.background = plainBg; } else { au.style.background = fgS; au.style.color = invS; } } /* the A button: OFF wears the padlock's colours; ENGAGED is simply INVERTED (solid in the glyph colour, the A cut out in the opposite), per direct request */ } catch (e) {} } }
+      if (lk.classList.contains('sp-mag-off')) { lk.style.color = fgS; lk.style.background = plainBg; } else { lk.style.background = fgS; lk.style.color = invS; } /* the PADLOCK: LOCKED = INVERTED, exactly like the A button, per direct request */ const au = document.getElementById('modifyAuto'); if (au) { if (au.classList.contains('sp-mag-off')) { au.style.color = fgS; au.style.background = plainBg; } else { au.style.background = fgS; au.style.color = invS; } } /* the A button: OFF wears the padlock's colours; ENGAGED is simply INVERTED (solid in the glyph colour, the A cut out in the opposite), per direct request */ const obt = document.getElementById('modifyOrbit'); if (obt) { if (obt.classList.contains('sp-mag-off')) { obt.style.color = fgS; obt.style.background = plainBg; } else { obt.style.background = fgS; obt.style.color = invS; } } /* the ORBIT button: the same */ } catch (e) {} } }
   }
   // back to the centre, EASED (a new pattern) — dragging again cancels the ease straight away
   function easeHome(fast) { const m = marks(); if (!m || orbiting()) return;
@@ -8731,7 +8817,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     });
   }
   function tick() { raf = 0; if (!pad) return; if (pend) apply(pend[0], pend[1]); drawGrid(); if (held) raf = requestAnimationFrame(tick); } // held: re-applied every frame (cheap — only real changes are written)
-  const inBar = e => document.body.classList.contains('modify') && nb() && nb().contains(e.target) && !(e.target.closest && e.target.closest('#modifyLock, #modifyAuto'));
+  const inBar = e => document.body.classList.contains('modify') && nb() && nb().contains(e.target) && !(e.target.closest && e.target.closest('#modifyLock, #modifyAuto, #modifyOrbit'));
   const evY = e => { const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || e; return t.clientY; };
   const inStrip = e => { if (!inBar(e)) return false; const r = nb().getBoundingClientRect(); return evY(e) - r.top < 56.08; }; // the SONG NAME strip (the top 66px — the same size as the bar everywhere else)
   const inPad = e => !window._axisMenuOpen && inBar(e) && !inStrip(e); // (not while the AXIS MENU is open / closing)
@@ -8754,7 +8840,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // Capture on the WINDOW so the song name's own gestures (double-tap save, hold, swipes) never see these while in MODIFY
   // the PADLOCK: its touches/presses are kept away from the song name's handlers (their touchstart preventDefault would also
   // stop the tap's click), so a tap on it only ever toggles the latch
-  const onLock = e => e.target && e.target.closest && e.target.closest('#modifyLock, #modifyAuto');
+  const onLock = e => e.target && e.target.closest && e.target.closest('#modifyLock, #modifyAuto, #modifyOrbit');
   ['touchstart', 'touchend', 'mousedown', 'mouseup', 'dblclick'].forEach(t => window.addEventListener(t, e => { if (onLock(e)) e.stopPropagation(); }, true));
   // DOUBLE TAP / DOUBLE CLICK ANYWHERE IN THE GRAPH, per direct request: the ring eases back to the centre and the graph resets —
   // the pattern goes back to how it was (effects the pad already took away stay gone, as always)
@@ -8776,29 +8862,35 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
   // cursor will take — slowly turning round the centre, following the drag live, in the TOP ROW HIGHLIGHT colour at 60% — then
   // fading away over a QUARTER NOTE once the drag lets go.
   // (the guide first appears THROUGH THE RING where it is now, then glides out / in to the fingertip, per direct request)
-  let guideR = null, guideRaf = 0;
-  const guideStep = () => { guideRaf = 0; const g = document.getElementById('orbitGuide'), m = document.getElementById('modifyPadMarks'); if (!g || !m || guideR === null) return;
-    guideR += (orbitTargetR - guideR) * 0.22; if (Math.abs(orbitTargetR - guideR) < 0.0015) guideR = orbitTargetR;
-    g.firstChild.setAttribute('r', Math.max(1, guideR * m.clientHeight)); if (guideR !== orbitTargetR) guideRaf = requestAnimationFrame(guideStep); };
+  let guideRX = null, guideRY = null, guideRaf = 0;
+  const guideStep = () => { guideRaf = 0; const g = document.getElementById('orbitGuide'), m = document.getElementById('modifyPadMarks'); if (!g || !m || guideRX === null) return;
+    guideRX += (orbitTargetRX - guideRX) * 0.22; if (Math.abs(orbitTargetRX - guideRX) < 0.0015) guideRX = orbitTargetRX; guideRY += (orbitTargetRY - guideRY) * 0.22; if (Math.abs(orbitTargetRY - guideRY) < 0.0015) guideRY = orbitTargetRY;
+    g.firstChild.setAttribute('rx', Math.max(1, guideRX * m.clientWidth)); g.firstChild.setAttribute('ry', Math.max(1, guideRY * m.clientHeight)); if (guideRX !== orbitTargetRX || guideRY !== orbitTargetRY) guideRaf = requestAnimationFrame(guideStep); };
   const orbitGuide = (show) => { const m = document.getElementById('modifyPadMarks'); if (!m) return;
-    if (!show) guideR = null;
+    if (!show) guideRX = guideRY = null;
     let g = document.getElementById('orbitGuide');
     if (!show) { if (g) { let q = 0.5; try { q = stepDuration() * 4; } catch (e) {} g.style.transition = `opacity ${Math.max(0.05, q).toFixed(3)}s linear`; g.style.opacity = '0'; } return; }
     if (!document.body.classList.contains('modulate-mode')) { if (g) g.style.opacity = '0'; return; }
     if (!g) { g = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); g.id = 'orbitGuide'; g.setAttribute('aria-hidden', 'true');
       g.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible;opacity:0;';
-      g.innerHTML = '<circle fill="none" stroke="var(--top-row-highlight-color, #f8ff00)" stroke-width="3.75" stroke-linecap="round" stroke-dasharray="6.25 10.25" style="transform-box:view-box;transform-origin:50% 50%;animation:orbit-guide-spin 24s linear infinite;"/>';
+      g.innerHTML = '<ellipse fill="none" stroke="var(--top-row-highlight-color, #f8ff00)" stroke-width="3.75" stroke-linecap="round" stroke-dasharray="6.25 10.25" style="animation:orbit-guide-dash 0.42s linear infinite;"/>'; // an ELLIPSE now (the orbit can be an oval) — the dashes travel round it instead of the whole thing spinning, which would turn an oval
       if (getComputedStyle(m).position === 'static') m.style.position = 'relative'; m.appendChild(g); }
     const w = m.clientWidth, h = m.clientHeight; g.setAttribute('viewBox', `0 0 ${w} ${h}`);
     const c = g.firstChild; c.setAttribute('cx', w / 2); c.setAttribute('cy', h / 2);
-    if (guideR === null) { guideR = pad ? Math.hypot(pad.x - 0.5, pad.y - 0.5) : orbitR || orbitTargetR; c.setAttribute('r', Math.max(1, guideR * h)); } // starts through the ring's centre
+    if (guideRX === null) { let sc = 1; if (pad) { const q = Math.hypot((pad.x - 0.5) / orbitTargetRX, (pad.y - 0.5) / orbitTargetRY); if (q > 0.01 && isFinite(q)) sc = q; } guideRX = orbitTargetRX * sc; guideRY = orbitTargetRY * sc; c.setAttribute('rx', Math.max(1, guideRX * w)); c.setAttribute('ry', Math.max(1, guideRY * h)); } // starts through the ring's centre
     if (!guideRaf) guideRaf = requestAnimationFrame(guideStep);
     g.style.transition = 'none'; g.style.opacity = '0.6'; };
   const orbitSize = (cx, cy) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); const x = (cx - rc.left) / rc.width, y = (cy - rc.top) / rc.height;
-    const ringHalf = ringPx() / Math.max(40, rc.height); orbitTargetR = Math.max(0.04, Math.min(0.5 - ringHalf, Math.hypot(x - 0.5, y - 0.5))); try { orbitGuide(true); } catch (e) {} }; // (never off the graph) // (graph-height units — the ring never leaves the graph)
-  window.addEventListener('touchstart', e => { if (!inPad(e)) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (orbiting()) { orbitGrab = true; const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (e.touches.length === 1 && isDouble()) { padReset(); return; } const t = e.touches[0]; start(t.clientX, t.clientY); }, { capture: true, passive: false });
-  window.addEventListener('touchmove', e => { if (orbitGrab) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (!held) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; pos(t.clientX, t.clientY); }, { capture: true, passive: false });
-  ['touchend', 'touchcancel'].forEach(t => window.addEventListener(t, e => { if (orbitGrab) { e.stopPropagation(); if (!e.touches || !e.touches.length) { orbitGrab = false; try { orbitGuide(false); } catch (er) {} } return; } if (!held) return; e.stopPropagation(); if (!e.touches || !e.touches.length) end(); }, { capture: true }));
+    orbitThrough(x - 0.5, y - 0.5); try { orbitGuide(true); } catch (e) {} }; // (one finger: the same shape — circle or oval — sized to pass through the finger)
+  // TWO-FINGER PINCH, per direct request: the orbit becomes an OVAL — spread the fingers sideways for a wide one, up / down for a
+  // tall one; both fingers sit on the path. (Once pinched, lifting one finger doesn't snap it back — it waits for both to lift.)
+  let orbitPinched = false;
+  const orbitPinch = (t0, t1) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); if (!rc.width || !rc.height) return;
+    const dx = Math.abs(t0.clientX - t1.clientX) / rc.width, dy = Math.abs(t0.clientY - t1.clientY) / rc.height; orbitPinched = true;
+    orbitTargetRX = Math.max(0.04, Math.min(orbitMaxX(), dx / Math.SQRT2)); orbitTargetRY = Math.max(0.04, Math.min(orbitMaxY(), dy / Math.SQRT2)); try { orbitGuide(true); } catch (e) {} }; // (never off the graph) // (graph-height units — the ring never leaves the graph)
+  window.addEventListener('touchstart', e => { if (!inPad(e)) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (orbiting()) { orbitGrab = true; if (e.touches.length >= 2) { orbitPinch(e.touches[0], e.touches[1]); return; } const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (e.touches.length === 1 && isDouble()) { padReset(); return; } const t = e.touches[0]; start(t.clientX, t.clientY); }, { capture: true, passive: false });
+  window.addEventListener('touchmove', e => { if (orbitGrab) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (e.touches.length >= 2) { orbitPinch(e.touches[0], e.touches[1]); return; } if (orbitPinched) return; const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (!held) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; pos(t.clientX, t.clientY); }, { capture: true, passive: false });
+  ['touchend', 'touchcancel'].forEach(t => window.addEventListener(t, e => { if (orbitGrab) { e.stopPropagation(); if (!e.touches || !e.touches.length) { orbitGrab = false; orbitPinched = false; try { orbitGuide(false); } catch (er) {} } return; } if (!held) return; e.stopPropagation(); if (!e.touches || !e.touches.length) end(); }, { capture: true }));
   window.addEventListener('mousedown', e => { if (!inPad(e)) return; e.stopPropagation(); e.preventDefault(); if (orbiting()) { orbitGrab = true; orbitSize(e.clientX, e.clientY); return; } if (isDouble()) { padReset(); return; } start(e.clientX, e.clientY); }, true);
   window.addEventListener('mousemove', e => { if (orbitGrab) { orbitSize(e.clientX, e.clientY); return; } if (held) pos(e.clientX, e.clientY); }, true);
   window.addEventListener('mouseup', e => { if (orbitGrab) { e.stopPropagation(); orbitGrab = false; try { orbitGuide(false); } catch (er) {} return; } if (held) { e.stopPropagation(); end(); } }, true);
@@ -8810,7 +8902,7 @@ window._padLatch = false; // PADLOCK OFF by default (unlocked = the ring springs
     // pattern and nothing was edited in between (otherwise it starts afresh from the centre)
     if (sp && !pad && padSaved) { const ps = padSaved; padSaved = null;
       if (ps.name === nameNow() && ps.sig === JSON.stringify(grid)) { pad = ps.pad; try { apply(pad.x, pad.y); redraw(); showDot([pad.x, pad.y]); } catch (e) {} } }
-    if (sp && !held && !springRaf && !orbitRaf) { try { showDot(pad ? [pad.x, pad.y] : null); } catch (e) {} } /* (showDot: colour AND the aberration's colours) */ // RING COLOUR kept up to date while idle (display mode / MODULATE / page colour changes) — it used to only catch up once you touched the graph, per direct report
+    if (sp && !held && !springRaf && !orbitRaf && !jumpRaf) { try { showDot(pad ? [pad.x, pad.y] : null); } catch (e) {} } /* (showDot: colour AND the aberration's colours) */ // RING COLOUR kept up to date while idle (display mode / MODULATE / page colour changes) — it used to only catch up once you touched the graph, per direct report
     if (!pad) { try { if (!window._sweepGestureActive && window._djLP && (window._djLP.frequency.value < 19000 || window._djHP.frequency.value > 30)) djFilter(0); } catch (e) {} return; } // (no graph state left = the FILTER opens back up)
     if (!sp && window._orbitMain) { held = false; if (pad.name !== nameNow()) { window._padMute = null; pad = null; } return; } // AUTO going on in MAIN: keep the pad live (a new pattern = start from it afresh)
     if (!sp) { held = false; springStop();
