@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-20 04:17:37 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-20 04:29:38 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3146,7 +3146,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 04:17:37 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 04:29:38 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4155,8 +4155,8 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
       </div>
       <!-- DRUMS BUS (was the DRUMS menu's volume slider), per direct request -->
       <div style="display:flex;flex-direction:column;gap:15px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">DRUMS BUS</div><div id="beatVolBusVal" style="font-size:0.85rem;font-weight:700;color:#111;">47%</div></div>
-        <input autocomplete="off" type="range" id="beatVolBar" min="0" max="100" value="47" class="master-vol-slider" style="width:100%;" oninput="setBeatVol(this.value/100)" onchange="setBeatVol(this.value/100)">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">DRUMS BUS</div><div id="beatVolBusVal" style="font-size:0.85rem;font-weight:700;color:#111;">22%</div></div>
+        <input autocomplete="off" type="range" id="beatVolBar" min="0" max="100" value="22" class="master-vol-slider" style="width:100%;" oninput="setBeatVol(this.value/100)" onchange="setBeatVol(this.value/100)">
       </div>
 
       <!-- AUTO NOTE OUTLINE slider removed, per direct request — hard-coded 3px (see --auto-outline-w on :root) -->
@@ -4414,7 +4414,7 @@ const INSTRUMENTS = {
   spiano: { name: 'SCHOOL PIANO', soft: null, accent: null, group: 'tonal' },
   magic:  { name: 'MAGIC',        soft: null, accent: null, group: 'tonal' },
   sparkle:{ name: 'DENIECE',     soft: null, accent: null, group: 'tonal' },
-  rhodes: { name: 'ARP',       soft: null, accent: null, group: 'tonal' },
+  // rhodes: { name: 'ARP',     soft: null, accent: null, group: 'tonal' }, // ARP taken out — BIT TRILL takes its place everywhere (old saves load it as BIT TRILL), per direct request
   denial: { name: 'KATHEDRA',    soft: null, accent: null, group: 'tonal' }, // KATHEDRA took BUCK's slot (same key), per direct request — see playKathedra
   stab:   { name: 'RYTM GTR',     soft: null, accent: null, group: 'tonal' },
   chug:   { name: 'CHUG',        soft: null, accent: null, group: 'tonal' },
@@ -6415,7 +6415,7 @@ function _endNameShuffle(sh) {
 //   COMP: MARIO PIANO (chord), DREAM PIANO (two layered instruments), MAGIC (chord), DENIECE (chord), BUCK (chord),
 //         RYTM GTR (chord stab), CHUG (power chord), BROOTH (two voices, an octave apart), TEXTURE (chord),
 //         UNDERPASS (adds a second, different pitch)
-const _LEAD_MONO = new Set(['jcmgtr', 'clar', 'rhodes2', 'spiano', 'rhodes', 'damask', 'yamask', 'satk', 'dronePlus', 'tralaarp', 'ballsac']);
+const _LEAD_MONO = new Set(['jcmgtr', 'clar', 'rhodes2', 'spiano', 'bittrl', 'damask', 'yamask', 'satk', 'dronePlus', 'tralaarp', 'ballsac']);
 function randomizeCurrentInstruments(opts) {
   _cancelRandInst(); // a fresh press cancels any swaps (and name shuffles) still waiting from the last one
   // A/B + colors, per direct request: this now counts as a NEW PATTERN as
@@ -6441,7 +6441,7 @@ function randomizeCurrentInstruments(opts) {
     new Set(['fflute','damask','yamask','dulc']),
     new Set(['jcmgtr','clar','boog']),
     new Set(['shihat','tamb','shak','guiro']),
-    new Set(['rhodes','sprkls','boog']), // BROOTH (dulc) and JINX taken out of the rare-lead group, per direct request
+    new Set(['bittrl','sprkls','boog']), // BROOTH (dulc) and JINX taken out of the rare-lead group, per direct request
     new Set(['jcmgtr','damask','yamask']),
     new Set(['magic','boog']), // MAGIC is DREAM PIANO's own voice as a chord — never both (same rule RAND uses), now that they share the COMP group
   ];
@@ -6537,7 +6537,7 @@ function swapTrackInstrumentInGroup(tr, anyGroup, avoidKey) { // anyGroup (doubl
     new Set(['fflute','damask','yamask','dulc']),
     new Set(['jcmgtr','clar','boog']),
     new Set(['shihat','tamb','shak','guiro']),
-    new Set(['rhodes','sprkls','boog']),
+    new Set(['bittrl','sprkls','boog']),
     new Set(['jcmgtr','damask','yamask']),
     new Set(['magic','boog']),
   ];
@@ -7119,7 +7119,6 @@ function playBuffer(key, isAccent, time, tr, stepIdx) {
   if (key === 'sstring') { return; } // handled in scheduler
   if (key === 'sleg')    { return; } // handled in scheduler
   if (key === 'sparkle') { return; } // handled in scheduler
-  if (key === 'rhodes')  { return; } // handled in scheduler
   if (key === 'rhodes2')  { return; }
   if (key === 'sflute')   { return; }
   if (key === 'spiano')   { return; }
@@ -7699,7 +7698,7 @@ function scheduler() {
       for (let tr = 0; tr < NUM_TRACKS; tr++) {
         grid[tr] = [...snap.grid[tr]];
         trackOffset[tr] = snap.trackOffset[tr];
-        trackInstruments[tr] = snap.trackInstruments[tr];
+        trackInstruments[tr] = snap.trackInstruments[tr] === 'rhodes' ? 'bittrl' : snap.trackInstruments[tr]; // (ARP retired → BIT TRILL)
         trackMuted[tr] = snap.trackMuted[tr];
         if (snap.trackBassScale?.[tr]) trackBassScale[tr] = [...snap.trackBassScale[tr]];
         else delete trackBassScale[tr];
@@ -7872,7 +7871,7 @@ function fireStepAudio(step, t) {
         if (trackChink[tr]) _chinkHit(tr, t, val === 2, gs); // CHOKE: open the gate for just a blip on this hit
         if (tr !== 0) duckEchoTrack(t); // TEXTURE gets pumped by everything else going on
         const key = trackInstruments[tr];
-        if (key === 'bittrl' || key === 'sbass' || key === 'sbass3' || key === 'sbass4' || key === 'dbass' || key === 'pbass' || key === 'sludge' || key === 'stab' || key === 'chug' || key === 'bashp' || key === 'denial' || key === 'jcmgtr' || key === 'sprkls' || key === 'clar' || key === 'sstring' || key === 'sleg' || key === 'sparkle' || key === 'rhodes' || key === 'rhodes2' || key === 'sflute' || key === 'spiano' || key === 'satk' || key === 'boog' || key === 'magic' || key === 'fflute' || key === 'blunt' || key === 'damask' || key === 'yamask' || key === 'dulc' || (key === 'opening' || key === 'tralaarp' || key === 'ballsac') || key === 'drone' || key === 'dronePlus' || key === 'underpass') {
+        if (key === 'bittrl' || key === 'sbass' || key === 'sbass3' || key === 'sbass4' || key === 'dbass' || key === 'pbass' || key === 'sludge' || key === 'stab' || key === 'chug' || key === 'bashp' || key === 'denial' || key === 'jcmgtr' || key === 'sprkls' || key === 'clar' || key === 'sstring' || key === 'sleg' || key === 'sparkle' || key === 'rhodes2' || key === 'sflute' || key === 'spiano' || key === 'satk' || key === 'boog' || key === 'magic' || key === 'fflute' || key === 'blunt' || key === 'damask' || key === 'yamask' || key === 'dulc' || (key === 'opening' || key === 'tralaarp' || key === 'ballsac') || key === 'drone' || key === 'dronePlus' || key === 'underpass') {
           const scale = trackBassScale[tr] || [110];
           const noteIdx = gs % scale.length;
           const freq = (trackPitchOverride[tr] && trackPitchOverride[tr][gs] !== undefined) ? trackPitchOverride[tr][gs] : scale[noteIdx];
@@ -7926,7 +7925,6 @@ function fireStepAudio(step, t) {
           if (key === 'sparkle') playHopkins(freq, dur, val === 2, t, tr);
           if (key === 'sprkls')  playSparkles(freq, dur, val === 2, t, tr);
           if (key === 'clar')    playSteelGuitar(freq, dur, val === 2, t, tr);
-          if (key === 'rhodes')  playSpaceKoto(freq, dur, val === 2, t, tr);
           if (key === 'rhodes2') playRhodes2(freq, dur, val === 2, t, tr);
           if (key === 'sflute')  playSparp(freq, dur, val === 2, t, tr);
           if (key === 'underpass') playUnderpass(freq, dur, val === 2, t, tr);
@@ -7948,7 +7946,7 @@ function fireStepAudio(step, t) {
           }
           }
           // Duck all pad tracks when busiest track fires
-          const _padKeys = new Set(['fflute','sstring','sleg','sparkle','sprkls','rhodes','rhodes2','opening','magic']);
+          const _padKeys = new Set(['fflute','sstring','sleg','sparkle','sprkls','rhodes2','opening','magic']);
           if (!_padKeys.has(key)) {
             let _bestDensity = 0, _busiestTr = -1;
             for (let _i = 0; _i < NUM_TRACKS; _i++) {
@@ -8023,7 +8021,6 @@ function fireStepAudio(step, t) {
             if (key === 'sparkle') playHopkins(freq2, dur2, false, t2, tr);
             if (key === 'sprkls')  playSparkles(freq2, dur2, false, t2, tr);
             if (key === 'clar')    playSteelGuitar(freq2, dur2, false, t2, tr);
-            if (key === 'rhodes')  playSpaceKoto(freq2, dur2, false, t2, tr);
             if (key === 'rhodes2') playRhodes2(freq2, dur2, false, t2, tr);
             if (key === 'dulc')    playBrooth(freq2, dur2, false, t2, tr);
             if (key === 'sflute')  playSparp(freq2, dur2, false, t2, tr);
@@ -9432,7 +9429,6 @@ function togglePlay() {
         if (MIDEAST_KEYS.has(trackInstruments[tr]) && !trackScaleMode[tr]) trackScaleMode[tr] = pickOrShareMideastScale(tr);
         trackBassScale[tr] = buildScaleFromRoot(root, scaleModeFor(tr), tr); delete trackPitchOverride[tr]; // new scale — any pinned pitches from an old melody no longer apply
         if (trackInstruments[tr] === 'stab' || trackInstruments[tr] === 'chug' || trackInstruments[tr] === 'bashp' || trackInstruments[tr] === 'sparkle') trackBassScale[tr] = trackBassScale[tr].slice(0, 4); // limited palette — max 4 notes in the scale
-        if (trackInstruments[tr] === 'rhodes' && typeof _writeArpPattern === 'function') { _writeArpPattern(tr, trackBassScale[tr]); redrawTrackCells(tr, true); } // ARP re-arpeggiates in the new key (its pitches are pinned per step)
       }
     }
     document.body.classList.add('seq-playing');
@@ -9976,7 +9972,7 @@ let globalScaleRoot = null;
 // an all-music pattern still has 6 music tracks but can't overload iOS audio.
 const HEAVY_TONAL_KEYS = new Set(['denial', 'fflute','blunt','sstring','sleg','opening','tralaarp', 'ballsac','drone','dronePlus','magic','sparkle','clar','rhodes2','underpass','sflute','boog']);
 const HEAVY_TONAL_MAX = 2;
-const TONAL_KEYS = new Set(['bittrl','sbass','sbass3','sbass4','dbass','pbass','sludge','stab','chug','bashp','denial','jcmgtr','sprkls','clar','sstring','sleg','sparkle','rhodes','rhodes2','sflute','spiano','satk','boog','fflute','blunt','damask','yamask','dulc','opening','tralaarp', 'ballsac','drone','dronePlus','magic','amlgm','underpass']);
+const TONAL_KEYS = new Set(['bittrl','sbass','sbass3','sbass4','dbass','pbass','sludge','stab','chug','bashp','denial','jcmgtr','sprkls','clar','sstring','sleg','sparkle','rhodes2','sflute','spiano','satk','boog','fflute','blunt','damask','yamask','dulc','opening','tralaarp', 'ballsac','drone','dronePlus','magic','amlgm','underpass']);
 
 function buildScaleFromRoot(root, scaleOverride, tr) {
   const scaleArr = scaleOverride || PENTA_MINOR;
@@ -10015,7 +10011,7 @@ function getRangeRoots(key) {
   if (key === 'blunt') return MID_ROOTS;
   if (key === 'chug') return CHUG_ROOTS;
   if (key === 'stab' || key === 'bashp' || key === 'bittrl') return MID_ROOTS;
-  if (key === 'sstring' || key === 'sleg' || key === 'rhodes' || key === 'rhodes2' || key === 'clar' || key === 'jcmgtr' || key === 'denial' || key === 'damask' || key === 'yamask' || (key === 'opening' || key === 'tralaarp' || key === 'ballsac') || key === 'spiano' || key === 'dulc' || key === 'drone' || key === 'dronePlus' || key === 'sflute') return MELODY_ROOTS; // sflute (CLUNG) moved here from HIGH_ROOTS above — same root pool as STRINGS+, per direct request to match its auto-generation criteria
+  if (key === 'sstring' || key === 'sleg' || key === 'rhodes2' || key === 'clar' || key === 'jcmgtr' || key === 'denial' || key === 'damask' || key === 'yamask' || (key === 'opening' || key === 'tralaarp' || key === 'ballsac') || key === 'spiano' || key === 'dulc' || key === 'drone' || key === 'dronePlus' || key === 'sflute') return MELODY_ROOTS; // sflute (CLUNG) moved here from HIGH_ROOTS above — same root pool as STRINGS+, per direct request to match its auto-generation criteria
   return BASS_ROOTS;
 }
 
@@ -10023,34 +10019,8 @@ function getRangeRoots(key) {
 // the usual scattered notes, walk straight up/down/up-down/down-up through
 // the scale on every 8th note. Standalone helper so it's easy to call from
 // both randomizeBassTrack() and anywhere else that might want it later.
-const ARPEGGIO_KEYS = new Set(['rhodes2', 'spiano']); /* 'rhodes' (ARP, was SPACE KOTO) now ALWAYS arpeggiates — see _writeArpPattern */ // DX PIANO, SPACE KOTO, SCHOOL PIANO (DREAM PIANO removed; XYLOPHONE's old slot, sflute, removed too — it's CLUNG now and matches STRINGS+'s criteria instead, not this XYLOPHONE-specific arpeggio quirk)
+const ARPEGGIO_KEYS = new Set(['rhodes2', 'spiano']); // DX PIANO, SPACE KOTO, SCHOOL PIANO (DREAM PIANO removed; XYLOPHONE's old slot, sflute, removed too — it's CLUNG now and matches STRINGS+'s criteria instead, not this XYLOPHONE-specific arpeggio quirk)
 const BASS_ARPEGGIO_KEYS = new Set(['sbass', 'sbass3', 'sbass4', 'dbass', 'pbass', 'sludge']); // rarer — 1 in 8, not 1 in 4
-// ARP pattern: every step of the measure filled (no gaps) with the current scale's notes, in one of three feels:
-//  '16th' — a run on every 16th; '8th' — every 8th; 'triplet' — every 16th grouped in threes (3-note broken-chord cells,
-//  accent on each cell's first note), so it rolls over the beat in a 3-against-4 triplet feel.
-function _writeArpPattern(tr, scale) {
-  scale = (scale && scale.length) ? scale : [220];
-  const n = scale.length, feels = ['16th', '8th', 'triplet'];
-  const feel = feels[Math.floor(Math.random() * feels.length)];
-  if (!trackPitchOverride[tr]) trackPitchOverride[tr] = {};
-  for (let s2 = 0; s2 < NUM_STEPS; s2++) { grid[tr][s2] = 0; delete trackPitchOverride[tr][s2]; }
-  const shapes = ['up', 'down', 'updown'], shape = shapes[Math.floor(Math.random() * shapes.length)];
-  const period = Math.max(2, (n - 1) * 2);
-  const walk = i => { if (shape === 'up') return i % n; if (shape === 'down') return (n - 1) - (i % n); const p = i % period; return p < n ? p : period - p; };
-  if (feel === 'triplet') {
-    for (let i = 0; i < NUM_STEPS; i++) {
-      const cell = Math.floor(i / 3), j = i % 3;
-      const idx = (walk(cell) + j * 2) % n; // root / 3rd / 5th of the scale from each cell's starting degree
-      grid[tr][i] = j === 0 ? 2 : 1; trackPitchOverride[tr][i] = scale[idx];
-    }
-  } else {
-    const stepSize = feel === '8th' ? 2 : 1;
-    for (let i = 0, st = 0; st < NUM_STEPS; i++, st += stepSize) {
-      grid[tr][st] = (st % 4 === 0) ? 2 : 1; trackPitchOverride[tr][st] = scale[walk(i)];
-    }
-  }
-  trackArpFeel[tr] = feel;
-}
 const trackArpFeel = {};
 function _writeArpeggioPattern(tr, scale) {
   // Below 100bpm there's room for it to breathe, so sometimes go 16th notes
@@ -10183,7 +10153,6 @@ function randomizeBassTrack(tr, level) {
 
   // ARP (was SPACE KOTO), per direct request: ALWAYS an arpeggio of the current scale across the whole measure (16th, 8th or triplet feel) —
   // whole-pattern RAND and the track's own + both come through here
-  if (key === 'rhodes') { _writeArpPattern(tr, trackBassScale[tr]); redrawTrackCells(tr); markModified(); return; } // must redraw — this early return used to skip it, so + / auto played new notes without showing them
   // TONAL + PRESS LADDER, per direct request: YOUR OWN taps on a tonal track's + climb a 5-step note quota — each press more
   // notes than the one before, then back to the sparsest — so the random arpeggio swaps are skipped on those presses
   const _ladderTap = window._plusTapTr === tr;
@@ -10206,7 +10175,6 @@ function randomizeBassTrack(tr, level) {
     sleg:    [[1,2,0.10],[2,3,0.20],[2,5,0.30]],   // Strings — fewest
     satk:    [[1,2,0.25],[2,3,0.40],[2,3,0.50]],   // Syn Attack — max 3
     bittrl:  [[2,3,0.30],[2,4,0.45],[3,5,0.55]],   // BIT TRILL — a few notes, room to hear each trill unwind
-    rhodes:  [[2,3,0.15],[3,6,0.30],[5,8,0.45]],   // Piano — medium
     rhodes2: [[2,3,0.15],[3,6,0.30],[5,8,0.45]],   // Rhodes — medium
     sprkls:  [[2,3,0.30],[3,4,0.40],[3,5,0.50]],   // Sparkles — a few twinkles
     boog:    [[1,3,0.20],[3,4,0.40],[4,7,0.60]],   // BOOG — half the generic default density
@@ -10431,10 +10399,10 @@ function randomizeBassTrack(tr, level) {
 
   // RAND-time only: chance to promote a soft hit to a 32nd-split for select instruments.
   // This is the ONLY place split-32 notes are ever assigned — never during live playback.
-  const split32Keys = new Set(['shihat','guiro','congHi','bongHi','timbHi','timbMid','timbLo','rhodes','rhodes2','shak','spiano','jcmgtr']); /* 'dulc' removed — BROOTH is a breathy legato voice, no 32nd splits */ // 'sflute' removed — it's CLUNG now, matching STRINGS+'s criteria instead of this XYLOPHONE-era split mechanic
+  const split32Keys = new Set(['shihat','guiro','congHi','bongHi','timbHi','timbMid','timbLo','rhodes2','shak','spiano','jcmgtr']); /* 'dulc' removed — BROOTH is a breathy legato voice, no 32nd splits */ // 'sflute' removed — it's CLUNG now, matching STRINGS+'s criteria instead of this XYLOPHONE-era split mechanic
   if (split32Keys.has(key)) {
     let splitCount = 0;
-    const maxSplits = (key === 'rhodes' || key === 'rhodes2' || key === 'dulc' || key === 'spiano') ? 3 : 99;
+    const maxSplits = (key === 'rhodes2' || key === 'dulc' || key === 'spiano') ? 3 : 99;
     const splitChance = (key === 'jcmgtr') ? 0.15 : (key === 'dulc') ? 0.28 : 0.18; // JINX back down near the general default — rapid 32nds constantly was part of what made it feel unnaturally busy; BOOBOO gets some, more moderate
     for (let s = 0; s < NUM_STEPS; s++) {
       if (grid[tr][s] === 1 && splitCount < maxSplits && Math.random() < splitChance) {
@@ -10934,48 +10902,6 @@ const _sparkleGlideState = {};
 
 // ── Piano: additive partials with inharmonicity + hammer transient ──
 const _rhodesGlide = {};
-// SPACE KOTO pluck cache: one Karplus-Strong render per pitch (period),
-// most-recently-used 10 kept (~4.5MB max). See playSpaceKoto.
-const _kotoCache = new Map();
-function _kotoBuf(freq) {
-  const sr = ctx.sampleRate, period = Math.max(2, Math.round(sr / freq));
-  let e = _kotoCache.get(period);
-  if (e && e.ctx === ctx) { _kotoCache.delete(period); _kotoCache.set(period, e); return e.buf; }
-  const numSamples = Math.round(sr * 2.4);
-  const buf = ctx.createBuffer(1, numSamples, sr), data = buf.getChannelData(0);
-  const ring = new Float32Array(period);
-  for (let i = 0; i < period; i++) ring[i] = (Math.random() * 2 - 1) * (1 - i / period);
-  let idx = 0; const damp = 0.994; // per-sample extra damping to shape overall decay length
-  for (let n = 0; n < numSamples; n++) {
-    const cur = ring[idx], next = ring[(idx + 1) % period];
-    data[n] = cur; ring[idx] = (cur + next) * 0.5 * damp; idx = (idx + 1) % period;
-  }
-  _kotoCache.set(period, { ctx, buf });
-  while (_kotoCache.size > 10) _kotoCache.delete(_kotoCache.keys().next().value);
-  return buf;
-}
-function playSpaceKoto(freq, durSec, isAccent, time, tr) { // ARP (was SPACE KOTO) — reworked into a plain synth pluck, per direct request
-  if (!ctx || !freq) return;
-  const dest = getSynthConnectNode(tr);
-  _rhodesGlide[tr] = freq;
-  let f = freq; while (f < 220) f *= 2; while (f > 880) f /= 2; // arp register
-  const vel = isAccent ? 0.105 : 0.075;
-  const len = Math.max(0.09, Math.min(durSec * 0.9 + 0.06, 0.32)); // short and clipped — an arpeggiator, not a ringing string
-  const o1 = ctx.createOscillator(); o1.type = 'sawtooth'; o1.frequency.setValueAtTime(f, time);
-  const o2 = ctx.createOscillator(); o2.type = 'square'; o2.frequency.setValueAtTime(f, time); o2.detune.value = 7;
-  const g2 = ctx.createGain(); g2.gain.value = 0.55;
-  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 7; // resonant filter blip
-  lp.frequency.setValueAtTime(Math.min(f * (isAccent ? 14 : 10), 12000), time);
-  lp.frequency.exponentialRampToValueAtTime(Math.max(f * 1.6, 200), time + len * 0.8);
-  const env = ctx.createGain();
-  env.gain.setValueAtTime(0, time);
-  env.gain.linearRampToValueAtTime(vel, time + 0.003);
-  env.gain.exponentialRampToValueAtTime(vel * 0.35, time + len * 0.45);
-  env.gain.exponentialRampToValueAtTime(0.0001, time + len);
-  o1.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(env); env.connect(dest);
-  o1.start(time); o2.start(time); o1.stop(time + len + 0.02); o2.stop(time + len + 0.02);
-  o1.onended = () => { try { o1.disconnect(); o2.disconnect(); g2.disconnect(); lp.disconnect(); env.disconnect(); } catch(e) {} };
-}
 // ── Acid Pluck: resonant filtered saw with a fast downward filter/pitch sweep — 303-style squelch ──
 function playAcidPluck(freq, durSec, isAccent, time, tr) {
   if (!ctx || !freq) return;
@@ -11746,7 +11672,7 @@ const BIT_TRILL_FAST_FIRST = true;
 function playBitTrill(freq, durSec, isAccent, time, tr) {
   if (!ctx || !freq) return;
   const dest = getSynthConnectNode(tr);
-  const dur = Math.max(0.03, durSec), rel = 0.025, vel = isAccent ? 0.075 : 0.06;
+  const dur = Math.max(0.03, durSec), rel = 0.025, vel = (isAccent ? 0.075 : 0.06) * 1.122; // (+1dB, per direct request)
   const osc = ctx.createOscillator(); osc.type = 'square';
   // the segment lengths (each used twice: low, then high)
   const segs = []; { let L = 0.002, tot = 0; while (tot < dur) { segs.push(L); tot += L * 2; L *= 2; } if (!BIT_TRILL_FAST_FIRST) segs.reverse(); }
@@ -13493,7 +13419,7 @@ function markStepAsSplit32(tr, stepNow) {
 // synth-based instrument picks it up automatically without each one having
 // to wrap its own output — only the sample-based (WAV) percussion voices in
 // playBuffer need their own explicit call, since they route separately.
-const LEAD_INSTRUMENT_KEYS = new Set(['jcmgtr', 'clar', 'boog', 'sparkle', 'rhodes', 'rhodes2', 'damask', 'yamask', 'dulc']); // (KATHEDRA, in BUCK's old slot, is a drone — not a lead) // JINX, JENNY, DREAM PIANO, DENIECE, SPACE KOTO, DX PIANO, BUCK, DAMASK, YAMASK, BOOBOO
+const LEAD_INSTRUMENT_KEYS = new Set(['jcmgtr', 'clar', 'boog', 'sparkle', 'bittrl', 'rhodes2', 'damask', 'yamask', 'dulc']); // (KATHEDRA, in BUCK's old slot, is a drone — not a lead) // JINX, JENNY, DREAM PIANO, DENIECE, SPACE KOTO, DX PIANO, BUCK, DAMASK, YAMASK, BOOBOO
 // Basses were getting lost in the mix — rather than boosting them (which
 // just risks clipping/distortion), every OTHER instrument gets a small
 // -1dB trim applied right at its own output, before any FX/delay/pump
@@ -15448,7 +15374,6 @@ function previewNote(tr, isAccent) {
     else if (key === 'sparkle') playHopkins(freq, dur, isAccent, t, tr);
     else if (key === 'sprkls')  playSparkles(freq, dur, isAccent, t, tr);
     else if (key === 'clar')    playSteelGuitar(freq, dur, isAccent, t, tr);
-    else if (key === 'rhodes')  playSpaceKoto(freq, dur, isAccent, t, tr);
     else if (key === 'rhodes2') playRhodes2(freq, dur, isAccent, t, tr);
     else if (key === 'sflute')  playSparp(freq, dur, isAccent, t, tr);
     else if (key === 'underpass') playUnderpass(freq, dur, isAccent, t, tr);
@@ -16358,44 +16283,6 @@ async function renderSlotToWav(snap) {
           const clkEnv = offline.createGain(); clkEnv.gain.value=rVel*0.2;
           clk.connect(clkLP); clkLP.connect(clkEnv); clkEnv.connect(offDest); clk.start(t);
 
-        } else if (key === 'rhodes') {
-          // Matches live playSpaceKoto voice — Karplus-Strong precomputed into a buffer
-          const rVel = isAccent ? 0.241 : 0.156; // -3dB (was 0.34/0.22)
-          const decayTime = Math.min(dur + 1.8, 2.4);
-          const numSamples = Math.max(2, Math.round(sampleRate * decayTime));
-          const period = Math.max(2, Math.round(sampleRate / freq));
-          const buf = offline.createBuffer(1, numSamples, sampleRate);
-          const data = buf.getChannelData(0);
-          const ring = new Float32Array(period);
-          for (let i = 0; i < period; i++) ring[i] = (Math.random() * 2 - 1) * (1 - i / period);
-          let idx = 0;
-          const damp = 0.994;
-          for (let n = 0; n < numSamples; n++) {
-            const cur = ring[idx];
-            const next = ring[(idx + 1) % period];
-            data[n] = cur;
-            ring[idx] = (cur + next) * 0.5 * damp;
-            idx = (idx + 1) % period;
-          }
-          const src = offline.createBufferSource(); src.buffer = buf;
-          const env = offline.createGain(); env.gain.value = rVel;
-          src.connect(env); env.connect(offDest);
-          src.start(t);
-
-          // Shimmer
-          const shimLen = 0.5;
-          const shimBuf = offline.createBuffer(1, Math.ceil(sampleRate * shimLen), sampleRate);
-          const sd = shimBuf.getChannelData(0);
-          for (let i = 0; i < sd.length; i++) sd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / sd.length, 1.5);
-          const shim = offline.createBufferSource(); shim.buffer = shimBuf;
-          const shimBP = offline.createBiquadFilter(); shimBP.type = 'bandpass';
-          shimBP.frequency.value = Math.min(freq * 8, 9000); shimBP.Q.value = 6;
-          const shimEnv = offline.createGain();
-          shimEnv.gain.setValueAtTime(0, t);
-          shimEnv.gain.linearRampToValueAtTime(rVel * 0.16, t + 0.01);
-          shimEnv.gain.exponentialRampToValueAtTime(0.0001, t + shimLen);
-          shim.connect(shimBP); shimBP.connect(shimEnv); shimEnv.connect(offDest);
-          shim.start(t);
         }
         continue;
       }
@@ -18981,7 +18868,7 @@ function randAll(mode, opts) {
   const soloUniqueKeys = new Set(['jcmgtr','clar','boog']); // max one of these — JCX GUITAR / JENNY / BOOG
   const soloHatKeys = new Set(['shihat','tamb','shak','guiro']); // max one of these — hihat/shaker/tambourine never together
   const snareKeys = new Set(['ssnare']); // just the one snare now
-  const soloRareLeadKeys = new Set(['rhodes','sprkls','boog']); /* JINX removed too, per direct request — as likely as DAMASK now */ /* BROOTH (dulc) removed from this group, per direct request — it now only follows YAMASK's one-of rule */ // max one of these — JINX/SPACE KOTO/SPARKLES/DREAM PIANO/BOOBOO (XYLOPHONE's old slot, sflute, removed — it's CLUNG now, matching STRINGS+'s criteria instead of this XYLOPHONE-era solo restriction)
+  const soloRareLeadKeys = new Set(['bittrl','sprkls','boog']); /* JINX removed too, per direct request — as likely as DAMASK now */ /* BROOTH (dulc) removed from this group, per direct request — it now only follows YAMASK's one-of rule */ // max one of these — JINX/SPACE KOTO/SPARKLES/DREAM PIANO/BOOBOO (XYLOPHONE's old slot, sflute, removed — it's CLUNG now, matching STRINGS+'s criteria instead of this XYLOPHONE-era solo restriction)
   const jinxClashKeys = new Set(['jcmgtr', 'damask', 'yamask']); // JINX never coexists with DAMASK or YAMASK specifically
   const padKeys = new Set(['fflute', 'blunt', 'sstring', 'sleg', 'opening', 'drone', 'magic']); // max one PAD-classified instrument per pattern — HASSELL/STRINGS/etc. never together
   // Exclude instruments already locked on other tracks
@@ -19456,7 +19343,7 @@ function randAll(mode, opts) {
   const tonalNonBassKeys = new Set([...TONAL_KEYS].filter(k => !bassKeys2.has(k)));
 
   // Rank each instrument: 0=hihat, 1=perc, 2=tonal lead, 2.5=tonal mid, 3.5=kick, 4=bass
-  const leadTonalKeys = new Set(['jcmgtr','clar','boog','sparkle','rhodes','rhodes2']); /* KATHEDRA (BUCK's old slot) isn't a lead */ // JINX, JENNY, DREAM PIANO, DENIECE, SPACE KOTO, DX PIANO, BUCK
+  const leadTonalKeys = new Set(['jcmgtr','clar','boog','sparkle','bittrl','rhodes2']); /* KATHEDRA (BUCK's old slot) isn't a lead */ // JINX, JENNY, DREAM PIANO, DENIECE, SPACE KOTO, DX PIANO, BUCK
   function trackRank(k) {
     if (hihatKeys.has(k)) return 0;
     if (bassKeys2.has(k)) return 4;
@@ -20044,7 +19931,7 @@ function randAll(mode, opts) {
     }
   }
   // Voice harmony: if >1 melody tonal track, shift 2nd+ up an octave + minor third
-  const melodyKeys = new Set(['sstring','sleg','sparkle','rhodes','rhodes2','stab','bashp','damask','yamask','opening','tralaarp', 'ballsac']);
+  const melodyKeys = new Set(['sstring','sleg','sparkle','bittrl','rhodes2','stab','bashp','damask','yamask','opening','tralaarp', 'ballsac']);
   const melodyTracks = [];
   for (let tr = 1; tr < NUM_TRACKS; tr++) {
     if (melodyKeys.has(trackInstruments[tr])) melodyTracks.push(tr);
@@ -20726,7 +20613,7 @@ function restoreState(snap, opts) {
   for (let tr=0; tr<NUM_TRACKS; tr++) {
     grid[tr]=[...snap.grid[tr]]; trackOffset[tr]=snap.trackOffset[tr];
     const snapInst = snap.trackInstruments[tr];
-    trackInstruments[tr] = INSTRUMENTS[snapInst] ? snapInst : (snapInst === 'sflute' ? 'tralaarp' : snapInst === 'sprkls' ? 'ballsac' : Object.keys(INSTRUMENTS)[0]);
+    trackInstruments[tr] = INSTRUMENTS[snapInst] ? snapInst : (snapInst === 'sflute' ? 'tralaarp' : snapInst === 'sprkls' ? 'ballsac' : snapInst === 'rhodes' ? 'bittrl' /* ARP retired */ : Object.keys(INSTRUMENTS)[0]);
     trackMuted[tr]=snap.trackMuted[tr];
     if (snap.trackRLevel) trackRLevel[tr] = snap.trackRLevel[tr] ?? 0;
     if (snap.trackBassScale?.[tr]) trackBassScale[tr] = [...snap.trackBassScale[tr]];
@@ -21288,7 +21175,7 @@ function randomizeTrack(tr) {
   // other kit/perc instrument. STRINGS is now a normal tonal instrument,
   // dispatched through randomizeBassTrack just below like any other lead.
 
-  if (trackInstruments[tr] === 'sbass' || trackInstruments[tr] === 'sbass3' || trackInstruments[tr] === 'sbass4' || trackInstruments[tr] === 'dbass' || trackInstruments[tr] === 'pbass' || trackInstruments[tr] === 'sludge' || trackInstruments[tr] === 'stab' || trackInstruments[tr] === 'chug' || trackInstruments[tr] === 'bashp' || trackInstruments[tr] === 'denial' || trackInstruments[tr] === 'jcmgtr' || trackInstruments[tr] === 'sprkls' || trackInstruments[tr] === 'clar' || trackInstruments[tr] === 'sstring' || trackInstruments[tr] === 'sleg' || trackInstruments[tr] === 'sparkle' || trackInstruments[tr] === 'rhodes' || trackInstruments[tr] === 'rhodes2' || trackInstruments[tr] === 'sflute' || trackInstruments[tr] === 'spiano' || trackInstruments[tr] === 'satk' || trackInstruments[tr] === 'boog' || trackInstruments[tr] === 'magic' || trackInstruments[tr] === 'fflute' || trackInstruments[tr] === 'blunt' || trackInstruments[tr] === 'damask' || trackInstruments[tr] === 'yamask' || trackInstruments[tr] === 'dulc' || (trackInstruments[tr] === 'opening' || trackInstruments[tr] === 'tralaarp' || trackInstruments[tr] === 'ballsac') || trackInstruments[tr] === 'drone' || trackInstruments[tr] === 'dronePlus' || trackInstruments[tr] === 'underpass') {
+  if (trackInstruments[tr] === 'sbass' || trackInstruments[tr] === 'sbass3' || trackInstruments[tr] === 'sbass4' || trackInstruments[tr] === 'dbass' || trackInstruments[tr] === 'pbass' || trackInstruments[tr] === 'sludge' || trackInstruments[tr] === 'stab' || trackInstruments[tr] === 'chug' || trackInstruments[tr] === 'bashp' || trackInstruments[tr] === 'denial' || trackInstruments[tr] === 'jcmgtr' || trackInstruments[tr] === 'sprkls' || trackInstruments[tr] === 'clar' || trackInstruments[tr] === 'sstring' || trackInstruments[tr] === 'sleg' || trackInstruments[tr] === 'sparkle' || trackInstruments[tr] === 'rhodes2' || trackInstruments[tr] === 'sflute' || trackInstruments[tr] === 'spiano' || trackInstruments[tr] === 'satk' || trackInstruments[tr] === 'boog' || trackInstruments[tr] === 'magic' || trackInstruments[tr] === 'fflute' || trackInstruments[tr] === 'blunt' || trackInstruments[tr] === 'damask' || trackInstruments[tr] === 'yamask' || trackInstruments[tr] === 'dulc' || (trackInstruments[tr] === 'opening' || trackInstruments[tr] === 'tralaarp' || trackInstruments[tr] === 'ballsac') || trackInstruments[tr] === 'drone' || trackInstruments[tr] === 'dronePlus' || trackInstruments[tr] === 'underpass') {
     randomizeBassTrack(tr, level);
     // + LADDER guarantee: some instruments' own clean-up passes (legato merging, spacing / density checks) can take onsets back
     // out after the quota — so on YOUR + presses the result is topped up to always show MORE notes than the press before
@@ -21572,10 +21459,10 @@ function randomizeTrack(tr) {
 
   // RAND-time only: chance to promote a soft hit to a 32nd-split for select instruments.
   // This is the ONLY place split-32 notes are ever assigned — never during live playback.
-  const split32Keys = new Set(['shihat','guiro','congHi','bongHi','timbHi','timbMid','timbLo','rhodes','rhodes2','shak','spiano','jcmgtr']); /* 'dulc' removed — BROOTH is a breathy legato voice, no 32nd splits */ // 'sflute' removed — it's CLUNG now, matching STRINGS+'s criteria instead of this XYLOPHONE-era split mechanic
+  const split32Keys = new Set(['shihat','guiro','congHi','bongHi','timbHi','timbMid','timbLo','rhodes2','shak','spiano','jcmgtr']); /* 'dulc' removed — BROOTH is a breathy legato voice, no 32nd splits */ // 'sflute' removed — it's CLUNG now, matching STRINGS+'s criteria instead of this XYLOPHONE-era split mechanic
   if (split32Keys.has(key)) {
     let splitCount = 0;
-    const maxSplits = (key === 'rhodes' || key === 'rhodes2' || key === 'dulc' || key === 'spiano') ? 3 : 99;
+    const maxSplits = (key === 'rhodes2' || key === 'dulc' || key === 'spiano') ? 3 : 99;
     const splitChance = (key === 'jcmgtr') ? 0.15 : (key === 'dulc') ? 0.28 : 0.18; // JINX back down near the general default — rapid 32nds constantly was part of what made it feel unnaturally busy; BOOBOO gets some, more moderate
     for (let s = 0; s < NUM_STEPS; s++) {
       if (grid[tr][s] === 1 && splitCount < maxSplits && Math.random() < splitChance) {
@@ -25600,7 +25487,7 @@ function fullReset() {
   const _bpmSettingsSliderEl = document.getElementById('bpmSettingsSlider'); if (_bpmSettingsSliderEl) _bpmSettingsSliderEl.value = bpm;
   _beatOffset = 0; _beatReverbMix = 0.09; { const b = document.getElementById('beatReverbMixBar'); if (b) b.value = 9; const v = document.getElementById('beatReverbMixVal'); if (v) v.textContent = '9'; } // REVERB ON BEAT default 9%, per direct request _beatFx = false; _beatPump = false; _setBeatChoke(false);
   _beatAutoRandActive = false; _beatAutoRandBarCount = 0; window._beatBulldozer = false;
-  _beatVolRaw = 0.47; _applyBeatVolWithDuck(); // DRUMS BUS default 47% (was 30%, 40%, 50%, 60%, 39% before that), per direct request
+  _beatVolRaw = 0.22; _applyBeatVolWithDuck(); { const b = document.getElementById('beatVolBar'); if (b) b.value = 22; const v = document.getElementById('beatVolBusVal'); if (v) v.textContent = '22%'; } // DRUMS BUS default 22% (was 47%, 30%, 40%, 50%, 60%, 39% before that), per direct request
   const _bbFullReset = document.getElementById('beatBtn'); if (_bbFullReset) _bbFullReset.classList.remove('beat-auto-active');
   if (window._beatReverbSend && ctx) window._beatReverbSend.gain.setValueAtTime(_beatReverbGainForMix(_beatReverbMix), ctx.currentTime); // on by default now, not silenced
   if (window._beatCrunchSend && ctx) window._beatCrunchSend.gain.setValueAtTime(0, ctx.currentTime);
@@ -27180,7 +27067,7 @@ function _setBeatCountShown(on) {
 // the gain actually applied to the node also folds in a -1.5dB duck
 // whenever FX or BLAST is engaged on BEAT, so the dial itself always
 // reflects what the user set rather than the post-duck level.
-let _beatVolRaw = 0.47; // DRUMS BUS default 47% (was 30%, 40%, 50%, 60%, 39%, before that 0.5711), per direct request
+let _beatVolRaw = 0.22; // DRUMS BUS default 22% (was 47%, 30%, 40%, 50%, 60%, 39%, before that 0.5711), per direct request
 let _beatSoloMuted = false; // true whenever any track is soloed — SOLO should silence BEAT too, same as every un-soloed track
 // AUDIO SNAPSHOT (DEV > DIAGNOSTICS), per direct request — for the "DRUMS is just a filtered snare" state. Now AUTOMATIC as
 // well, since it's too rare to remember to press: a DRUMS WATCHDOG listens for 1 second every 15 seconds while DRUMS is
@@ -27844,7 +27731,7 @@ function _pickReleaseInstrument(tr) {
   const isBass = k => ['sbass','sbass3','sbass4','dbass','pbass','sludge'].includes(k);
   const oneOf = [
     new Set(['tamb','shak','ngate','clap','guiro']), new Set(['fflute','damask','yamask','dulc']), new Set(['jcmgtr','clar','boog']),
-    new Set(['shihat','tamb','shak','guiro']), new Set(['rhodes','sprkls','boog']), new Set(['jcmgtr','damask','yamask']),
+    new Set(['shihat','tamb','shak','guiro']), new Set(['bittrl','sprkls','boog']), new Set(['jcmgtr','damask','yamask']),
   ];
   const others = trackInstruments.filter((o, t) => t !== tr && o);
   const clashes = k => others.some(o => o === k || oneOf.some(set => set.has(k) && set.has(o)));
