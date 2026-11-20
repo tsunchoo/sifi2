@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-20 03:42:05 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-20 03:54:58 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3145,7 +3145,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 03:42:05 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 03:54:58 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -5546,7 +5546,7 @@ function playUiSound(name, forceMix, trim) {
   // StopReversed, Cymbal, Rand, and the plain 0.7 default (click, play,
   // clickoff).
   g.gain.value = (name === 'rewind' ? 0.625 : name === 'Stop' ? 0.7 * 0.376 : name === 'StopReversed' ? 0.7 * 0.376 : name === 'Cymbal' ? 0.7 * 0.299 : name === 'Rand' ? 0.7 * 0.3548 : name === 'tinyclick' ? 0.7 * 0.7079 : 0.7) * 0.7943 * (trim || 1); // tinyclick (header icon drags) -3dB, per direct request
-  if (window._buttonSoundsToMix === false) { // (forceMix no longer overrides it — with BUTTONS SOUNDS TO MIX off, NO button sound reaches any recording, per direct request)
+  if (window._buttonSoundsToMix === false || window._uiDirectOnce) { // (_uiDirectOnce: the STOP sound goes round the STOP GATE, so it's the one thing heard) (forceMix no longer overrides it — with BUTTONS SOUNDS TO MIX off, NO button sound reaches any recording, per direct request)
     // Straight to the speakers, level-matched to the mix path (see above).
     g.gain.value *= (masterGain ? masterGain.gain.value : 1) * (window._makeupGain ? window._makeupGain.gain.value : 1);
     src.connect(g); g.connect(ctx.destination);
@@ -8551,7 +8551,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   function openAxisMenu() {
     closeAxisMenu(); const au = document.getElementById('modifyGear'); if (!au) return; const r = au.getBoundingClientRect(); // (drops from the GEAR now)
     const mn = document.createElement('div'); mn.id = 'axisMenu';
-    mn.style.cssText = `position:fixed;top:${Math.round(r.bottom + 6)}px;left:${Math.max(8, Math.round(r.left))}px;max-height:${Math.max(160, Math.round(innerHeight - r.bottom - 16))}px;overflow-y:auto;z-index:9000;background:#111;color:#fff;padding:10px 12px 6px;border-radius:6px;font:700 0.66rem/1 'DM Sans',sans-serif;letter-spacing:1px;min-width:190px;box-shadow:0 6px 20px rgba(0,0,0,0.35);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;`;
+    mn.style.cssText = `position:fixed;top:${Math.round(r.bottom + 6)}px;left:${Math.max(8, Math.round(r.left))}px;max-height:${Math.round(innerHeight - 16)}px;overflow-y:auto;z-index:9000;background:#111;color:#fff;padding:10px 12px 6px;border-radius:6px;font:700 0.66rem/1 'DM Sans',sans-serif;letter-spacing:1px;min-width:190px;box-shadow:0 6px 20px rgba(0,0,0,0.35);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;`;
     const build = () => { mn.innerHTML = '';
       [['x', 'LEFT ↔ RIGHT'], ['y', 'DOWN ↕ UP']].forEach(([ax, title]) => {
         const h = document.createElement('div'); h.textContent = title; h.style.cssText = 'opacity:0.55;font-size:0.58rem;margin:4px 0 6px;'; mn.appendChild(h);
@@ -8569,6 +8569,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
           mn.appendChild(row); });
       }); };
     build(); document.body.appendChild(mn); window._axisMenuOpen = true;
+    { const h = mn.offsetHeight, top = Math.round(r.bottom + 6); if (top + h > innerHeight - 8) mn.style.top = Math.max(8, Math.round(innerHeight - 8 - h)) + 'px'; } // TALLER, per direct request: the whole list shown — if it won't fit below the gear it slides up the screen (only scrolls if it's taller than the screen itself)
   }
   // the menu only closes on a tap OUTSIDE it — and that tap only closes it (the graph ignores it)
   window.addEventListener('pointerdown', e => { if (window._axisMenuOpen !== true) return; const m = document.getElementById('axisMenu'); if (m && m.contains(e.target)) return; closeAxisMenu(); window._axisMenuOpen = 'closing'; }, true);
@@ -9371,9 +9372,33 @@ function updateBeatPulse() {
   if (bb) bb.classList.remove('beat-pulse');
 }
 
+// STOP = SILENCE, per direct request: pressing STOP cuts EVERYTHING straight away — notes already planned ahead, reverb tails, echoes —
+// so the stop sound is the only thing heard. A gate on the output (after the limiters) closes in ~12ms; the stop sound goes round
+// it. It opens again once everything behind it has died away (checked, not guessed — at least 1.2s, so notes planned ahead are
+// covered too; 12s at most), or straight away when PLAY is pressed.
+function _stopGateOk() { const g = window._stopGate; return g && ctx && g.context === ctx ? g : null; }
+function _stopSilenceAll() {
+  const g = _stopGateOk(); if (!g) return;
+  const t = ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + 0.012);
+  window._stopGateClosed = true;
+  let an = window._stopGateAn; if (!an || an.context !== ctx) { an = window._stopGateAn = ctx.createAnalyser(); an.fftSize = 512; try { window._safetyLimiter.connect(an); } catch (e) {} window._stopGateBuf = new Float32Array(an.fftSize); }
+  clearInterval(window._stopGateT); const t0 = performance.now(); let quiet = 0;
+  window._stopGateT = setInterval(() => {
+    if (!window._stopGateClosed) { clearInterval(window._stopGateT); return; }
+    let pk = 0; try { an.getFloatTimeDomainData(window._stopGateBuf); for (let i = 0; i < window._stopGateBuf.length; i++) { const a = Math.abs(window._stopGateBuf[i]); if (a > pk) pk = a; } } catch (e) { pk = 0; }
+    quiet = pk < 0.0005 ? quiet + 1 : 0; // (about −66dB)
+    const el = performance.now() - t0; if ((el > 1200 && quiet >= 3) || el > 12000) _stopGateOpen();
+  }, 50);
+}
+function _stopGateOpen() {
+  window._stopGateClosed = false; clearInterval(window._stopGateT);
+  const g = _stopGateOk(); if (!g) return; const t = ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(1, t + 0.01);
+}
 function togglePlay() {
   if (ctx) ctx.resume();
-  if (!window._silentPlayToggle) { playUiSound(playing ? 'clickoff' : 'play'); window._playdoeRwTok = null; } // PLAYDOE double-tap stops/restarts without these clicks; a real play/stop press cancels its pending restart
+  if (!playing && window._stopGateClosed) { try { _stopGateOpen(); } catch (e) {} } // PLAY: the gate opens straight away
+  if (!window._silentPlayToggle && playing) { try { _stopSilenceAll(); } catch (e) {} window._uiDirectOnce = true; } // STOP: everything else silenced, the stop sound round the gate
+  if (!window._silentPlayToggle) { try { playUiSound(playing ? 'clickoff' : 'play'); } finally { window._uiDirectOnce = false; } window._playdoeRwTok = null; } // PLAYDOE double-tap stops/restarts without these clicks; a real play/stop press cancels its pending restart
   playing = !playing;
   const btn = document.getElementById('playBtn');
   if (playing) {
@@ -26315,7 +26340,7 @@ window.masterLimiter = ctx.createDynamicsCompressor(); const masterLimiter = win
     window._drumMasterRevSend = ctx.createGain(); window._drumMasterRevSend.gain.value = 1; window._drumMasterRevSend.connect(window._reverbSendBus); // drum tracks' whole-signal reverb (REVERB ON BEAT), bypassing OVERALL
     window._reverbSendBus.connect(window._reverbConv); window._reverbSendBus._sifiConvOn = true; window._reverbConv.connect(window._reverbOutGain); window._reverbOutGain.connect(window._normalTrackFadeGain);
     window._djLP = ctx.createBiquadFilter(); window._djLP.type = 'lowpass'; window._djLP.frequency.value = 20000; window._djLP.Q.value = 0.9; window._djHP = ctx.createBiquadFilter(); window._djHP.type = 'highpass'; window._djHP.frequency.value = 20; window._djHP.Q.value = 0.9; // the AXIS MENU's FILTER (open = no effect)
-    masterGain.connect(window._normalTrackFadeGain); window._normalTrackFadeGain.connect(window._djLP); window._djLP.connect(window._djHP); window._djHP.connect(makeupGain); makeupGain.connect(window._duckGain); window._duckGain.connect(masterLimiter); masterLimiter.connect(window._safetyLimiter); window._safetyLimiter.connect(window._postLimiterGain); _connectEightBitOutput(ctx);
+    masterGain.connect(window._normalTrackFadeGain); window._normalTrackFadeGain.connect(window._djLP); window._djLP.connect(window._djHP); window._djHP.connect(makeupGain); makeupGain.connect(window._duckGain); window._duckGain.connect(masterLimiter); masterLimiter.connect(window._safetyLimiter); window._stopGate = ctx.createGain(); window._stopGate.gain.value = 1; window._safetyLimiter.connect(window._stopGate); window._stopGate.connect(window._postLimiterGain); /* STOP GATE (see _stopSilenceAll) */ _connectEightBitOutput(ctx);
     // REVERB MIX OVERALL send — a second, parallel reverb send tapping
     // every track's own fully-processed output (post FX/BLAST/pan, same
     // point that feeds masterGain), independent of and in addition to
