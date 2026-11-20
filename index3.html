@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-20 03:29:37 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-20 03:42:05 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2651,6 +2651,9 @@ html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyPadMarks .sp-tint,
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #nameEq { opacity: 1 !important; } /* no see-through (grey) markers / EQ */
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *::before, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *::after { text-shadow: none !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .step-cell::before, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .step-cell::after { opacity: 1 !important; box-shadow: none !important; filter: none !important; } /* note markers solid black (no soft / see-through greys, no glow) */
+/* MUTED TRACKS in MONO, per direct request: MONO paints everything solid black, so a muted track looked the same as a live one — its buttons and all its notes now go to 50% */
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .track-ctrl-row.row-muted button, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .track-ctrl-row.row-muted .track-ctrl-icon-btn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .track-ctrl-row.row-muted .shift-btn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .track-ctrl-row.row-muted .fx-btn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .track-name-btn.muted { opacity: 0.5 !important; }
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .step-lane.lane-muted .step-cell::before, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .step-lane.lane-muted .step-cell::after { opacity: 0.5 !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #_hamBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #devMenuBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #randomizeReverbIconBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #markerStyleIconBtn { box-shadow: none !important; background: transparent !important; } /* the header icons (menu, rainbow, reverb, marker style) stay plain icons — no black box round them, per direct report */
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #installBanner, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #_helpBtn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #_noticeToast, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #tapeDrawerPlayAll, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #devMenuOverlay button { background: #fff !important; box-shadow: inset 0 0 0 1.5px #000 !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #playBtnImg { filter: brightness(0) !important; } html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #playBtn.playing #playBtnImg { filter: brightness(0) invert(1) !important; } html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #playBtnMask { background: #fff !important; } html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #playBtnGlowWrap { filter: none !important; } /* the play / stop glyph: black, white on the lit (playing) button */
@@ -2725,6 +2728,10 @@ html body.modify #modifyLock { display: flex; } /* the MAGNET (was the padlock),
 html body.modify #modifyAuto { display: flex; } /* MODIFY too now (was MODULATE only), per direct request */
 #modifyAuto.sp-mag-off { opacity: 0.45; }
 #modifyAuto:not(.sp-mag-off) { opacity: 1; }
+/* GEAR (top-LEFT of the graph), per direct request: opens the AXIS MENU (what the graph's axes control) — that used to be a hold on A */
+#modifyGear { display: none; position: absolute; left: 6px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; opacity: 0.45; }
+html body.modify #modifyGear { display: flex; }
+html body.modify #modifyPadMarks .sp-ylab { top: 46px; } /* (the side label starts below the gear) */
 /* ORBIT button (a circle with a node on its path), per direct request: switches the orbit on / off — same footprint and colours as A, just to its left */
 #modifyOrbit { display: none; position: absolute; right: 86px; top: calc(var(--modify-strip-h, 56.08px) + 4px + 6px); z-index: 3; width: 34px; height: 34px; padding: 0; border: none; border-radius: 4px; background: rgba(0,0,0,0.12); color: inherit; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 html body.modify #modifyOrbit { display: flex; }
@@ -3138,7 +3145,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 03:29:37 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 03:42:05 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -7578,7 +7585,6 @@ function scheduler() {
     // that must not happen to it.
     // Fire pending auto-rand on downbeat
     if (step === 0) {
-      try { if (window._padBarTick) window._padBarTick(); } catch (e) {} // MODULATE's A = JUMP: a new cursor position every 4 bars, on the downbeat
       try { const w = performance.now() + Math.max(0, (t - ctx.currentTime) * 1000); (window._barStartWall = window._barStartWall || []).push(w); if (window._barStartWall.length > 8) window._barStartWall.shift(); } catch (e) {} // wall-clock time each bar actually STARTS sounding (used by SHAKE's one-bar rest)
       // RECALL only ever gets updated at two explicit moments — a new
       // whole-pattern RAND landing (top-row + button, single press or its
@@ -7814,6 +7820,7 @@ function scheduler() {
     }
     } // end !_muteForTransition
     nextStepTime += stepDuration();
+    if (step === NUM_STEPS - 1) { try { if (window._padBarTick) window._padBarTick(nextStepTime); } catch (e) {} } // MODULATE's A = JUMP: the bar's last 16th is planned — pick + set up the next place now, ready for the 1
   }
 }
 
@@ -8375,6 +8382,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
 (function () {
   let pad = null, raf = 0, pend = null, held = false;
   let jumpOn = false, jumpBars = 0, jumpRaf = 0; // A = JUMP (see setJump below)
+  let jumpEvery = 4; try { const v = +localStorage.getItem('sifiJumpBars'); if ([1, 2, 4, 8, 16].includes(v)) jumpEvery = v; } catch (e) {} // HOLD A to change it
   const nb = () => document.getElementById('nameBar');
   const LOCK_SVG = on => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="display:block;"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="${on ? 'M8 11V7a4 4 0 0 1 8 0v4' : 'M8 11V7a4 4 0 0 1 7.6-1.8'}" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`; // PADLOCK again (was the magnet), per direct request — closed = LOCKED (the ring stays where you leave it), open = OFF (springs back to the centre)
   const marks = () => {
@@ -8387,8 +8395,8 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
       const au = document.createElement('button'); au.id = 'modifyAuto'; au.type = 'button'; au.setAttribute('aria-label', 'auto');
       au.innerHTML = '<span style="display:block;font-family:\'DM Sans\',sans-serif;font-weight:700;font-size:23px;line-height:1;letter-spacing:0;pointer-events:none;">A</span>'; // a capital A in the TOP ROW buttons' font (DM Sans Bold), per direct request
       au.style.webkitTouchCallout = 'none'; au.style.userSelect = 'none';
-      let auHoldT = 0, auHeld = false; // HOLD A = the AXIS MENU, per direct request (a plain click still switches AUTO)
-      au.addEventListener('pointerdown', () => { auHeld = false; clearTimeout(auHoldT); auHoldT = setTimeout(() => { auHeld = true; openAxisMenu(); try { playUiSound('tinyclick'); } catch (er) {} }, 500); });
+      let auHoldT = 0, auHeld = false; // HOLD A = how often it JUMPS (1 / 2 / 4 / 8 / 16 bars), per direct request (the AXIS MENU moved to the GEAR)
+      au.addEventListener('pointerdown', () => { auHeld = false; clearTimeout(auHoldT); auHoldT = setTimeout(() => { auHeld = true; openJumpMenu(); try { playUiSound('tinyclick'); } catch (er) {} }, 500); });
       ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => au.addEventListener(t, () => clearTimeout(auHoldT)));
       au.addEventListener('contextmenu', e => e.preventDefault());
       au.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (auHeld) { auHeld = false; return; } setJump(!jumpOn); try { playUiSound('tinyclick'); } catch (er) {} }); // A now = JUMP (a new cursor position every 4 bars), per direct request — the orbit has its own button
@@ -8397,7 +8405,12 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
       ob.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="2.9" fill="currentColor"/></svg>'; // a circle with a little node on its path
       ob.style.webkitTouchCallout = 'none'; ob.style.userSelect = 'none'; ob.addEventListener('contextmenu', e => e.preventDefault());
       ob.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setOrbitAuto(orbitOff); try { playUiSound('tinyclick'); } catch (er) {} });
-      b.appendChild(ob); syncAutoBtn(); try { axisLabels(); } catch (er) {}
+      b.appendChild(ob);
+      const gr = document.createElement('button'); gr.id = 'modifyGear'; gr.type = 'button'; gr.setAttribute('aria-label', 'axes'); // GEAR = the AXIS MENU, per direct request
+      gr.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="3"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" stroke-dasharray="3.3 3.77"/></svg>';
+      gr.style.webkitTouchCallout = 'none'; gr.style.userSelect = 'none'; gr.addEventListener('contextmenu', e => e.preventDefault());
+      gr.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (document.getElementById('axisMenu')) { closeAxisMenu(); window._axisMenuOpen = false; return; } openAxisMenu(); try { playUiSound('tinyclick'); } catch (er) {} });
+      b.appendChild(gr); syncAutoBtn(); try { axisLabels(); } catch (er) {}
       setTimeout(() => showDot(pad ? [pad.x, pad.y] : null), 0); // ring + colour showing from the start
     }
     return m;
@@ -8536,9 +8549,9 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   }
   function closeAxisMenu() { const m = document.getElementById('axisMenu'); if (m) m.remove(); }
   function openAxisMenu() {
-    closeAxisMenu(); const au = document.getElementById('modifyAuto'); if (!au) return; const r = au.getBoundingClientRect();
+    closeAxisMenu(); const au = document.getElementById('modifyGear'); if (!au) return; const r = au.getBoundingClientRect(); // (drops from the GEAR now)
     const mn = document.createElement('div'); mn.id = 'axisMenu';
-    mn.style.cssText = `position:fixed;top:${Math.round(r.bottom + 6)}px;right:${Math.max(8, Math.round(innerWidth - r.right))}px;z-index:9000;background:#111;color:#fff;padding:10px 12px 6px;border-radius:6px;font:700 0.66rem/1 'DM Sans',sans-serif;letter-spacing:1px;min-width:190px;box-shadow:0 6px 20px rgba(0,0,0,0.35);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;`;
+    mn.style.cssText = `position:fixed;top:${Math.round(r.bottom + 6)}px;left:${Math.max(8, Math.round(r.left))}px;max-height:${Math.max(160, Math.round(innerHeight - r.bottom - 16))}px;overflow-y:auto;z-index:9000;background:#111;color:#fff;padding:10px 12px 6px;border-radius:6px;font:700 0.66rem/1 'DM Sans',sans-serif;letter-spacing:1px;min-width:190px;box-shadow:0 6px 20px rgba(0,0,0,0.35);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;`;
     const build = () => { mn.innerHTML = '';
       [['x', 'LEFT ↔ RIGHT'], ['y', 'DOWN ↕ UP']].forEach(([ax, title]) => {
         const h = document.createElement('div'); h.textContent = title; h.style.cssText = 'opacity:0.55;font-size:0.58rem;margin:4px 0 6px;'; mn.appendChild(h);
@@ -8562,6 +8575,20 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   ['pointerup', 'pointercancel'].forEach(t => window.addEventListener(t, () => { if (window._axisMenuOpen === 'closing') setTimeout(() => { if (window._axisMenuOpen === 'closing') window._axisMenuOpen = false; }, 120); }, true));
   window.addEventListener('click', e => { if (window._axisMenuOpen === 'closing') { e.stopPropagation(); e.preventDefault(); } }, true);
   window._openAxisMenu = openAxisMenu;
+  // HOLD A: how often A's JUMP picks a new place — every 1 / 2 / 4 / 8 / 16 bars (remembered), per direct request
+  function openJumpMenu() {
+    closeAxisMenu(); const au = document.getElementById('modifyAuto'); if (!au) return; const r = au.getBoundingClientRect();
+    const mn = document.createElement('div'); mn.id = 'axisMenu'; // (the same menu slot — so it closes the same way, on a tap outside)
+    mn.style.cssText = `position:fixed;top:${Math.round(r.bottom + 6)}px;right:${Math.max(8, Math.round(innerWidth - r.right))}px;z-index:9000;background:#111;color:#fff;padding:10px 12px 6px;border-radius:6px;font:700 0.66rem/1 'DM Sans',sans-serif;letter-spacing:1px;min-width:150px;box-shadow:0 6px 20px rgba(0,0,0,0.35);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;`;
+    const build = () => { mn.innerHTML = '';
+      const h = document.createElement('div'); h.textContent = 'NEW POSITION EVERY'; h.style.cssText = 'opacity:0.55;font-size:0.58rem;margin:4px 0 6px;'; mn.appendChild(h);
+      [1, 2, 4, 8, 16].forEach(n => { const on = jumpEvery === n;
+        const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;';
+        row.innerHTML = `<span style="width:14px;height:14px;border:2px solid #fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;${on ? 'background:#fff;color:#111;' : ''}">${on ? '✓' : ''}</span><span>${n} BAR${n > 1 ? 'S' : ''}</span>`;
+        row.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); jumpEvery = n; jumpBars = 0; try { localStorage.setItem('sifiJumpBars', String(n)); } catch (er) {} try { playUiSound('tinyclick'); } catch (er) {} build(); });
+        mn.appendChild(row); }); };
+    build(); document.body.appendChild(mn); window._axisMenuOpen = true;
+  }
   function capture() {
     const base = { grid: grid.map(r => r.slice()), rev: trackDelay.slice(), fx: [], drums: drumsFx(), auto: [], inst: trackInstruments.slice(), rsize: window._reverbIntensity, dtime: echoStop(), crush: window._eightBitMix || 0 }; for (let tr = 0; tr < NUM_TRACKS; tr++) { base.fx.push(fxOf(tr)); base.auto.push(autoOn(tr)); }
     const notes = [], empties = [], effOn = [], effOff = [], pick = [];
@@ -8680,19 +8707,20 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     orbitA = 0; orbitRX = Math.min(orbitTargetRX, orbitMaxX()); orbitRY = Math.min(orbitTargetRY, orbitMaxY()); pad.x = 0.5 + orbitRX; pad.y = 0.5; if (document.body.classList.contains('modify')) showDot([pad.x, pad.y]); try { apply(pad.x, pad.y); } catch (e) {} }
   // A = JUMP, per direct request: while A is engaged the cursor moves to a NEW RANDOM POSITION on the graph every 4 BARS, on the
   // downbeat (the first one straight after A goes on). The ring glides there; the sound lands with the bar. Only while playing.
+  // (HOLD A for 1 / 2 / 4 / 8 / 16 bars. The new place is chosen and set up a 16th AHEAD of the 1, not at the last moment.)
   function setJump(on) { jumpOn = !!on; jumpBars = 0; if (jumpOn && !orbitOff) setOrbitAuto(false); syncAutoBtn(); } // (the orbit stops, the padlock goes on — the ring stays wherever it jumps to)
-  function jumpTo() {
+  function jumpTo(at) {
     if (!jumpOn || held || orbiting() || !document.body.classList.contains('modify')) return;
     if (!pad) pad = capture();
     const mx = 0.5 - orbitMaxX(), my = 0.5 - orbitMaxY(); // (kept far enough in that the ring never goes off the graph)
     let x, y, n = 0; do { x = mx + Math.random() * (1 - 2 * mx); y = my + Math.random() * (1 - 2 * my); } while (++n < 12 && Math.hypot(x - pad.x, y - pad.y) < 0.25); // somewhere properly new
     const x0 = pad.x, y0 = pad.y; try { springStop(); } catch (e) {}
     apply(x, y);
-    cancelAnimationFrame(jumpRaf); const t0 = performance.now(), D = 220;
+    cancelAnimationFrame(jumpRaf); const t0 = performance.now(); let D = 220; try { if (at && ctx) D = Math.max(120, Math.min(1500, (at - ctx.currentTime) * 1000)); } catch (e) {} // the ring glides in, landing ON the 1
     const step = now => { if (held || orbiting()) { jumpRaf = 0; return; } const k = Math.min(1, (now - t0) / D), q = 1 - Math.pow(1 - k, 3); showDot([x0 + (x - x0) * q, y0 + (y - y0) * q]); jumpRaf = k < 1 ? requestAnimationFrame(step) : 0; };
     jumpRaf = requestAnimationFrame(step);
   }
-  window._padBarTick = () => { if (!jumpOn) return; if (jumpBars % 4 === 0) { try { jumpTo(); } catch (e) {} } jumpBars++; }; // called by the scheduler at each bar's downbeat
+  window._padBarTick = at => { if (!jumpOn) return; if (jumpBars % jumpEvery === 0) { try { jumpTo(at); } catch (e) {} } jumpBars++; }; // called by the scheduler once the bar's LAST 16th is planned — so the new place is picked and set up IN ADVANCE, ready for the 1 (at = when the 1 sounds)
   setInterval(() => {
     if (document.body.classList.contains('modify') && orbiting() && orbitA === null && !orbitGrab) { try { orbitStart(); } catch (e) {} } // (waiting there before PLAY too)
     { const on = orbitMoving(); if (document.body.classList.contains('orbit-auto') !== on) document.body.classList.toggle('orbit-auto', on);
@@ -8766,7 +8794,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     }
     // MAGNET colour from the page background too (very light / very dark, whichever stands out more), so it can't get lost, per direct request
     { const lk = document.getElementById('modifyLock'); if (lk) { try { const bg = (_anyRgba(getComputedStyle(document.body).backgroundColor) || [128, 128, 128]).slice(0, 3), [hh, ss] = _rgbHsl(rgb.split(',').map(Number)), lt = _hslRgb(hh, Math.min(ss, 0.5), 0.95), dkC = _hslRgb(hh, Math.min(ss, 0.6), 0.1), useLt = _contrast(lt, bg) >= _contrast(dkC, bg); const fgS = `rgb(${(useLt ? lt : dkC).join(',')})`, invS = `rgb(${(useLt ? dkC : lt).join(',')})`, plainBg = useLt ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)';
-      if (lk.classList.contains('sp-mag-off')) { lk.style.color = fgS; lk.style.background = plainBg; } else { lk.style.background = fgS; lk.style.color = invS; } /* the PADLOCK: LOCKED = INVERTED, exactly like the A button, per direct request */ const au = document.getElementById('modifyAuto'); if (au) { if (au.classList.contains('sp-mag-off')) { au.style.color = fgS; au.style.background = plainBg; } else { au.style.background = fgS; au.style.color = invS; } } /* the A button: OFF wears the padlock's colours; ENGAGED is simply INVERTED (solid in the glyph colour, the A cut out in the opposite), per direct request */ const obt = document.getElementById('modifyOrbit'); if (obt) { if (obt.classList.contains('sp-mag-off')) { obt.style.color = fgS; obt.style.background = plainBg; } else { obt.style.background = fgS; obt.style.color = invS; } } /* the ORBIT button: the same */ } catch (e) {} } }
+      if (lk.classList.contains('sp-mag-off')) { lk.style.color = fgS; lk.style.background = plainBg; } else { lk.style.background = fgS; lk.style.color = invS; } /* the PADLOCK: LOCKED = INVERTED, exactly like the A button, per direct request */ const au = document.getElementById('modifyAuto'); if (au) { if (au.classList.contains('sp-mag-off')) { au.style.color = fgS; au.style.background = plainBg; } else { au.style.background = fgS; au.style.color = invS; } } /* the A button: OFF wears the padlock's colours; ENGAGED is simply INVERTED (solid in the glyph colour, the A cut out in the opposite), per direct request */ const obt = document.getElementById('modifyOrbit'); if (obt) { if (obt.classList.contains('sp-mag-off')) { obt.style.color = fgS; obt.style.background = plainBg; } else { obt.style.background = fgS; obt.style.color = invS; } } /* the ORBIT button: the same */ const gb = document.getElementById('modifyGear'); if (gb) { gb.style.color = fgS; gb.style.background = plainBg; } /* the GEAR: always the plain (off) look */ } catch (e) {} } }
   }
   // back to the centre, EASED (a new pattern) — dragging again cancels the ease straight away
   function easeHome(fast) { const m = marks(); if (!m || orbiting()) return;
@@ -8817,7 +8845,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     });
   }
   function tick() { raf = 0; if (!pad) return; if (pend) apply(pend[0], pend[1]); drawGrid(); if (held) raf = requestAnimationFrame(tick); } // held: re-applied every frame (cheap — only real changes are written)
-  const inBar = e => document.body.classList.contains('modify') && nb() && nb().contains(e.target) && !(e.target.closest && e.target.closest('#modifyLock, #modifyAuto, #modifyOrbit'));
+  const inBar = e => document.body.classList.contains('modify') && nb() && nb().contains(e.target) && !(e.target.closest && e.target.closest('#modifyLock, #modifyAuto, #modifyOrbit, #modifyGear'));
   const evY = e => { const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || e; return t.clientY; };
   const inStrip = e => { if (!inBar(e)) return false; const r = nb().getBoundingClientRect(); return evY(e) - r.top < 56.08; }; // the SONG NAME strip (the top 66px — the same size as the bar everywhere else)
   const inPad = e => !window._axisMenuOpen && inBar(e) && !inStrip(e); // (not while the AXIS MENU is open / closing)
@@ -8840,7 +8868,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   // Capture on the WINDOW so the song name's own gestures (double-tap save, hold, swipes) never see these while in MODIFY
   // the PADLOCK: its touches/presses are kept away from the song name's handlers (their touchstart preventDefault would also
   // stop the tap's click), so a tap on it only ever toggles the latch
-  const onLock = e => e.target && e.target.closest && e.target.closest('#modifyLock, #modifyAuto, #modifyOrbit');
+  const onLock = e => e.target && e.target.closest && e.target.closest('#modifyLock, #modifyAuto, #modifyOrbit, #modifyGear');
   ['touchstart', 'touchend', 'mousedown', 'mouseup', 'dblclick'].forEach(t => window.addEventListener(t, e => { if (onLock(e)) e.stopPropagation(); }, true));
   // DOUBLE TAP / DOUBLE CLICK ANYWHERE IN THE GRAPH, per direct request: the ring eases back to the centre and the graph resets —
   // the pattern goes back to how it was (effects the pad already took away stay gone, as always)
