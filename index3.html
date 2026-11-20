@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-20 04:35:01 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-20 04:50:20 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2651,6 +2651,11 @@ html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #modifyPadMarks .sp-tint,
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) #nameEq { opacity: 1 !important; } /* no see-through (grey) markers / EQ */
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *::before, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) *::after { text-shadow: none !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .step-cell::before, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4) .step-cell::after { opacity: 1 !important; box-shadow: none !important; filter: none !important; } /* note markers solid black (no soft / see-through greys, no glow) */
+/* GRAPH MENUS in MONO (the gear's AXIS MENU, the hold menus for JUMP / ORBIT), per direct request: they were black text on their own black panel — now black on white with a black outline, ticked boxes solid black */
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) #axisMenu { background: #fff !important; box-shadow: inset 0 0 0 1.5px #000 !important; }
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) #axisMenu, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) #axisMenu * { color: #000 !important; opacity: 1 !important; }
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) #axisMenu .ax-box { border-color: #000 !important; background: #fff !important; }
+html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) #axisMenu .ax-box.ax-on { background: #000 !important; color: #fff !important; }
 /* MUTED TRACKS in MONO, per direct request: MONO paints everything solid black, so a muted track looked the same as a live one — its buttons and all its notes now go to 50% */
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .track-ctrl-row.row-muted button, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .track-ctrl-row.row-muted .track-ctrl-icon-btn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .track-ctrl-row.row-muted .shift-btn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .track-ctrl-row.row-muted .fx-btn, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .track-name-btn.muted { opacity: 0.5 !important; }
 html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .step-lane.lane-muted .step-cell::before, html body.mono:not(#_m1):not(#_m2):not(#_m3):not(#_m4):not(#_m5) .step-lane.lane-muted .step-cell::after { opacity: 0.5 !important; }
@@ -3146,7 +3151,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 04:35:01 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-20 04:50:20 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -5533,7 +5538,7 @@ function setNoButtonSounds(on) {
   const cb = document.getElementById('noButtonSoundsToggle'); if (cb) cb.checked = !!on;
 }
 document.addEventListener('DOMContentLoaded', () => { setButtonSoundsToMix(window._buttonSoundsToMix); setNoButtonSounds(window._noButtonSounds); });
-function playUiSound(name, forceMix, trim) {
+function playUiSound(name, forceMix, trim, delaySec) { // delaySec: start this much later (the PLAY sound, per direct request)
   if (name === 'tinyclick' || name === 'click') { playUiBeep(); return; } // every button CLICK is now a tiny beep (never recorded), per direct request — PLAY / STOP and RECORD keep their own sounds // trim: optional extra gain multiplier for this one play // forceMix: always through the mix (so REALTIME recording captures it), whatever BUTTON SOUNDS TO MIX says
   if (window._noButtonSounds) return;
   if (window._tapeDrawerQuiet) return; // TAPE DRAWER is silent — no tape button / play / stop noises while it's open, per direct request
@@ -5555,7 +5560,7 @@ function playUiSound(name, forceMix, trim) {
   } else {
     src.connect(g); g.connect(masterGain);
   }
-  src.start();
+  src.start(delaySec > 0 ? ctx.currentTime + delaySec : 0);
   src.onended = () => { try { g.disconnect(); } catch(e) {} };
 }
 // FLIP SOUND, per direct request: a small, innocuous white-noise 'flip' — a ~50ms band-passed noise tick with a quick downward
@@ -8393,7 +8398,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   const marks = () => {
     let m = document.getElementById('modifyPadMarks'), b = nb();
     if (!m && b) {
-      m = document.createElement('div'); m.id = 'modifyPadMarks'; m.innerHTML = '<div class="sp-tint"></div><div class="sp-glow"></div><canvas id="modifyGridCv"></canvas><div class="sp-count" id="modifyCount"></div><div class="sp-top"></div><div class="sp-bot"></div><div class="sp-xlab"><span class="sp-g sp-m">&minus;</span><span>NOTES</span><span class="sp-g sp-p">+</span></div><div class="sp-ylab"><span class="sp-g sp-m">&minus;</span><span>EFFECTS</span><span class="sp-g sp-p">+</span></div><div class="sp-h"></div><div class="sp-v"></div><div class="sp-dot"></div>'; b.appendChild(m);
+      m = document.createElement('div'); m.id = 'modifyPadMarks'; m.innerHTML = '<div class="sp-tint"></div><div class="sp-glow"></div><canvas id="modifyGridCv"></canvas><div class="sp-count" id="modifyCount"></div><div class="sp-top"></div><div class="sp-bot"></div><div class="sp-xlab"><span class="sp-g sp-m">&minus;</span><span>FILTER</span><span class="sp-g sp-p">+</span></div><div class="sp-ylab"><span class="sp-g sp-m">&minus;</span><span>REVERB SIZE</span><span class="sp-g sp-p">+</span></div><div class="sp-h"></div><div class="sp-v"></div><div class="sp-dot"></div>'; b.appendChild(m);
       const lk = document.createElement('button'); lk.id = 'modifyLock'; lk.type = 'button'; lk.setAttribute('aria-label', 'lock'); lk.innerHTML = LOCK_SVG(window._padLatch); lk.classList.toggle('sp-mag-off', !window._padLatch);
       lk.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setLatch(!window._padLatch); });
       b.appendChild(lk);
@@ -8474,8 +8479,8 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   //   DRUM PATTERN — every beat type has its own place along the axis: the pattern's own beat in the centre, the rest laid out
   //                 either side of it (always in the same order, so the same neighbours each time)
   const AXIS_PARAMS = [['notes', 'NOTES'], ['effects', 'EFFECTS'], ['inst', 'INSTRUMENTS'], ['rsize', 'REVERB SIZE'], ['dtime', 'DELAY TIME'], ['filter', 'FILTER'], ['crush', 'BITCRUSH'], ['beat', 'DRUM PATTERN']];
-  window._axisMap = { x: ['notes'], y: ['effects'] };
-  try { const v = JSON.parse(localStorage.getItem('sifiAxisMap') || 'null'); if (v && Array.isArray(v.x) && Array.isArray(v.y)) window._axisMap = { x: v.x.filter(k => AXIS_PARAMS.some(p => p[0] === k)), y: v.y.filter(k => AXIS_PARAMS.some(p => p[0] === k)) }; } catch (e) {}
+  window._axisMap = { x: ['filter'], y: ['rsize'] }; // DEFAULT now FILTER (left ↔ right) + REVERB SIZE (down ↕ up), per direct request (was NOTES / EFFECTS)
+  try { const v = JSON.parse(localStorage.getItem('sifiAxisMap2') || 'null'); if (v && Array.isArray(v.x) && Array.isArray(v.y)) window._axisMap = { x: v.x.filter(k => AXIS_PARAMS.some(p => p[0] === k)), y: v.y.filter(k => AXIS_PARAMS.some(p => p[0] === k)) }; } catch (e) {}
   const axOf = (k, X, Y) => window._axisMap.x.includes(k) ? X : window._axisMap.y.includes(k) ? Y : null;
   const instCat = k => { if (!k || !INSTRUMENTS[k]) return ''; const g = INSTRUMENTS[k].group; if (g === 'kit' || g === 'perc') return g; if (['sbass', 'sbass3', 'sbass4', 'dbass', 'pbass', 'sludge'].includes(k)) return 'bass'; if (['fflute', 'blunt', 'sstring', 'sleg', 'opening', 'drone'].includes(k)) return 'pad'; return 'tonal'; };
   function echoStop() { const sl = document.getElementById('fxEchoExtraSlider'); const v = sl ? +sl.value : 5; return isNaN(v) ? 5 : v; }
@@ -8562,12 +8567,12 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
         const h = document.createElement('div'); h.textContent = title; h.style.cssText = 'opacity:0.55;font-size:0.58rem;margin:4px 0 6px;'; mn.appendChild(h);
         AXIS_PARAMS.forEach(([k, nm]) => { const on = window._axisMap[ax].includes(k);
           const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;';
-          row.innerHTML = `<span style="width:14px;height:14px;border:2px solid #fff;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;${on ? 'background:#fff;color:#111;' : ''}">${on ? '✓' : ''}</span><span>${nm}</span>`;
+          row.innerHTML = `<span class="ax-box${on ? ' ax-on' : ''}" style="width:14px;height:14px;border:2px solid #fff;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;${on ? 'background:#fff;color:#111;' : ''}">${on ? '✓' : ''}</span><span>${nm}</span>`;
           row.addEventListener('click', e => { e.stopPropagation(); e.preventDefault();
             const other = ax === 'x' ? 'y' : 'x';
             if (on) window._axisMap[ax] = window._axisMap[ax].filter(q => q !== k);
             else { window._axisMap[ax] = window._axisMap[ax].concat(k); window._axisMap[other] = window._axisMap[other].filter(q => q !== k); } // (one axis each)
-            try { localStorage.setItem('sifiAxisMap', JSON.stringify(window._axisMap)); } catch (er) {}
+            try { localStorage.setItem('sifiAxisMap2', JSON.stringify(window._axisMap)); } catch (er) {}
             axisLabels(); try { playUiSound('tinyclick'); } catch (er) {}
             if (pad) { try { apply(pad.x, pad.y); } catch (er) {} }
             build(); });
@@ -8590,7 +8595,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
       const h = document.createElement('div'); h.textContent = isOrb ? 'ONE ORBIT EVERY' : 'NEW POSITION EVERY'; h.style.cssText = 'opacity:0.55;font-size:0.58rem;margin:4px 0 6px;'; mn.appendChild(h);
       [1, 2, 4, 8, 16].forEach(n => { const on = (isOrb ? orbitBars : jumpEvery) === n;
         const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;';
-        row.innerHTML = `<span style="width:14px;height:14px;border:2px solid #fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;${on ? 'background:#fff;color:#111;' : ''}">${on ? '✓' : ''}</span><span>${n} BAR${n > 1 ? 'S' : ''}</span>`;
+        row.innerHTML = `<span class="ax-box${on ? ' ax-on' : ''}" style="width:14px;height:14px;border:2px solid #fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;${on ? 'background:#fff;color:#111;' : ''}">${on ? '✓' : ''}</span><span>${n} BAR${n > 1 ? 'S' : ''}</span>`;
         row.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (isOrb) { orbitBars = n; try { localStorage.setItem('sifiOrbitBars', String(n)); } catch (er) {} } else { jumpEvery = n; jumpBars = 0; try { localStorage.setItem('sifiJumpBars', String(n)); } catch (er) {} } try { playUiSound('tinyclick'); } catch (er) {} build(); });
         mn.appendChild(row); }); };
     build(); document.body.appendChild(mn); window._axisMenuOpen = true;
@@ -9415,7 +9420,7 @@ function togglePlay() {
   if (ctx) ctx.resume();
   if (!playing && window._stopGateClosed) { try { _stopGateOpen(); } catch (e) {} } // PLAY: the gate opens straight away
   if (!window._silentPlayToggle && playing) { try { _stopSilenceAll(); } catch (e) {} window._uiDirectOnce = true; } // STOP: everything else silenced, the stop sound round the gate
-  if (!window._silentPlayToggle) { try { playUiSound(playing ? 'clickoff' : 'play'); } finally { window._uiDirectOnce = false; } window._playdoeRwTok = null; } // PLAYDOE double-tap stops/restarts without these clicks; a real play/stop press cancels its pending restart
+  if (!window._silentPlayToggle) { try { if (playing) playUiSound('clickoff'); else playUiSound('play', undefined, undefined, 0.1); /* the PLAY sound 100ms later, per direct request */ } finally { window._uiDirectOnce = false; } window._playdoeRwTok = null; } // PLAYDOE double-tap stops/restarts without these clicks; a real play/stop press cancels its pending restart
   playing = !playing;
   const btn = document.getElementById('playBtn');
   if (playing) {
