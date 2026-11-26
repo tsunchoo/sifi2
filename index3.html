@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-26 08:20:54 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-26 08:33:26 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1682,12 +1682,12 @@ body.battery-saver-mode .shift-btn.right { opacity: 0.3 !important; pointer-even
 body.battery-saver-mode:not(.modify) #randomizeReverbIconBtn { opacity: 0.3 !important; pointer-events: none !important; }
 /* REVERB ICON GLOW, per direct request: a soft glow in the icon's own colour whenever the overall REVERB MIX isn't zero
    (class set by setGlobalDelayMix). Off with GLOWS OFF / SAFE GFX / BATTERY SAVER like every other glow. */
-#randomizeReverbIconBtn.rev-on svg { filter: drop-shadow(0 0 1.5px #555) drop-shadow(0 0 3px color-mix(in srgb, #555 45%, transparent)); }
+#randomizeReverbIconBtn.rev-on svg { filter: drop-shadow(0 0 0.75px #555) drop-shadow(0 0 1.5px color-mix(in srgb, #555 22%, transparent)); } /* glow halved, per direct request */
 body.battery-saver-mode:not(.modify) #randomizeReverbIconBtn.rev-on svg { filter: none !important; }
 /* ACTIVE whenever REVERB MIX isn't 0%, per direct request — in EVERY display mode (glows-off modes included, which used to hide
    it): the lines go to the header's full text colour and keep the glow. */
 html body #randomizeReverbIconBtn.rev-on svg rect, html body #randomizeReverbIconBtn.rev-on svg line { stroke: var(--hdr-tint, #111) !important; }
-html body:not(#_g1):not(#_g2):not(#_g3) #randomizeReverbIconBtn.rev-on svg { filter: drop-shadow(0 0 1.5px var(--hdr-tint, #555)) drop-shadow(0 0 4px color-mix(in srgb, var(--hdr-tint, #555) 55%, transparent)) !important; } /* lit in the header's own colour — light on dark modes, dark on light ones */
+html body:not(#_g1):not(#_g2):not(#_g3) #randomizeReverbIconBtn.rev-on svg { filter: drop-shadow(0 0 0.75px color-mix(in srgb, var(--hdr-tint, #555) 50%, transparent)) drop-shadow(0 0 2px color-mix(in srgb, var(--hdr-tint, #555) 27%, transparent)) !important; } /* the BLUR calmed by 50% (half the spread, half the strength), per direct request */ /* lit in the header's own colour — light on dark modes, dark on light ones */
 html body.battery-saver-mode:not(.modify):not(#_g1):not(#_g2):not(#_g3) #randomizeReverbIconBtn.rev-on svg { filter: none !important; }
 body.battery-saver-mode:not(.modify) #randomizeReverbIconBtn svg rect,
 body.battery-saver-mode:not(.modify) #randomizeReverbIconBtn svg line { stroke: var(--track-ctrl-btn-color, var(--neutral-track, #b0b0b0)) !important; }
@@ -3151,7 +3151,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 08:20:54 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 08:33:26 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -7313,7 +7313,7 @@ function updateVolFillDisplay(tr) {
 // arrives at an offset instrument some other way (a loaded slot/tape, a
 // reset) with no record, the offset is assumed to already be baked into
 // its volume, so leaving still removes it rather than stacking again.
-const _INSTR_VOL_OFFSET = { timbHi: -0.2, timbLo: -0.2 }; // TIMBALE HI / LO: their VOL sliders 20% lower on screen, per direct request (put back when the track changes to something else) // RYTM GTR's −0.35 fader nudge (≈ −8.4dB) is now built into its voice instead (see playStab), per direct request — faders are never moved by an instrument change // DOUBLE BASS no longer moves the vol slider at all, per direct request — its lift is built into the voice instead (see playDoubleBass)
+const _INSTR_VOL_OFFSET = { timbHi: -0.2, timbLo: -0.2, tomHi: -0.25, tomMid: -0.25, tomLo: -0.25, toms: -0.25 }; // + every TOM: VOL slider 25% lower whenever it's chosen, per direct request // TIMBALE HI / LO: their VOL sliders 20% lower on screen, per direct request (put back when the track changes to something else) // RYTM GTR's −0.35 fader nudge (≈ −8.4dB) is now built into its voice instead (see playStab), per direct request — faders are never moved by an instrument change // DOUBLE BASS no longer moves the vol slider at all, per direct request — its lift is built into the voice instead (see playDoubleBass)
 const _instrVolRec = new Array(NUM_TRACKS).fill(null);
 function _setInstrVolOffset(tr, prevKey, k) {
   if (prevKey === k) return;
@@ -19823,6 +19823,7 @@ function randAll(mode, opts) {
       bassTracks.forEach(tr => {
         if (tr === keepTr || trackSweep[tr]) return;
         const replacement = replacementPool[Math.floor(Math.random() * replacementPool.length)];
+        try { _setInstrVolOffset(tr, trackInstruments[tr], replacement); } catch (e) {} // (TOMS / TIMBALES slider offsets)
         trackInstruments[tr] = replacement;
         const tbR = document.getElementById(`tbtn-${tr}`); if (tbR) tbR.textContent = INSTRUMENTS[replacement]?.name || replacement;
         setTrackNameColor(tr, replacement);
@@ -28115,6 +28116,7 @@ function _applyJazzTracksToCurrentPattern() {
   if (rideTr == null && compingTr == null) return;
   const _jazzCompingKey = Math.random() < 0.5 ? 'sidestick' : 'ssnare';
   const _applyOne = (tr, key) => {
+    try { _setInstrVolOffset(tr, trackInstruments[tr], key); } catch (e) {} // (a TOMS / TIMBALE offset on the old instrument is taken back off)
     trackInstruments[tr] = key;
     trackMuted[tr] = false; updateTrackMute(tr); // a beat type's own fixed tracks must always be audible when they're forced in, not silently sitting muted from before
     trackOffset[tr] = 0; // any leftover per-track shift would misalign this fixed pattern against the beat engine's own kick
@@ -28195,6 +28197,7 @@ function _applyMozambiqueTracksToCurrentPattern() {
   const rideTr = _t.ride, sidestickTr = _t.sidestick, tomsTr = _t.toms;
   if (rideTr == null && sidestickTr == null && tomsTr == null) return;
   const _applyOneMoz = (tr, key) => {
+    try { _setInstrVolOffset(tr, trackInstruments[tr], key); } catch (e) {} // (MOZAMBIQUE's TOMS come in 25% lower too)
     trackInstruments[tr] = key;
     trackMuted[tr] = false; updateTrackMute(tr); // a beat type's own fixed tracks must always be audible when they're forced in, not silently sitting muted from before
     trackOffset[tr] = 0; // any leftover per-track shift would misalign this fixed pattern against the beat engine's own kick
