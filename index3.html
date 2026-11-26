@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-26 08:43:36 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-26 09:00:50 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3151,7 +3151,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 08:43:36 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 09:00:50 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -9501,6 +9501,7 @@ function togglePlay() {
     document.documentElement.style.setProperty('--spirit-pulse-dur', (60 / bpm) + 's'); // SPIRIT PULSE ("+" glyph color-cycle while in AUTO mode) — hard-coded to one quarter note at the loaded pattern's own tempo, per direct request; set globally (not scoped to one element like the logo's own --logo-anim-dur above) since #randBtn isn't a descendant of the logo
     if ('mediaSession' in navigator) { try { navigator.mediaSession.playbackState = 'playing'; } catch (e) {} }
     scheduleInterval = setInterval(scheduler, SCHEDULE_MS);
+    clearTimeout(window._recIdleStopT); // (PLAY again in time — the recording carries on)
     startRecallLoop();
     btn.classList.add('playing');
     updateBeatPulse();
@@ -9557,7 +9558,12 @@ function togglePlay() {
     if (window._duckGain) { window._duckGain.gain.cancelScheduledValues(ctx.currentTime); window._duckGain.gain.setTargetAtTime(1, ctx.currentTime, 0.02); } // eased back up (was an instant jump — a click whenever the pump was mid-duck on stop)
     // Auto-stop recording after half-bar delay (to capture reverb tail),
     // plus an extra fixed 2s on top before actually finishing the file.
-    if (!window._silentPlayToggle && _recArmed && _mediaRecorder && _mediaRecorder.state === 'recording') { // …or ends a recording — it carries straight on through the rewind, per direct request
+    // REALTIME RECORDING left stopped for 10 SECONDS with no PLAY again = the take ends, just as if REC had been pressed, per direct request
+    clearTimeout(window._recIdleStopT);
+    if (_recordMode === 'realtime' && !window._silentPlayToggle && _recArmed && _mediaRecorder && _mediaRecorder.state === 'recording') {
+      window._recIdleStopT = setTimeout(() => { if (!playing && _recArmed && _mediaRecorder && _mediaRecorder.state === 'recording') { try { toggleRecord(); } catch (e) {} } }, 10000);
+    }
+    if (_recordMode !== 'realtime' && !window._silentPlayToggle && _recArmed && _mediaRecorder && _mediaRecorder.state === 'recording') { // (REALTIME RECORDING now keeps going through STOP — only the REC button ends it, per direct request) …or ends a recording — it carries straight on through the rewind, per direct request
       _showBounceToast();
       const tailMs = (stepDuration() * 8) * 1000 + 2000; // half bar + 2s
       setTimeout(() => {
@@ -17854,6 +17860,7 @@ function toggleRecord() {
 
   // If already armed/recording — stop and share
   if (_recArmed) {
+    clearTimeout(window._recIdleStopT);
     _recArmed = false;
     if (playing) togglePlay(); // stop transport immediately — recording used to always stop playback here too
     if (_mediaRecorder && _mediaRecorder.state === 'recording') {
