@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-26 21:12:10 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-26 21:29:56 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3151,7 +3151,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 21:12:10 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 21:29:56 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8517,12 +8517,13 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
       if (want && trackInstruments[tr] !== want && INSTRUMENTS[want]) { selectSound(tr, want); try { redrawTrackCells(tr, true); } catch (e) {} } }
     // REVERB SIZE (cached rooms, so moving back and forth is cheap)
     const ar = axOf('rsize', X0, Y0), rb = B.rsize != null ? B.rsize : window._reverbIntensity;
-    { let v = ar === null ? rb : ar > 0 ? rb + ar * (1 - rb) : rb + ar * rb; v = Math.round(Math.max(0, Math.min(1, v)) * 20) / 20; if (ar === null || ar === 0) v = rb; // (the centre = exactly as it was)
+    if (ar !== null || pad._rs) { pad._rs = ar !== null; // (REVERB SIZE / DELAY TIME are only touched when on an axis — or just taken off one, to put them back — per direct report: DELAY TIME couldn't be changed in ORBIT)
+    let v = ar === null ? rb : ar > 0 ? rb + ar * (1 - rb) : rb + ar * rb; v = Math.round(Math.max(0, Math.min(1, v)) * 20) / 20; if (ar === null || ar === 0) v = rb; // (the centre = exactly as it was)
       if (Math.abs(v - (window._reverbIntensity || 0)) > 0.001 && ctx && window._reverbConv) { const c = (window._irCache = window._irCache && window._irCache.ctx === ctx ? window._irCache : { ctx }); const key = Math.round(v * 1000);
         if (!c[key]) c[key] = _buildReverbIRBuffer(ctx, _reverbSizeFromSlider(v)); window._reverbConv.buffer = c[key]; window._reverbIntensity = v; } }
     // DELAY TIME (musical stops)
     const ad = axOf('dtime', X0, Y0), db = B.dtime != null ? B.dtime : echoStop();
-    { const v = ad === null ? db : Math.max(-4, Math.min(9, db + Math.round(ad * 5))); if (v !== echoStop()) { try { _setFxEchoExtra(v); } catch (e) {} } }
+    if (ad !== null || pad._dt) { pad._dt = ad !== null; const v = ad === null ? db : Math.max(-4, Math.min(9, db + Math.round(ad * 5))); if (v !== echoStop()) { try { _setFxEchoExtra(v); } catch (e) {} } }
     // FILTER
     const af = axOf('filter', X0, Y0); if (af !== null || pad._filt) { djFilter(af || 0); pad._filt = af !== null && af !== 0; }
     // BITCRUSH, per direct request: the 8-BIT MIX, from where it was at the centre up to 100% at the graph's edge (either direction)
@@ -8567,8 +8568,9 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   function padBeat(x, y) {
     if (!pad) return; const dz = v => { const a = Math.abs(v); return a < 0.06 ? 0 : Math.sign(v) * Math.min(1, (a - 0.06) / 0.86); }; // (the same dead zone as everything else)
     const ab = axOf('beat', dz(Math.max(-1, Math.min(1, x * 2 - 1))), dz(Math.max(-1, Math.min(1, 1 - y * 2))));
-    if (ab === null && !pad.beats) return;
-    const home = pad.beatHome || _beatType; beatGo(ab === null ? home : beatAt(home, ab));
+    if (pad._lbt && _beatType !== pad._lbt) { pad.beats = null; pad.beatHome = null; } // a BEAT TYPE picked by hand (DRUMS menu) becomes the new centre, rather than being switched straight back
+    if (ab === null && !pad.beats) { pad._lbt = _beatType; return; }
+    const home = pad.beatHome || _beatType; beatGo(ab === null ? home : beatAt(home, ab)); pad._lbt = _beatType;
   }
   function closeAxisMenu() { const m = document.getElementById('axisMenu'); if (m) m.remove(); }
   // MODULATE: the AXIS MENU fills the whole GRAPH, split down the middle — LEFT ↔ RIGHT on the left, DOWN ↕ UP on the right,
@@ -8682,7 +8684,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     const was = typeof trackMuted !== 'undefined' ? trackMuted.slice() : null;
     try { absorbEdits(); } catch (e) {}
     const g0 = grid.map(r => r.join(''));
-    try { applyRaw(x, y); } finally { try { if (pad) { pad._lg = grid.map(r => r.slice()); pad._lf = []; for (let tr = 0; tr < NUM_TRACKS; tr++) pad._lf.push(fxOf(tr)); pad._lr = trackDelay.slice(); pad._li = trackInstruments.slice(); pad._ldr = drumsFx(); } } catch (e) {}
+    try { applyRaw(x, y); } finally { try { if (pad) { pad._lg = grid.map(r => r.slice()); pad._lf = []; for (let tr = 0; tr < NUM_TRACKS; tr++) pad._lf.push(fxOf(tr)); pad._lr = trackDelay.slice(); pad._li = trackInstruments.slice(); pad._ldr = drumsFx(); pad._ldt = echoStop(); pad._lrs = window._reverbIntensity || 0; pad._lcr = window._eightBitMix || 0; pad._lau = []; for (let tr = 0; tr < NUM_TRACKS; tr++) pad._lau.push(autoOn(tr)); } } catch (e) {}
       if (!document.body.classList.contains('modify')) { for (let tr = 0; tr < NUM_TRACKS; tr++) if (grid[tr].join('') !== g0[tr]) { try { redrawTrackCells(tr, true); } catch (e) {} } try { _queueFxBtnSync(); } catch (e) {} } } // MAIN: the lanes follow the cursor
     { if (was) for (let tr = 0; tr < NUM_TRACKS; tr++) if (was[tr] && !trackMuted[tr]) { trackMuted[tr] = true; try { updateTrackMute(tr); } catch (e) {} } }
     try { _barVariantUpdate(); } catch (e) {} // the SONG NAME colour follows the cursor, per direct request
@@ -8692,6 +8694,10 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   function absorbEdits() {
     if (!pad || !pad._lg) return; const B = pad.base;
     if (pad._ldr !== undefined && drumsFx() !== pad._ldr) B.drums = drumsFx(); // DRUMS FX set by hand (the DRUMS menu) is kept too
+    if (pad._ldt !== undefined && echoStop() !== pad._ldt) B.dtime = echoStop(); // …and DELAY TIME, REVERB SIZE and the 8-BIT MIX changed by hand
+    if (pad._lrs !== undefined && Math.abs((window._reverbIntensity || 0) - pad._lrs) > 0.001) B.rsize = window._reverbIntensity;
+    if (pad._lcr !== undefined && Math.abs((window._eightBitMix || 0) - pad._lcr) > 0.001) B.crush = window._eightBitMix || 0;
+    if (pad._lau && B.auto) for (let tr = 0; tr < NUM_TRACKS; tr++) if (autoOn(tr) !== pad._lau[tr]) B.auto[tr] = autoOn(tr); // …and a track's AUTO NOTES switched by hand (it was being switched straight back)
     for (let tr = 0; tr < NUM_TRACKS; tr++) {
       if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) { const v = grid[tr][st]; if (v === pad._lg[tr][st]) continue;
         B.grid[tr][st] = v; const hasN = pad.notes.findIndex(a => a[0] === tr && a[1] === st), hasE = pad.empties.findIndex(a => a[0] === tr && a[1] === st);
@@ -14878,7 +14884,7 @@ window.addEventListener('mouseup', e => {
 function updateVolMuteCol(tr) { updateTrackMute(tr); }
 function attachVolMuteEvents() {}
 
-// Lock / unlock a track from RAND — the L button (when LOCK BUTTONS = NEW INST is off) and a left-to-right swipe on the track name.
+// Lock / unlock a track from RAND — the L button (when LOCK BUTTONS = NEW INST is off) and a right-to-left swipe on the track name (swapped, per direct request).
 function _toggleTrackLock(tr) {
   trackSweep[tr] = !trackSweep[tr];
   if (trackSweep[tr]) { try { _gestureNotice('TRACK LOCKED'); } catch (e) {} } // per direct request
@@ -25878,19 +25884,18 @@ function fullReset() {
         _dragActive = false;
         if (_nameHoldTimer) { clearTimeout(_nameHoldTimer); _nameHoldTimer = null; }
         if (!document.body.classList.contains('lock-swap') && trackSweep[_nameHoldTr]) { /* LOCKED: the instrument swipes do nothing, per direct request */ }
-        else if (dx > 0 && !document.body.classList.contains('lock-swap')) { // RIGHT = BACK to the previous instrument, per direct request (was NEW)
-          try { _btnSwipeFx(document.getElementById(`tbtn-${_nameHoldTr}`), 1); } catch (e) {}
+        else if (dx < 0 && !document.body.classList.contains('lock-swap')) { // LEFT = BACK to the previous instrument — SWAPPED, per direct request (was RIGHT)
+          try { _btnSwipeFx(document.getElementById(`tbtn-${_nameHoldTr}`), -1); } catch (e) {}
           if (!trackInstrumentBack(_nameHoldTr)) { try { _showNotice('NO EARLIER INSTRUMENT'); } catch (e) {} }
         }
-        else if (dx < 0 && !document.body.classList.contains('lock-swap')) { // LEFT = NEW INSTRUMENT, per direct request (was the right swipe)
-          try { _btnSwipeFx(document.getElementById(`tbtn-${_nameHoldTr}`), -1); } catch (e) {}
-          window._tnFromRight = true; setTimeout(() => { window._tnFromRight = false; }, 0);
+        else if (dx > 0 && !document.body.classList.contains('lock-swap')) { // RIGHT = NEW INSTRUMENT — SWAPPED, per direct request (was LEFT)
+          try { _btnSwipeFx(document.getElementById(`tbtn-${_nameHoldTr}`), 1); } catch (e) {} // (the new name slides in from the left, with the swipe)
           // LOCK BUTTONS = NEW INST OFF (the button locks), per direct request: a right swipe does the NEW INSTRUMENT action instead —
           // exactly a tap on the track's asterisk button in NEW INST mode (two quick swipes = any group, like its double-tap)
           const lb = document.getElementById(`swpbtn-${_nameHoldTr}`);
           if (lb) { document.body.classList.add('lock-swap'); try { lb.dispatchEvent(new MouseEvent('mouseup', { bubbles: false })); } finally { document.body.classList.remove('lock-swap'); } }
         }
-        else if (dx > 0 && (!trackMuted[_nameHoldTr] || trackSweep[_nameHoldTr])) _toggleTrackLock(_nameHoldTr); /* a muted track can't be LOCKED by a swipe, but a locked one can always be UNLOCKED */ // a MUTED track can't be locked OR unlocked by a swipe, per direct request // left-to-right LOCKS / UNLOCKS the track, per direct request; the old slot / RECALL swipes were removed (never worked)
+        else if (dx < 0 && (!trackMuted[_nameHoldTr] || trackSweep[_nameHoldTr])) _toggleTrackLock(_nameHoldTr); /* (LOCK is the LEFT swipe now — swapped, per direct request) */ /* a muted track can't be LOCKED by a swipe, but a locked one can always be UNLOCKED */ // a MUTED track can't be locked OR unlocked by a swipe, per direct request // left-to-right LOCKS / UNLOCKS the track, per direct request; the old slot / RECALL swipes were removed (never worked)
         return;
       }
       // Mostly-horizontal movement that hasn't reached the swipe distance yet: wait for it rather than committing to a mute-drag
@@ -28967,7 +28972,7 @@ function snapshotDisplay() {
     ['#beatBtn', 'DRUMS', 'Tap to switch the drum beat on or off. Hold for the beat menu — beat types, the drums\' own FX button (FX / EN / DS / DL), and A for DRUMS AUTO.'],
     ['#scratchBtn', 'A / B', 'Jumps back to the previous pattern; tap again to go back. Handy for comparing two grooves.'],
     ['#saveBtn', 'RECORD', 'Tap to start recording in real time. Hold for the RECORD menu: real time, bounce loops or stems, save a tape, or send a tape link.'],
-    ['.track-name-btn', 'INSTRUMENT NAME', 'The instrument on this track. Tap to mute / unmute, hold for the instrument menu, swipe LEFT for a new instrument, RIGHT to go back to the one before (with the lock buttons set to NEW INST, swipe RIGHT locks the track instead).'],
+    ['.track-name-btn', 'INSTRUMENT NAME', 'The instrument on this track. Tap to mute / unmute, hold for the instrument menu, swipe RIGHT for a new instrument, LEFT to go back to the one before (with the lock buttons set to NEW INST, swipe LEFT locks the track instead).'],
     ['.lock-btn', 'INSTRUMENT RANDOMIZER', 'Tap for a new instrument in the same family. Double-tap to switch between tonal and drums.'],
     ['.track-vol-bar', 'TRACK VOLUME', () => MOD() ? 'Drag to change level — in MODULATE only the live level meter shows (no fader).' : 'Drag to change level. With VOL BANGER on, the fill bounces with the track\'s live level.'],
     ['.shift-btn', '<  OFFSET', 'Moves the track\'s notes a step earlier. The step size is set in LOOK AND FEEL under DEV / BEHAVIOUR.'],
