@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-26 08:06:36 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-26 08:20:54 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3151,7 +3151,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 08:06:36 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 08:20:54 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -7838,7 +7838,7 @@ function scheduler() {
     }
     } // end !_muteForTransition
     nextStepTime += stepDuration();
-    if (step === NUM_STEPS - 1) { try { if (window._padBarTick) window._padBarTick(nextStepTime); } catch (e) {} } // MODULATE's A = JUMP: the bar's last 16th is planned — pick + set up the next place now, ready for the 1
+    if (step % 4 === 3) { try { if (window._padBarTick) window._padBarTick(nextStepTime); } catch (e) {} } // MODULATE's JUMP: counted in BEATS now — each beat's last 16th is planned — pick + set up the next place now, ready for the 1
   }
 }
 
@@ -8403,7 +8403,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   let pad = null, raf = 0, pend = null, held = false;
   let jumpOn = false, jumpBars = 0, jumpRaf = 0; // A = JUMP (see setJump below)
   let orbitBars = 4; try { const v = +localStorage.getItem('sifiOrbitBars2'); if ([1, 2, 4, 8, 16].includes(v)) orbitBars = v; } catch (e) {} // ORBIT: one lap every N bars (HOLD the MODE button in ORBIT), per direct request
-  let jumpEvery = 4; try { const v = +localStorage.getItem('sifiJumpBars'); if ([1, 2, 4, 8, 16].includes(v)) jumpEvery = v; } catch (e) {} // HOLD A to change it
+  let jumpEvery = 1; try { const v = +localStorage.getItem('sifiJumpBeats'); if ([1, 2, 4, 8, 16].includes(v)) jumpEvery = v; } catch (e) {} // JUMP (teleport) every N BEATS — 1 beat by default now, per direct request (was 4 bars; the choices are 1 / 2 beats, 1 / 2 / 4 bars) — HOLD the MODE button to change it
   const nb = () => document.getElementById('nameBar');
   const ORBIT_SVG = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><path d="M19.48 11.41 A7.5 7.5 0 1 1 12.59 4.52" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17.3" cy="6.7" r="2.9" fill="currentColor"/></svg>';
   const JUMP_SVG = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><circle cx="5.8" cy="18.2" r="2.4" stroke="currentColor" stroke-width="1.8"/><path d="M6.6 14.2 Q7.6 5.8 14 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="1.6 2.6"/><circle cx="18.2" cy="5.8" r="3" fill="currentColor"/></svg>'; // JUMP: from one place to the next
@@ -8642,8 +8642,8 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
       const h = document.createElement('div'); h.textContent = isOrb ? 'ONE ORBIT EVERY' : 'NEW POSITION EVERY'; h.style.cssText = 'opacity:0.55;font-size:0.58rem;margin:4px 0 6px;'; mn.appendChild(h);
       [1, 2, 4, 8, 16].forEach(n => { const on = (isOrb ? orbitBars : jumpEvery) === n;
         const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;';
-        row.innerHTML = `<span class="ax-box${on ? ' ax-on' : ''}" style="width:14px;height:14px;border:2px solid #fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;${on ? 'background:#fff;color:#111;' : ''}">${on ? '✓' : ''}</span><span>${n} BAR${n > 1 ? 'S' : ''}</span>`;
-        row.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (isOrb) { orbitBars = n; try { localStorage.setItem('sifiOrbitBars2', String(n)); } catch (er) {} } else { jumpEvery = n; jumpBars = 0; try { localStorage.setItem('sifiJumpBars', String(n)); } catch (er) {} } try { playUiSound('tinyclick'); } catch (er) {} build(); });
+        row.innerHTML = `<span class="ax-box${on ? ' ax-on' : ''}" style="width:14px;height:14px;border:2px solid #fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;${on ? 'background:#fff;color:#111;' : ''}">${on ? '✓' : ''}</span><span>${isOrb ? n + ' BAR' + (n > 1 ? 'S' : '') : (n < 4 ? n + ' BEAT' + (n > 1 ? 'S' : '') : (n / 4) + ' BAR' + (n > 4 ? 'S' : ''))}</span>`;
+        row.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (isOrb) { orbitBars = n; try { localStorage.setItem('sifiOrbitBars2', String(n)); } catch (er) {} } else { jumpEvery = n; jumpBars = 0; try { localStorage.setItem('sifiJumpBeats', String(n)); } catch (er) {} } try { playUiSound('tinyclick'); } catch (er) {} build(); });
         mn.appendChild(row); }); };
     build(); document.body.appendChild(mn); window._axisMenuOpen = true;
   }
@@ -8790,7 +8790,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     const step = now => { if (held || orbiting()) { jumpRaf = 0; return; } const k = Math.min(1, (now - t0) / D), q = 1 - Math.pow(1 - k, 3); showDot([x0 + (x - x0) * q, y0 + (y - y0) * q]); jumpRaf = k < 1 ? requestAnimationFrame(step) : 0; };
     jumpRaf = requestAnimationFrame(step);
   }
-  window._padBarTick = at => { if (!jumpOn) return; if (jumpBars % jumpEvery === 0) { try { jumpTo(at); } catch (e) {} } jumpBars++; }; // called by the scheduler once the bar's LAST 16th is planned — so the new place is picked and set up IN ADVANCE, ready for the 1 (at = when the 1 sounds)
+  window._padBarTick = at => { if (!jumpOn) return; if (jumpBars % jumpEvery === 0) /* (counts BEATS: jumpBars is a beat count now) */ { try { jumpTo(at); } catch (e) {} } jumpBars++; }; // called by the scheduler once the bar's LAST 16th is planned — so the new place is picked and set up IN ADVANCE, ready for the 1 (at = when the 1 sounds)
   setInterval(() => {
     if (document.body.classList.contains('modify') && orbiting() && orbitA === null && !orbitGrab) { try { orbitStart(); } catch (e) {} } // (waiting there before PLAY too)
     { const on = orbitMoving(); if (document.body.classList.contains('orbit-auto') !== on) document.body.classList.toggle('orbit-auto', on);
