@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-26 08:33:26 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-26 08:43:36 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3151,7 +3151,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 08:33:26 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 08:43:36 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4155,13 +4155,13 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
       <!-- MUSIC BUS, per direct request: the overall level of everything that isn't DRUMS or PERCUSSION (every melody / bass / pad
            track, their reverb included) — the drums menu, kit and percussion tracks are untouched. -->
       <div style="display:flex;flex-direction:column;gap:15px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">MUSIC BUS</div><div id="musicBusVal" style="font-size:0.85rem;font-weight:700;color:#111;">61%</div></div>
-        <input autocomplete="off" type="range" id="musicBusBar" min="0" max="100" value="61" class="master-vol-slider" style="width:100%;" oninput="setMusicBus(this.value)" onchange="setMusicBus(this.value)">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">MUSIC BUS</div><div id="musicBusVal" style="font-size:0.85rem;font-weight:700;color:#111;">67%</div></div>
+        <input autocomplete="off" type="range" id="musicBusBar" min="0" max="100" value="67" class="master-vol-slider" style="width:100%;" oninput="setMusicBus(this.value)" onchange="setMusicBus(this.value)">
       </div>
       <!-- DRUMS BUS (was the DRUMS menu's volume slider), per direct request -->
       <div style="display:flex;flex-direction:column;gap:15px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">DRUMS BUS</div><div id="beatVolBusVal" style="font-size:0.85rem;font-weight:700;color:#111;">22%</div></div>
-        <input autocomplete="off" type="range" id="beatVolBar" min="0" max="100" value="22" class="master-vol-slider" style="width:100%;" oninput="setBeatVol(this.value/100)" onchange="setBeatVol(this.value/100)">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">DRUMS BUS</div><div id="beatVolBusVal" style="font-size:0.85rem;font-weight:700;color:#111;">31%</div></div>
+        <input autocomplete="off" type="range" id="beatVolBar" min="0" max="100" value="31" class="master-vol-slider" style="width:100%;" oninput="setBeatVol(this.value/100)" onchange="setBeatVol(this.value/100)">
       </div>
 
       <!-- AUTO NOTE OUTLINE slider removed, per direct request — hard-coded 3px (see --auto-outline-w on :root) -->
@@ -8991,10 +8991,10 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   const orbitPinch = (t0, t1) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); if (!rc.width || !rc.height) return;
     const dx = Math.abs(t0.clientX - t1.clientX) / rc.width, dy = Math.abs(t0.clientY - t1.clientY) / rc.height; orbitPinched = true;
     orbitTargetRX = Math.max(0.04, Math.min(orbitMaxX(), dx / Math.SQRT2)); orbitTargetRY = Math.max(0.04, Math.min(orbitMaxY(), dy / Math.SQRT2)); try { orbitGuide(true); } catch (e) {} }; // (never off the graph) // (graph-height units — the ring never leaves the graph)
-  window.addEventListener('touchstart', e => { if (!inPad(e)) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (orbiting()) { orbitGrab = true; if (e.touches.length >= 2) { orbitPinch(e.touches[0], e.touches[1]); return; } const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (e.touches.length === 1 && isDouble()) { padReset(); return; } const t = e.touches[0]; start(t.clientX, t.clientY); }, { capture: true, passive: false });
+  window.addEventListener('touchstart', e => { if (!inPad(e)) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (jumpOn || (orbitOff && !window._padLatch)) { try { setPadMode('hold'); } catch (er) {} } /* JUMP (teleport) or SPRING (padlock open): a touch on the graph switches to HOLD (padlock) — the cursor locks where it's put, per direct request */ if (orbiting()) { orbitGrab = true; if (e.touches.length >= 2) { orbitPinch(e.touches[0], e.touches[1]); return; } const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (e.touches.length === 1 && isDouble()) { padReset(); return; } const t = e.touches[0]; start(t.clientX, t.clientY); }, { capture: true, passive: false });
   window.addEventListener('touchmove', e => { if (orbitGrab) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (e.touches.length >= 2) { orbitPinch(e.touches[0], e.touches[1]); return; } if (orbitPinched) return; const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (!held) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; pos(t.clientX, t.clientY); }, { capture: true, passive: false });
   ['touchend', 'touchcancel'].forEach(t => window.addEventListener(t, e => { if (orbitGrab) { e.stopPropagation(); if (!e.touches || !e.touches.length) { orbitGrab = false; orbitPinched = false; try { orbitGuide(false); } catch (er) {} } return; } if (!held) return; e.stopPropagation(); if (!e.touches || !e.touches.length) end(); }, { capture: true }));
-  window.addEventListener('mousedown', e => { if (!inPad(e)) return; e.stopPropagation(); e.preventDefault(); if (orbiting()) { orbitGrab = true; orbitSize(e.clientX, e.clientY); return; } if (isDouble()) { padReset(); return; } start(e.clientX, e.clientY); }, true);
+  window.addEventListener('mousedown', e => { if (!inPad(e)) return; e.stopPropagation(); e.preventDefault(); if (jumpOn || (orbitOff && !window._padLatch)) { try { setPadMode('hold'); } catch (er) {} } /* (JUMP / SPRING → HOLD, as above) */ if (orbiting()) { orbitGrab = true; orbitSize(e.clientX, e.clientY); return; } if (isDouble()) { padReset(); return; } start(e.clientX, e.clientY); }, true);
   window.addEventListener('mousemove', e => { if (orbitGrab) { orbitSize(e.clientX, e.clientY); return; } if (held) pos(e.clientX, e.clientY); }, true);
   window.addEventListener('mouseup', e => { if (orbitGrab) { e.stopPropagation(); orbitGrab = false; try { orbitGuide(false); } catch (er) {} return; } if (held) { e.stopPropagation(); end(); } }, true);
   ['click', 'dblclick'].forEach(t => window.addEventListener(t, e => { if (inPad(e)) { e.stopPropagation(); e.preventDefault(); } }, true));
@@ -25455,7 +25455,7 @@ function fullReset() {
   try { const _fe = document.getElementById('fxEchoExtraSlider'); if (_fe) _fe.value = 5; _setFxEchoExtra(5); } catch (e) {}
   try { _setFxEchoLevel(15); } catch (e) {}
   try { _setEchoDirty(true); } catch (e) {}
-  try { const _mb = document.getElementById('musicBusBar'); if (_mb) _mb.value = 61; setMusicBus(61); } catch (e) {}
+  try { const _mb = document.getElementById('musicBusBar'); if (_mb) _mb.value = 67; setMusicBus(67); } catch (e) {}
   try { const _an = document.getElementById('autoNotesFlashLenSlider'); if (_an) _an.value = 3.25; _setAutoNotesFlashLen(3.25); } catch (e) {}
   try { setDrums8bit(false); } catch (e) {}
   // Cancel any per-track pattern-generation steps still queued from a
@@ -25549,7 +25549,7 @@ function fullReset() {
   const _bpmSettingsSliderEl = document.getElementById('bpmSettingsSlider'); if (_bpmSettingsSliderEl) _bpmSettingsSliderEl.value = bpm;
   _beatOffset = 0; _beatReverbMix = 0.09; { const b = document.getElementById('beatReverbMixBar'); if (b) b.value = 9; const v = document.getElementById('beatReverbMixVal'); if (v) v.textContent = '9'; } // REVERB ON BEAT default 9%, per direct request _beatFx = false; _beatPump = false; _setBeatChoke(false);
   _beatAutoRandActive = false; _beatAutoRandBarCount = 0; window._beatBulldozer = false;
-  _beatVolRaw = 0.22; _applyBeatVolWithDuck(); { const b = document.getElementById('beatVolBar'); if (b) b.value = 22; const v = document.getElementById('beatVolBusVal'); if (v) v.textContent = '22%'; } // DRUMS BUS default 22% (was 47%, 30%, 40%, 50%, 60%, 39% before that), per direct request
+  _beatVolRaw = 0.31; _applyBeatVolWithDuck(); { const b = document.getElementById('beatVolBar'); if (b) b.value = 31; const v = document.getElementById('beatVolBusVal'); if (v) v.textContent = '31%'; } // DRUMS BUS default 31% (was 22%, 47%, 30%, 40%, 50%, 60%, 39% before that), per direct request
   const _bbFullReset = document.getElementById('beatBtn'); if (_bbFullReset) _bbFullReset.classList.remove('beat-auto-active');
   if (window._beatReverbSend && ctx) window._beatReverbSend.gain.setValueAtTime(_beatReverbGainForMix(_beatReverbMix), ctx.currentTime); // on by default now, not silenced
   if (window._beatCrunchSend && ctx) window._beatCrunchSend.gain.setValueAtTime(0, ctx.currentTime);
@@ -27196,7 +27196,7 @@ function _setBeatCountShown(on) {
 // the gain actually applied to the node also folds in a -1.5dB duck
 // whenever FX or BLAST is engaged on BEAT, so the dial itself always
 // reflects what the user set rather than the post-duck level.
-let _beatVolRaw = 0.22; // DRUMS BUS default 22% (was 47%, 30%, 40%, 50%, 60%, 39%, before that 0.5711), per direct request
+let _beatVolRaw = 0.31; // DRUMS BUS default 31% (was 22%, 47%, 30%, 40%, 50%, 60%, 39%, before that 0.5711), per direct request
 let _beatSoloMuted = false; // true whenever any track is soloed — SOLO should silence BEAT too, same as every un-soloed track
 // AUDIO SNAPSHOT (DEV > DIAGNOSTICS), per direct request — for the "DRUMS is just a filtered snare" state. Now AUTOMATIC as
 // well, since it's too rare to remember to press: a DRUMS WATCHDOG listens for 1 second every 15 seconds while DRUMS is
@@ -27606,7 +27606,7 @@ const _BEAT_ADDED_DRUM_KEYS = new Set(['ride', 'sidestick', 'ssnare', 'toms', 's
 // MUSIC BUS (SETTINGS, under MAIN VOL), per direct request: one level for every track that isn't drums / percussion. A gain per
 // track sits between its fader and its CHOKE gate (so its reverb follows too); drum / percussion tracks stay at 1. Re-checked
 // whenever instruments change (and twice a second as a backstop) since a track can swap between the two at any time.
-window._musicBus = 0.61; // default 61% (was 84%, 46%, 63%, 85% before that), per direct request
+window._musicBus = 0.67; // default 67% (was 61%, 84%, 46%, 63%, 85% before that), per direct request
 function _musicBusFor(tr) { try { return _isDrumTrack(tr) ? 1 : window._musicBus * (_BASS_KEYS_FOR_TRIM.has(trackInstruments[tr]) ? 0.8913 /* basses -1dB (−0.5dB, then another −0.5dB per direct request) */ : 0.9661 /* tonal -0.3dB */); } catch (e) { return 1; } } // per direct request
 // SIDECHAIN, per direct request: every KICK (the DRUMS kick and any KICK track) ducks the whole mix EXCEPT the drums — every
 // melody / bass / pad track, their FX and what they send to the reverb — and it swells back over about an 8th note: the classic
