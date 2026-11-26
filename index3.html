@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-26 01:51:30 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-26 08:06:36 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3151,7 +3151,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 01:51:30 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 08:06:36 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -6169,9 +6169,11 @@ window._randoLast = null;
 // DOUBLE CLICK on >>: the whole screen except the >> button drops to grayscale for a flash (~0.12s), then eases back.
 // DOUBLE CLICK on >> always frees every track first: locked → unlocked, muted → unmuted, per direct request
 function _dblUnlockUnmuteAll() {
-  for (let tr = 0; tr < NUM_TRACKS; tr++) {
-    if (trackSweep[tr]) continue; // LOCKED tracks stay locked (and untouched) through a double-click — in MAIN too now, not just MODIFY, per direct request
-    if (trackMuted[tr]) { trackMuted[tr] = false; try { updateTrackMute(tr); } catch (e) {} }
+  try { _clearAllSolo(); } catch (e) {} // (any SOLO goes too — it's a mute state as well)
+  for (let tr = 0; tr < NUM_TRACKS; tr++) { // EVERY track's mute is reset on a double-click, per direct request — LOCKED tracks included now (they stay locked, just unmuted)
+    if (trackMuted[tr]) { trackMuted[tr] = false; }
+    try { updateTrackMute(tr); } catch (e) {}
+    try { const sb = document.getElementById(`solobtn-${tr}`); if (sb) sb.classList.remove('solo-on'); } catch (e) {}
   }
 }
 function _dblGrayFlash() {
@@ -6235,7 +6237,7 @@ function _randoLocal(which) {
   if (!_shOpts.landInMs) window._schedBoostUntil = performance.now() + 3000;
   try { _glowPause(); } catch (e) {} // no glows while the new instruments land (performance test, per direct request)
   window._visJob = 'instrument shuffle animation'; clearTimeout(window._visJobT); window._visJobT = setTimeout(() => { window._visJob = null; }, 2600);
-  try { if (c.eightBit) setEightBitMix(Math.random() * 100); } catch (e) {}
+  const _ebMix = c.eightBit ? Math.random() * 100 : null; // (set below — ON THE 1 with the new instruments when they're timed to it)
   // REVERB / FX: new per-track allocations for the pattern that's playing — once the shuffled instruments have landed (the rules
   // depend on the instrument)
   if (c.shuffle && (c.reverb || c.beatFx)) { clearTimeout(window._randoAllocT); window._randoAllocT = setTimeout(() => { try { _rerollAllocations(!!c.beatFx, !!c.reverb); } catch (e) {} }, 1300); }
@@ -6259,8 +6261,14 @@ function _randoLocal(which) {
   try { if (c.tempo && !_tempoLocked && typeof _tapeSetBpm === 'function') { _tapeSetBpm(Math.floor(Math.random() * 66) + 70); const bd = document.getElementById('bpmDisplay'); if (bd) bd.textContent = bpm; const tb = document.getElementById('tempoBar'); if (tb) tb.value = bpm; } } catch (e) {}
   // NOTES: new random notes on every unlocked track that has some (its own + re-roll, so it keeps its instrument and key)
   if (c.notes) { try { for (let tr = 0; tr < NUM_TRACKS; tr++) { if (trackSweep[tr] || !grid[tr].some(v => v > 0)) continue; _untagBeatOwned && _untagBeatOwned(tr); randomizeTrack(tr); redrawTrackCells(tr, true); } markModified(); } catch (e) { console.error('new notes failed', e); } }
-  if (c.shuffle) { try { randomizeCurrentInstruments(_shOpts); /* single click AND shake: the name just flashes white */ if (_shOpts.landInMs) { if (_shOpts.aligned) setTimeout(() => { window._schedBoostUntil = performance.now() + 3000; }, (_shOpts.lastLandMs || 0) + 30); else window._schedBoostUntil = performance.now() + 3000; } } catch (e) { console.error('shuffle instruments failed', e); } } // single click: the name just flashes white (no split-flap)
+  if (c.shuffle) { try { randomizeCurrentInstruments(_shOpts); /* single click AND shake: the name just flashes white */ if (_shOpts.landInMs) { if (_shOpts.aligned) setTimeout(() => { window._schedBoostUntil = performance.now() + 3000; }, (_shOpts.lastLandMs || 0) + 30); else window._schedBoostUntil = performance.now() + 3000; } } catch (e) { console.error('shuffle instruments failed', e); } }
   else if ((c.reverb || c.beatFx)) { clearTimeout(window._randoAllocT); try { _rerollAllocations(!!c.beatFx, !!c.reverb); } catch (e) {} } // nothing to wait for
+  // LOUD LAST BAR FIX, per direct report: the bar between the tap and the new instruments arriving was sometimes much louder —
+  // the REVERB / FX re-roll (meant for the NEW instruments) landed 1.3s after the tap, so the OLD ones played the rest of that bar
+  // through it (BLAST and all), and the 8-BIT MIX changed straight away. Now both land WITH the new instruments, just before the 1.
+  { const _onOne = !!(c.shuffle && _shOpts.landInMs && _shOpts.aligned), _at = _onOne ? (_shOpts.lastLandMs || 0) + 30 : 0;
+    if (_ebMix !== null) { if (_at) setTimeout(() => { try { setEightBitMix(_ebMix); } catch (e) {} }, _at); else { try { setEightBitMix(_ebMix); } catch (e) {} } }
+    if (_onOne && c.shuffle && (c.reverb || c.beatFx)) { clearTimeout(window._randoAllocT); window._randoAllocT = setTimeout(() => { try { _rerollAllocations(!!c.beatFx, !!c.reverb); } catch (e) {} }, _at); } } // single click: the name just flashes white (no split-flap)
 }
 // Re-rolls the per-track FX (FX/BLAST) and/or REVERB (R) allocations on the current pattern — same per-instrument chances a new
 // pattern uses. Locked and empty tracks are left alone.
@@ -7152,6 +7160,7 @@ function playBuffer(key, isAccent, time, tr, stepIdx) {
   const _isCongaBongoKey = (key === 'congHi' || key === 'congLo' || key === 'bongHi' || key === 'bongLo');
   const _congaBongoFxOnlyBoost = (_isCongaBongoKey && trackFx[tr] && (trackFx[tr].x > 0 || trackFx[tr].y > 0) && !trackPump[tr]) ? 1.2589 : 1; // +2dB, specifically when FX is on but NOT BLAST, per direct request
   instrumentGain.gain.value = ((key === 'shak') ? 0.265 : (key === 'clap') ? 0.2971 /* +0.5dB more (was 0.2805), per direct request */ : (key === 'tamb') ? 0.4455 : (key === 'guiro') ? 0.1672 : (key === 'ngate') ? 0.4159 : (key === 'ride' && _beatType === 'mozambique') ? 0.3566 : (key === 'ride') ? 0.225 : (key === 'timbHi' || key === 'timbMid' || key === 'timbLo') ? 0.8914 : _isCongaBongoKey ? 0.6686 : (key === 'sidestick' && _beatType === 'bossa') ? 0.2525 : (key === 'sidestick') ? 0.1195 /* SIDESTICK 20% quieter (was 0.3156 BOSSA / 0.1494), per direct request; earlier: SIDESTICK as a track instrument another -1dB (was 0.3541 BOSSA / 0.1676), per direct request; before that: -2.5dB total (was 0.2234; -1.5dB then another -1dB), per direct request */ : (key === 'tomHi' && _beatType === 'mozambique') ? 0.561 : (key === 'tomHi' || key === 'tomMid' || key === 'tomLo') ? 0.3972 : 0.5) * _congaBongoFxOnlyBoost; // SHAKER -1.5dB from the +2dB bump (was 0.315); TAMBOURINE +1dB (was 0.397); NOISE -1.6dB from the 0.5 default, per direct request; CONGA/BONGO +1dB more (was 0.5959), plus another +2dB specifically when FX (not BLAST) is engaged on that track, per direct request; TIMBALE +1.5dB more (was 0.75, pulled back from 1.1221 a few requests ago after clipping — still safely under unity gain at 0.8914, but noticeably higher into the soft-clip curve than CONGA/BONGO's own 0.6686 now, worth watching if it starts sounding hot again); SIDESTICK +1dB more overall, both variants together (was 0.1991, -1.5dB before that (0.2366), -2dB before that, -4dB before that, -0.5dB from the 0.5 default before that); SIDESTICK +4dB specifically in BOSSA on top of that same overall level (was 0.3156, same relative +4dB it always was over the base); HANDCLAP +1dB more still (was 0.25, +1dB before that (0.2228), +2dB before that, was 0.177); TOM HI/MID/LOW -5dB (was 0.7063, the +3dB-from-0.5-default level before that); RIDE +1dB more, specifically in MOZAMBIQUE only (was 0.3178, +3dB before that, same as every other beat type before that) — that beat's fixed ride pattern is mostly soft-velocity hits (the quieter sample) with only a few accents, so it was landing noticeably under SIDESTICK's all-accent pattern there; boosting just this beat's level (not the soft/accent split itself, which is deliberate structural-vs-filler phrasing, and not RIDE's level in JAZZ or anywhere else it's used) closes that gap; TOM HI -5dB more, specifically in MOZAMBIQUE only (was 0.9977, same relative +3dB-over-the-shared-tom-level it always was, just carried down from the new lower base)
+  if (INSTRUMENTS[key] && INSTRUMENTS[key].group === 'perc') instrumentGain.gain.value *= 0.9441; // ALL PERCUSSION −0.5dB at source, per direct request
 
   const fxVal = trackFx[tr];
   const on = fxVal && (fxVal.x > 0 || fxVal.y > 0);
@@ -8393,7 +8402,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
 (function () {
   let pad = null, raf = 0, pend = null, held = false;
   let jumpOn = false, jumpBars = 0, jumpRaf = 0; // A = JUMP (see setJump below)
-  let orbitBars = 4; try { const v = +localStorage.getItem('sifiOrbitBars'); if ([1, 2, 4, 8, 16].includes(v)) orbitBars = v; } catch (e) {} // ORBIT: one lap every N bars (HOLD the MODE button in ORBIT), per direct request
+  let orbitBars = 4; try { const v = +localStorage.getItem('sifiOrbitBars2'); if ([1, 2, 4, 8, 16].includes(v)) orbitBars = v; } catch (e) {} // ORBIT: one lap every N bars (HOLD the MODE button in ORBIT), per direct request
   let jumpEvery = 4; try { const v = +localStorage.getItem('sifiJumpBars'); if ([1, 2, 4, 8, 16].includes(v)) jumpEvery = v; } catch (e) {} // HOLD A to change it
   const nb = () => document.getElementById('nameBar');
   const ORBIT_SVG = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block;pointer-events:none;"><path d="M19.48 11.41 A7.5 7.5 0 1 1 12.59 4.52" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17.3" cy="6.7" r="2.9" fill="currentColor"/></svg>';
@@ -8402,7 +8411,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   const marks = () => {
     let m = document.getElementById('modifyPadMarks'), b = nb();
     if (!m && b) {
-      m = document.createElement('div'); m.id = 'modifyPadMarks'; m.innerHTML = '<div class="sp-tint"></div><div class="sp-glow"></div><canvas id="modifyGridCv"></canvas><div class="sp-count" id="modifyCount"></div><div class="sp-top"></div><div class="sp-bot"></div><div class="sp-xlab"><span class="sp-g sp-m">&minus;</span><span>FILTER</span><span class="sp-g sp-p">+</span></div><div class="sp-ylab"><span class="sp-g sp-m">&minus;</span><span>REVERB SIZE</span><span class="sp-g sp-p">+</span></div><div class="sp-h"></div><div class="sp-v"></div><div class="sp-dot"></div>'; b.appendChild(m);
+      m = document.createElement('div'); m.id = 'modifyPadMarks'; m.innerHTML = '<div class="sp-tint"></div><div class="sp-glow"></div><canvas id="modifyGridCv"></canvas><div class="sp-count" id="modifyCount"></div><div class="sp-top"></div><div class="sp-bot"></div><div class="sp-xlab"><span class="sp-g sp-m">&minus;</span><span>FILTER</span><span class="sp-g sp-p">+</span></div><div class="sp-ylab"><span class="sp-g sp-m">&minus;</span><span>INSTRUMENTS</span><span class="sp-g sp-p">+</span></div><div class="sp-h"></div><div class="sp-v"></div><div class="sp-dot"></div>'; b.appendChild(m);
       const lk = document.createElement('button'); lk.id = 'modifyLock'; lk.type = 'button'; lk.setAttribute('aria-label', 'lock'); lk.innerHTML = LOCK_SVG(window._padLatch); lk.classList.toggle('sp-mag-off', !window._padLatch);
       lk.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); setLatch(!window._padLatch); });
       b.appendChild(lk);
@@ -8483,8 +8492,8 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   //   DRUM PATTERN — every beat type has its own place along the axis: the pattern's own beat in the centre, the rest laid out
   //                 either side of it (always in the same order, so the same neighbours each time)
   const AXIS_PARAMS = [['notes', 'NOTES'], ['effects', 'EFFECTS'], ['inst', 'INSTRUMENTS'], ['rsize', 'REVERB SIZE'], ['dtime', 'DELAY TIME'], ['filter', 'FILTER'], ['crush', 'BITCRUSH'], ['beat', 'DRUM PATTERN']];
-  window._axisMap = { x: ['filter'], y: ['rsize'] }; // DEFAULT now FILTER (left ↔ right) + REVERB SIZE (down ↕ up), per direct request (was NOTES / EFFECTS)
-  try { const v = JSON.parse(localStorage.getItem('sifiAxisMap2') || 'null'); if (v && Array.isArray(v.x) && Array.isArray(v.y)) window._axisMap = { x: v.x.filter(k => AXIS_PARAMS.some(p => p[0] === k)), y: v.y.filter(k => AXIS_PARAMS.some(p => p[0] === k)) }; } catch (e) {}
+  window._axisMap = { x: ['filter'], y: ['inst'] }; // DEFAULT now FILTER (left ↔ right) + INSTRUMENTS (down ↕ up), per direct request (was FILTER / REVERB SIZE, NOTES / EFFECTS before that)
+  try { const v = JSON.parse(localStorage.getItem('sifiAxisMap3') || 'null'); if (v && Array.isArray(v.x) && Array.isArray(v.y)) window._axisMap = { x: v.x.filter(k => AXIS_PARAMS.some(p => p[0] === k)), y: v.y.filter(k => AXIS_PARAMS.some(p => p[0] === k)) }; } catch (e) {}
   const axOf = (k, X, Y) => window._axisMap.x.includes(k) ? X : window._axisMap.y.includes(k) ? Y : null;
   const instCat = k => { if (!k || !INSTRUMENTS[k]) return ''; const g = INSTRUMENTS[k].group; if (g === 'kit' || g === 'perc') return g; if (['sbass', 'sbass3', 'sbass4', 'dbass', 'pbass', 'bitbass', 'sludge'].includes(k)) return 'bass'; if (['fflute', 'blunt', 'sstring', 'sleg', 'opening', 'drone'].includes(k)) return 'pad'; return 'tonal'; };
   function echoStop() { const sl = document.getElementById('fxEchoExtraSlider'); const v = sl ? +sl.value : 5; return isNaN(v) ? 5 : v; }
@@ -8582,7 +8591,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
             const other = ax === 'x' ? 'y' : 'x';
             if (!e.target.checked) window._axisMap[ax] = window._axisMap[ax].filter(q => q !== k);
             else { if (!window._axisMap[ax].includes(k)) window._axisMap[ax] = window._axisMap[ax].concat(k); window._axisMap[other] = window._axisMap[other].filter(q => q !== k); } // (one axis each)
-            try { localStorage.setItem('sifiAxisMap2', JSON.stringify(window._axisMap)); } catch (er) {}
+            try { localStorage.setItem('sifiAxisMap3', JSON.stringify(window._axisMap)); } catch (er) {}
             axisLabels(); try { playUiSound('tinyclick'); } catch (er) {}
             if (pad) { try { apply(pad.x, pad.y); } catch (er) {} }
             build(); });
@@ -8610,7 +8619,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
             const other = ax === 'x' ? 'y' : 'x';
             if (on) window._axisMap[ax] = window._axisMap[ax].filter(q => q !== k);
             else { window._axisMap[ax] = window._axisMap[ax].concat(k); window._axisMap[other] = window._axisMap[other].filter(q => q !== k); } // (one axis each)
-            try { localStorage.setItem('sifiAxisMap2', JSON.stringify(window._axisMap)); } catch (er) {}
+            try { localStorage.setItem('sifiAxisMap3', JSON.stringify(window._axisMap)); } catch (er) {}
             axisLabels(); try { playUiSound('tinyclick'); } catch (er) {}
             if (pad) { try { apply(pad.x, pad.y); } catch (er) {} }
             build(); });
@@ -8634,7 +8643,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
       [1, 2, 4, 8, 16].forEach(n => { const on = (isOrb ? orbitBars : jumpEvery) === n;
         const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;';
         row.innerHTML = `<span class="ax-box${on ? ' ax-on' : ''}" style="width:14px;height:14px;border:2px solid #fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;${on ? 'background:#fff;color:#111;' : ''}">${on ? '✓' : ''}</span><span>${n} BAR${n > 1 ? 'S' : ''}</span>`;
-        row.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (isOrb) { orbitBars = n; try { localStorage.setItem('sifiOrbitBars', String(n)); } catch (er) {} } else { jumpEvery = n; jumpBars = 0; try { localStorage.setItem('sifiJumpBars', String(n)); } catch (er) {} } try { playUiSound('tinyclick'); } catch (er) {} build(); });
+        row.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); if (isOrb) { orbitBars = n; try { localStorage.setItem('sifiOrbitBars2', String(n)); } catch (er) {} } else { jumpEvery = n; jumpBars = 0; try { localStorage.setItem('sifiJumpBars', String(n)); } catch (er) {} } try { playUiSound('tinyclick'); } catch (er) {} build(); });
         mn.appendChild(row); }); };
     build(); document.body.appendChild(mn); window._axisMenuOpen = true;
   }
@@ -8970,7 +8979,12 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     if (!guideRaf) guideRaf = requestAnimationFrame(guideStep);
     g.style.transition = 'none'; g.style.opacity = '0.6'; };
   const orbitSize = (cx, cy) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); const x = (cx - rc.left) / rc.width, y = (cy - rc.top) / rc.height;
-    orbitThrough(x - 0.5, y - 0.5); try { orbitGuide(true); } catch (e) {} }; // (one finger: the same shape — circle or oval — sized to pass through the finger)
+    orbitThrough(x - 0.5, y - 0.5); try { orbitGuide(true); } catch (e) {}
+    // …and the cursor goes straight to the point on the orbit nearest the tap, carrying on round from there, per direct request
+    { const m2 = document.getElementById('modifyPadMarks'); orbitRX = Math.min(orbitTargetRX, orbitMaxX()); orbitRY = Math.min(orbitTargetRY, orbitMaxY());
+      orbitA = Math.atan2((y - 0.5) / orbitRY, (x - 0.5) / orbitRX); orbitLast = 0;
+      if (!pad) pad = capture(); const px = 0.5 + orbitRX * Math.cos(orbitA), py = 0.5 + orbitRY * Math.sin(orbitA);
+      pad.x = px; pad.y = py; if (m2) showDot([px, py]); try { apply(px, py); } catch (e) {} orbitApplyAt = performance.now(); } }; // (one finger: the same shape — circle or oval — sized to pass through the finger)
   // TWO-FINGER PINCH, per direct request: the orbit becomes an OVAL — spread the fingers sideways for a wide one, up / down for a
   // tall one; both fingers sit on the path. (Once pinched, lifting one finger doesn't snap it back — it waits for both to lift.)
   let orbitPinched = false;
@@ -11043,7 +11057,7 @@ function triggerNoiseGate(tr, isAccent, time) {
   gate.connect(getSynthConnectNode(tr));
   if (trackFx[tr] && (trackFx[tr].x > 0 || trackFx[tr].y > 0)) triggerFxEnvelope(tr, time);
   // Velocity variation: accent is louder and brighter with more randomness
-  const velBase = isAccent ? 0.1565 : 0.0673; // -3dB
+  const velBase = (isAccent ? 0.1565 : 0.0673) * 0.9441; // -3dB (−0.5dB more: ALL PERCUSSION −0.5dB at source, per direct request)
   const vel = velBase * (0.75 + Math.random() * 0.5); // ±25% randomness
   const sweepStart = isAccent ? (2000 + Math.random() * 2000) : (600 + Math.random() * 800);
   const sweepEnd   = isAccent ? (100 + Math.random() * 200)  : (300 + Math.random() * 200);
@@ -26775,12 +26789,30 @@ async function hardResetAudioEngine() {
     c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = f.col; c.fillStyle = f.col;
     c.shadowColor = f.col; c.shadowBlur = 4 + 22 * a;
     const P = f.pts;
-    for (let i = 1; i < P.length; i++) { const k = 1 - (now - P[i].t) / life; if (k <= 0) continue;
-      c.globalAlpha = Math.min(1, (0.25 + 0.75 * a) * k) * fade; c.lineWidth = (3 + 26 * a) * (0.25 + 0.75 * k);
+    // PIXELATED for the 8-BIT MIX (the drag RIGHT), per direct request: the smooth glowing trail (the white-noise sweep, drag DOWN)
+    // crossfades into a blocky, grid-snapped one — chunkier pixels the further right — so you can see which of the two you're applying
+    const px = Math.min(1, window._swDepthX || 0), sm = 1 - px, G = Math.round(4 + 14 * px); // G = the pixel size
+    if (sm > 0.01) for (let i = 1; i < P.length; i++) { const k = 1 - (now - P[i].t) / life; if (k <= 0) continue;
+      c.globalAlpha = Math.min(1, (0.25 + 0.75 * a) * k) * fade * sm; c.lineWidth = (3 + 26 * a) * (0.25 + 0.75 * k);
       c.beginPath(); c.moveTo(P[i - 1].x, P[i - 1].y); c.lineTo(P[i].x, P[i].y); c.stroke(); }
-    if (f.x != null) { // the finger cursor: a ring round the fingertip, filling in as SWEEP goes in
-      c.globalAlpha = fade; c.lineWidth = 3; c.beginPath(); c.arc(f.x, f.y, 24 + 6 * a, 0, Math.PI * 2); c.stroke();
-      c.globalAlpha = (0.15 + 0.6 * a) * fade; c.beginPath(); c.arc(f.x, f.y, 24 + 6 * a, 0, Math.PI * 2); c.fill(); }
+    if (px > 0.01) { c.shadowBlur = 0; const seen = new Map(); // cell → its strongest k
+      for (let i = 1; i < P.length; i++) { const k = 1 - (now - P[i].t) / life; if (k <= 0) continue;
+        const w = (3 + 26 * a) * (0.25 + 0.75 * k), x0 = P[i - 1].x, y0 = P[i - 1].y, x1 = P[i].x, y1 = P[i].y, n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / (G / 2)));
+        for (let j = 0; j <= n; j++) { const x = x0 + (x1 - x0) * j / n, y = y0 + (y1 - y0) * j / n, rad = Math.max(G / 2, w / 2);
+          for (let gx = Math.floor((x - rad) / G); gx <= Math.floor((x + rad) / G); gx++) for (let gy = Math.floor((y - rad) / G); gy <= Math.floor((y + rad) / G); gy++) {
+            const cx = (gx + 0.5) * G, cy = (gy + 0.5) * G; if (Math.hypot(cx - x, cy - y) > rad) continue;
+            const key = gx + ',' + gy; if (!(seen.get(key) >= k)) seen.set(key, k); } } }
+      seen.forEach((k, key) => { const [gx, gy] = key.split(',').map(Number); c.globalAlpha = Math.min(1, (0.25 + 0.75 * a) * k) * fade * px; c.fillRect(gx * G, gy * G, G - 1, G - 1); });
+      c.shadowBlur = 4 + 22 * a; }
+    if (f.x != null) { // the finger cursor: a ring round the fingertip, filling in as SWEEP goes in (in pixels too, for the 8-BIT MIX)
+      const R = 24 + 6 * a;
+      if (sm > 0.01) { c.globalAlpha = fade * sm; c.lineWidth = 3; c.beginPath(); c.arc(f.x, f.y, R, 0, Math.PI * 2); c.stroke();
+        c.globalAlpha = (0.15 + 0.6 * a) * fade * sm; c.beginPath(); c.arc(f.x, f.y, R, 0, Math.PI * 2); c.fill(); }
+      if (px > 0.01) { c.shadowBlur = 0;
+        for (let gx = Math.floor((f.x - R - G) / G); gx <= Math.floor((f.x + R + G) / G); gx++) for (let gy = Math.floor((f.y - R - G) / G); gy <= Math.floor((f.y + R + G) / G); gy++) {
+          const d = Math.hypot((gx + 0.5) * G - f.x, (gy + 0.5) * G - f.y); if (d > R + G / 2) continue;
+          c.globalAlpha = (d > R - G / 2 ? 1 : 0.15 + 0.6 * a) * fade * px; c.fillRect(gx * G, gy * G, G - 1, G - 1); } }
+    }
     c.globalAlpha = 1;
     if (f.ending && fade <= 0) { _sweepFxKill(); return; }
     f.raf = requestAnimationFrame(_sweepFxDraw);
