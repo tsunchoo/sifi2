@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-26 09:06:52 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-26 21:12:10 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3151,7 +3151,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 09:06:52 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 21:12:10 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8580,7 +8580,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     const build = () => { mn.innerHTML = '';
       const ttl = document.createElement('div'); ttl.textContent = 'GRAPH AXES'; ttl.style.cssText = 'font-size:0.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);text-align:center;'; mn.appendChild(ttl);
       const cols = document.createElement('div'); cols.style.cssText = 'flex:1;display:grid;grid-template-columns:1fr 1px 1fr;column-gap:14px;min-height:0;';
-      [['x', 'LEFT ↔ RIGHT'], null, ['y', 'DOWN ↕ UP']].forEach(c => {
+      [['x', 'X-AXIS'], null, ['y', 'Y-AXIS']].forEach(c => { // (X-AXIS / Y-AXIS, no arrows, per direct request)
         if (!c) { const d = document.createElement('div'); d.style.cssText = 'background:#ddd;'; cols.appendChild(d); return; } // the divider down the middle
         const [ax, title] = c, col = document.createElement('div'); col.style.cssText = 'display:flex;flex-direction:column;gap:10px;min-width:0;';
         const h = document.createElement('div'); h.textContent = title; h.style.cssText = 'font-size:0.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);padding-bottom:6px;border-bottom:1px solid #ddd;text-align:center;'; col.appendChild(h);
@@ -8610,7 +8610,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     const mn = document.createElement('div'); mn.id = 'axisMenu';
     mn.style.cssText = `position:fixed;top:${Math.round(r.bottom + 6)}px;left:${Math.max(8, Math.round(r.left))}px;max-height:${Math.round(innerHeight - 16)}px;overflow-y:auto;z-index:9000;background:#111;color:#fff;padding:10px 12px 6px;border-radius:6px;font:700 0.66rem/1 'DM Sans',sans-serif;letter-spacing:1px;min-width:190px;box-shadow:0 6px 20px rgba(0,0,0,0.35);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;`;
     const build = () => { mn.innerHTML = '';
-      [['x', 'LEFT ↔ RIGHT'], ['y', 'DOWN ↕ UP']].forEach(([ax, title]) => {
+      [['x', 'X-AXIS'], ['y', 'Y-AXIS']].forEach(([ax, title]) => {
         const h = document.createElement('div'); h.textContent = title; h.style.cssText = 'opacity:0.55;font-size:0.58rem;margin:4px 0 6px;'; mn.appendChild(h);
         AXIS_PARAMS.forEach(([k, nm]) => { const on = window._axisMap[ax].includes(k);
           const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;';
@@ -8682,7 +8682,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     const was = typeof trackMuted !== 'undefined' ? trackMuted.slice() : null;
     try { absorbEdits(); } catch (e) {}
     const g0 = grid.map(r => r.join(''));
-    try { applyRaw(x, y); } finally { try { if (pad) { pad._lg = grid.map(r => r.slice()); pad._lf = []; for (let tr = 0; tr < NUM_TRACKS; tr++) pad._lf.push(fxOf(tr)); pad._lr = trackDelay.slice(); pad._li = trackInstruments.slice(); } } catch (e) {}
+    try { applyRaw(x, y); } finally { try { if (pad) { pad._lg = grid.map(r => r.slice()); pad._lf = []; for (let tr = 0; tr < NUM_TRACKS; tr++) pad._lf.push(fxOf(tr)); pad._lr = trackDelay.slice(); pad._li = trackInstruments.slice(); pad._ldr = drumsFx(); } } catch (e) {}
       if (!document.body.classList.contains('modify')) { for (let tr = 0; tr < NUM_TRACKS; tr++) if (grid[tr].join('') !== g0[tr]) { try { redrawTrackCells(tr, true); } catch (e) {} } try { _queueFxBtnSync(); } catch (e) {} } } // MAIN: the lanes follow the cursor
     { if (was) for (let tr = 0; tr < NUM_TRACKS; tr++) if (was[tr] && !trackMuted[tr]) { trackMuted[tr] = true; try { updateTrackMute(tr); } catch (e) {} } }
     try { _barVariantUpdate(); } catch (e) {} // the SONG NAME colour follows the cursor, per direct request
@@ -8691,6 +8691,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   // button) goes into the pattern the cursor works from, so the next move builds on it instead of undoing it.
   function absorbEdits() {
     if (!pad || !pad._lg) return; const B = pad.base;
+    if (pad._ldr !== undefined && drumsFx() !== pad._ldr) B.drums = drumsFx(); // DRUMS FX set by hand (the DRUMS menu) is kept too
     for (let tr = 0; tr < NUM_TRACKS; tr++) {
       if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) { const v = grid[tr][st]; if (v === pad._lg[tr][st]) continue;
         B.grid[tr][st] = v; const hasN = pad.notes.findIndex(a => a[0] === tr && a[1] === st), hasE = pad.empties.findIndex(a => a[0] === tr && a[1] === st);
@@ -8724,7 +8725,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     else if (Y > 0) { const n = Math.round(pad.effOff.length * Y); for (let i = 0; i < n; i++) { const [tr, k] = pad.effOff[i]; if (k === 'R') rev[tr] = true; else if (k === 'AUTO') auto[tr] = true; else fx[tr] = Object.assign({}, pad.pick[tr]); } }
     for (let tr = 0; tr < NUM_TRACKS; tr++) { if (!!trackDelay[tr] !== rev[tr]) setRev(tr, rev[tr]); setFx(tr, fx[tr]); if (B.auto && !trackSweep[tr]) setAuto(tr, auto[tr]); }
     // DRUMS: MORE effects = DELAY from ~40% down, then FX2 (BLAST) from ~75%; LESS effects = FX1 (CHK) from about halfway up
-    setDrumsFx(Y >= 0.75 ? 2 : Y >= 0.4 ? 3 : Y <= -0.5 ? 1 : B.drums);
+    if (axOf('effects', 1, 1) !== null) setDrumsFx(Y >= 0.75 ? 2 : Y >= 0.4 ? 3 : Y <= -0.5 ? 1 : B.drums); // DRUMS FX only follows the graph when EFFECTS is on an axis — otherwise the DRUMS menu's FX button is left alone, per direct report (it was being snapped back)
     try { soundAxes(X0, Y0); } catch (e) {}
   }
   function redraw() { for (let tr = 0; tr < NUM_TRACKS; tr++) { try { redrawTrackCells(tr, true); } catch (e) {} } try { _queueFxBtnSync(); } catch (e) {} }
@@ -8813,7 +8814,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     springRaf = requestAnimationFrame(step);
   }
   function restore() { // back to the pattern as it was
-    if (!pad) return; if (pad.beats && pad.beatHome) { try { beatGo(pad.beatHome); } catch (e) {} } const B = pad.base; // (the pattern's own DRUM PATTERN back first)
+    if (!pad) return; try { absorbEdits(); } catch (e) {} // (hand edits since the last move — e.g. DRUMS FX — are part of 'as it was') if (pad.beats && pad.beatHome) { try { beatGo(pad.beatHome); } catch (e) {} } const B = pad.base; // (the pattern's own DRUM PATTERN back first)
     for (let tr = 0; tr < NUM_TRACKS; tr++) { if (B.auto && !trackSweep[tr]) setAuto(tr, B.auto[tr]); if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) grid[tr][st] = B.grid[tr][st]; if (!!trackDelay[tr] !== B.rev[tr]) setRev(tr, B.rev[tr]); setFx(tr, B.fx[tr]); }
     setDrumsFx(B.drums);
     try { soundAxes(0, 0); } catch (e) {} // INSTRUMENTS / REVERB SIZE / DELAY TIME / FILTER back as they were
