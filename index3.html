@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-26 21:29:56 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-26 21:33:22 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3151,7 +3151,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 21:29:56 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-26 21:33:22 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -8546,11 +8546,14 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     if (!pad.beats) { pad.beats = {}; pad.beatHome = _beatType; }
     pad.beats[_beatType] = beatSnap(); // remember the drums as they are now
     const pre = grid.map(r => r.slice());
+    const _lk = []; for (let tr = 0; tr < NUM_TRACKS; tr++) if (trackSweep[tr]) _lk.push([tr, grid[tr].slice(), trackInstruments[tr], !!trackMuted[tr]]); // LOCKED tracks: put back exactly as they were after the beat change
     try { setBeatType(type, false); } catch (e) {}
+    _lk.forEach(([tr, row, k, mu]) => { for (let st = 0; st < NUM_STEPS; st++) grid[tr][st] = row[st]; if (trackInstruments[tr] !== k && INSTRUMENTS[k]) { try { selectSound(tr, k); } catch (e) {} } if (!!trackMuted[tr] !== mu) { trackMuted[tr] = mu; try { updateTrackMute(tr); } catch (e) {} } try { redrawTrackCells(tr, true); } catch (e) {} });
     const S = pad.beats[type];
     if (S) { // been here before: exactly the same drums back
       B.grid = S.grid.map(r => r.slice()); B.inst = S.inst.slice(); pad.notes = S.notes.map(a => a.slice()); pad.empties = S.empties.map(a => a.slice());
       for (let tr = 0; tr < NUM_TRACKS; tr++) {
+        if (trackSweep[tr]) continue; // (LOCKED: left as it is)
         if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) grid[tr][st] = B.grid[tr][st];
         if (B.inst[tr] && trackInstruments[tr] !== B.inst[tr] && INSTRUMENTS[B.inst[tr]]) { try { selectSound(tr, B.inst[tr]); } catch (e) {} }
         if (!!trackMuted[tr] !== !!S.muted[tr]) { trackMuted[tr] = !!S.muted[tr]; try { updateTrackMute(tr); } catch (e) {} }
@@ -8714,9 +8717,11 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     const X = axOf('notes', X0, Y0) ?? 0, Y = axOf('effects', X0, Y0) ?? 0; // AXIS MENU (hold A): NOTES / EFFECTS follow whichever axis they're ticked on (0 = left as the pattern is) // Y FLIPPED, per direct request: the BOTTOM is now fewest effects and the TOP most (Y > 0 = more)
     // NOTES — taking away = MUTING (the notes stay in the pattern); adding = real notes on empty steps
     const g = B.grid.map(r => r.slice()), mute = new Uint8Array(NUM_TRACKS * NUM_STEPS);
-    if (X < 0) { const n = Math.round(pad.notes.length * -X); for (let i = 0; i < n; i++) { const [tr, st] = pad.notes[i]; mute[tr * NUM_STEPS + st] = 1; } }
-    else if (X > 0) { const n = Math.round(pad.empties.length * X); for (let i = 0; i < n; i++) { const [tr, st] = pad.empties[i]; g[tr][st] = 1; } }
-    for (let tr = 0; tr < NUM_TRACKS; tr++) { if (autoOn(tr)) continue; /* AUTO NOTES tracks write their own notes every bar — the pad leaves their grid alone (its mutes still apply) */ for (let st = 0; st < NUM_STEPS; st++) if (grid[tr][st] !== g[tr][st]) grid[tr][st] = g[tr][st]; }
+    // LOCKED TRACKS are never changed by the graph, per direct request — not their notes, mutes, effects or (below) instruments / drum pattern
+    const _unl = a => !trackSweep[a[0]], _nU = pad.notes.filter(_unl), _eU = pad.empties.filter(_unl);
+    if (X < 0) { const n = Math.round(_nU.length * -X); for (let i = 0; i < n; i++) { const [tr, st] = _nU[i]; mute[tr * NUM_STEPS + st] = 1; } }
+    else if (X > 0) { const n = Math.round(_eU.length * X); for (let i = 0; i < n; i++) { const [tr, st] = _eU[i]; g[tr][st] = 1; } }
+    for (let tr = 0; tr < NUM_TRACKS; tr++) { if (autoOn(tr) || trackSweep[tr]) continue; /* (LOCKED: left alone) */ /* AUTO NOTES tracks write their own notes every bar — the pad leaves their grid alone (its mutes still apply) */ for (let st = 0; st < NUM_STEPS; st++) if (grid[tr][st] !== g[tr][st]) grid[tr][st] = g[tr][st]; }
     window._padMute = X < 0 ? mute : null;
     // EFFECTS
     // REMOVED EFFECTS ARE GONE FOR GOOD, per direct request: an effect the pad takes off isn't remembered — moving back up / to
@@ -8729,7 +8734,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
       // …and FX1 (CHK) comes onto more and more tracks, per direct request — it chops each hit to a blip, so it takes sound AWAY too
       const c = Math.round(NUM_TRACKS * -Y); for (let i = 0; i < c; i++) fx[pad.chk[i]] = { x: 0, y: 0, pump: false, chink: true }; }
     else if (Y > 0) { const n = Math.round(pad.effOff.length * Y); for (let i = 0; i < n; i++) { const [tr, k] = pad.effOff[i]; if (k === 'R') rev[tr] = true; else if (k === 'AUTO') auto[tr] = true; else fx[tr] = Object.assign({}, pad.pick[tr]); } }
-    for (let tr = 0; tr < NUM_TRACKS; tr++) { if (!!trackDelay[tr] !== rev[tr]) setRev(tr, rev[tr]); setFx(tr, fx[tr]); if (B.auto && !trackSweep[tr]) setAuto(tr, auto[tr]); }
+    for (let tr = 0; tr < NUM_TRACKS; tr++) { if (trackSweep[tr]) continue; /* LOCKED: its R / FX / AUTO untouched */ if (!!trackDelay[tr] !== rev[tr]) setRev(tr, rev[tr]); setFx(tr, fx[tr]); if (B.auto) setAuto(tr, auto[tr]); }
     // DRUMS: MORE effects = DELAY from ~40% down, then FX2 (BLAST) from ~75%; LESS effects = FX1 (CHK) from about halfway up
     if (axOf('effects', 1, 1) !== null) setDrumsFx(Y >= 0.75 ? 2 : Y >= 0.4 ? 3 : Y <= -0.5 ? 1 : B.drums); // DRUMS FX only follows the graph when EFFECTS is on an axis — otherwise the DRUMS menu's FX button is left alone, per direct report (it was being snapped back)
     try { soundAxes(X0, Y0); } catch (e) {}
@@ -8821,7 +8826,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   }
   function restore() { // back to the pattern as it was
     if (!pad) return; try { absorbEdits(); } catch (e) {} // (hand edits since the last move — e.g. DRUMS FX — are part of 'as it was') if (pad.beats && pad.beatHome) { try { beatGo(pad.beatHome); } catch (e) {} } const B = pad.base; // (the pattern's own DRUM PATTERN back first)
-    for (let tr = 0; tr < NUM_TRACKS; tr++) { if (B.auto && !trackSweep[tr]) setAuto(tr, B.auto[tr]); if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) grid[tr][st] = B.grid[tr][st]; if (!!trackDelay[tr] !== B.rev[tr]) setRev(tr, B.rev[tr]); setFx(tr, B.fx[tr]); }
+    for (let tr = 0; tr < NUM_TRACKS; tr++) { if (trackSweep[tr]) continue; /* (LOCKED: never touched) */ if (B.auto) setAuto(tr, B.auto[tr]); if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) grid[tr][st] = B.grid[tr][st]; if (!!trackDelay[tr] !== B.rev[tr]) setRev(tr, B.rev[tr]); setFx(tr, B.fx[tr]); }
     setDrumsFx(B.drums);
     try { soundAxes(0, 0); } catch (e) {} // INSTRUMENTS / REVERB SIZE / DELAY TIME / FILTER back as they were
     window._padMute = null; pad = null; redraw(); showDot(null); { const m = document.getElementById('modifyPadMarks'); if (m) m.classList.remove('sp-latched'); }
