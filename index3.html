@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD TIMESTAMP: 2026-11-27 21:21:41 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
+<!-- BUILD TIMESTAMP: 2026-11-27 23:07:00 UTC — updated every time this file is regenerated in this conversation, so we can both confirm we're looking at the same build. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -395,6 +395,9 @@ body.bg-beat-pulse { animation: bg-pulse var(--bg-pulse-duration, 0.15s) ease-ou
 /* LIVE mode bits: tape graphics hidden (kept as invisible tap targets, so holding a reel still opens SETTINGS) and nothing in them
    animating; and no quarter-note pulse on the LOCK asterisks */
 body.hide-tape #tapeReels { opacity: 0 !important; }
+/* TAPE GRAPHICS OPACITY (SETTINGS, the two sliders at the top), per direct request: both spools and the tape window — one level while stopped, one while playing */
+html body #tapeReels > #leftReelWrap, html body #tapeReels > #rightReelWrap, html body #tapeReels > #tapeWindow { opacity: var(--tape-op-stop, 1); transition: opacity 0.3s ease; }
+html body.seq-playing #tapeReels > #leftReelWrap, html body.seq-playing #tapeReels > #rightReelWrap, html body.seq-playing #tapeReels > #tapeWindow { opacity: var(--tape-op-play, 1); }
 /* LIVE layout: tempo twice the size, the key shown big on the left of the tempo row (placed by _placeLiveKey), count 2.5x (see _placeBeatCount) */
 #liveKey { display: none; position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; font-family: 'DM Sans', sans-serif; font-weight: 700; white-space: nowrap; color: var(--header-text-color, #111); align-items: baseline; gap: 0; }
 body.live-layout #siFiTitle { visibility: hidden !important; pointer-events: none !important; } /* LIVE: the key takes the logo's place, per direct request */
@@ -3151,7 +3154,7 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
 <button id="loadingOverlay" onclick="document.getElementById('loadingProgress').style.display='block'; document.getElementById('loadingMsg').style.display='none'; this.style.pointerEvents='none'; if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } initAudio()">
   <h2>Si•Fi</h2>
   <p id="loadingMsg">Tap to load</p>
-  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-27 21:21:41 UTC</p>
+  <p id="buildTimestamp" style="font-size:0.6rem;color:#888;letter-spacing:0.5px;margin-top:6px;">BUILD 2026-11-27 23:07:00 UTC</p>
   <div id="loadingProgress" style="display:none;width:80%;max-width:260px;margin-top:16px;">
     <div style="width:100%;height:6px;background:#333;border-radius:3px;overflow:hidden;">
       <div id="loadingBar" style="height:100%;width:0%;background:#f17d21;transition:width 0.15s;"></div>
@@ -4113,6 +4116,17 @@ html body #loadingOverlay h2, html body #loadingOverlay p:not(#buildTimestamp) {
   <div id="settingsPanel" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#f5f0e8;padding:24px;min-width:min(340px,90vw);display:flex;flex-direction:column;gap:16px;font-family:'DM Sans',sans-serif;max-height:85vh;overflow-y:auto;">
 
     <div style="font-size:0.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);text-align:center;">SETTINGS</div>
+    <!-- TAPE GRAPHICS OPACITY — STOPPED / PLAYING (both spools + the tape window), at the very top, per direct request -->
+    <div style="display:flex;flex-direction:column;gap:12px;padding-bottom:12px;border-bottom:1px solid #ddd;">
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">TAPE OPACITY — STOPPED</div><div id="tapeOpStopVal" style="font-size:0.85rem;font-weight:700;color:#111;">100%</div></div>
+        <input autocomplete="off" type="range" id="tapeOpStopSlider" min="0" max="100" value="100" class="master-vol-slider" style="width:100%;" oninput="setTapeOpacity('stop', this.value)" onchange="setTapeOpacity('stop', this.value)">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);">TAPE OPACITY — PLAYING</div><div id="tapeOpPlayVal" style="font-size:0.85rem;font-weight:700;color:#111;">100%</div></div>
+        <input autocomplete="off" type="range" id="tapeOpPlaySlider" min="0" max="100" value="100" class="master-vol-slider" style="width:100%;" oninput="setTapeOpacity('play', this.value)" onchange="setTapeOpacity('play', this.value)">
+      </div>
+    </div>
     <!-- ABERRATION COLOUR fixed at 50% (slider removed) and the CROSS CURSOR option removed, per direct request -->
     <!-- MODIFY NOTE ROWS IN TRACK COLOURS removed from SETTINGS and hard-coded ON, per direct request -->
     <!-- SONG NAME EQ … GRAPH COUNT moved to LOOK AND FEEL > DEV (NOTE MARKERS OPACITY removed), per direct request -->
@@ -8403,6 +8417,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
 (function () {
   let pad = null, raf = 0, pend = null, held = false;
   let jumpOn = false, jumpBars = 0, jumpRaf = 0; // A = JUMP (see setJump below)
+  let jumpBox = null; // JUMP's BOUNDING BOX (graph units {x0, y0, x1, y1}) — pinched with two fingers in JUMP; null = the whole graph
   let orbitBars = 4; try { const v = +localStorage.getItem('sifiOrbitBars2'); if ([1, 2, 4, 8, 16].includes(v)) orbitBars = v; } catch (e) {} // ORBIT: one lap every N bars (HOLD the MODE button in ORBIT), per direct request
   let jumpEvery = 1; try { const v = +localStorage.getItem('sifiJumpBeats'); if ([1, 2, 4, 8, 16].includes(v)) jumpEvery = v; } catch (e) {} // JUMP (teleport) every N BEATS — 1 beat by default now, per direct request (was 4 bars; the choices are 1 / 2 beats, 1 / 2 / 4 bars) — HOLD the MODE button to change it
   const nb = () => document.getElementById('nameBar');
@@ -8455,7 +8470,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     try { if (pad) restore(); } catch (e) {}
     window._padMute = null; pad = null; padSaved = null; held = false;
     try { springStop(); } catch (e) {}
-    orbitOff = true; jumpOn = false; jumpBars = 0; orbitA = null; orbitLast = 0; orbitTargetRX = orbitTargetRY = 0.385; window._orbitMain = false; // (an OVAL goes back to the normal circle)
+    orbitOff = true; jumpOn = false; jumpBars = 0; jumpBox = null; orbitA = null; orbitLast = 0; orbitTargetRX = orbitTargetRY = 0.385; window._orbitMain = false; // (an OVAL goes back to the normal circle)
     if (orbitRaf) { cancelAnimationFrame(orbitRaf); orbitRaf = 0; }
     window._padLatch = true; { const lk = document.getElementById('modifyLock'); if (lk) { lk.innerHTML = LOCK_SVG(true); lk.classList.toggle('sp-mag-off', false); } } // padlock ON by default, per direct request
     try { if (!window._sweepGestureActive) djFilter(0); } catch (e) {} // (a held SWEEP keeps its filter)
@@ -8501,8 +8516,19 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   function axisLabels() { const m = document.getElementById('modifyPadMarks'); if (!m) return; const nm = k => (AXIS_PARAMS.find(p => p[0] === k) || [])[1] || '';
     const xl = m.querySelector('.sp-xlab > span:not(.sp-g)'), yl = m.querySelector('.sp-ylab > span:not(.sp-g)');
     if (xl) xl.textContent = window._axisMap.x.map(nm).join(' + ') || '—'; if (yl) yl.textContent = window._axisMap.y.map(nm).join(' + ') || '—'; }
-  function djFilter(v, tc) { // −1 … 1: low-pass down to 300Hz … open … high-pass up to 1.5kHz
-    const lp = window._djLP, hp = window._djHP; if (!lp || !hp || !ctx) return; const t = ctx.currentTime;
+  // JUMP lands its settings ON THE 1, per direct request: the notes / instruments / drum pattern are set up a 16th ahead (so the 1 is
+  // planned with them), but the MIX settings — FILTER, REVERB SIZE, DELAY TIME, BITCRUSH, DRUMS FX — switch in one step exactly on
+  // the 1 (no glide). padDeferAt = the 1's audio time while a JUMP is being applied (0 otherwise).
+  let padDeferAt = 0, padDeferPending = 0;
+  function padLater(fn) {
+    if (padDeferAt && ctx && padDeferAt > ctx.currentTime + 0.005) {
+      padDeferPending++; const ms = (padDeferAt - ctx.currentTime) * 1000;
+      setTimeout(() => { try { fn(); } catch (e) {} padDeferPending = Math.max(0, padDeferPending - 1);
+        if (pad) { try { pad._ldt = echoStop(); pad._lrs = window._reverbIntensity || 0; pad._lcr = window._eightBitMix || 0; pad._ldr = drumsFx(); } catch (e) {} } }, ms); // (so the switch isn't mistaken for a hand edit)
+    } else fn();
+  }
+  function djFilter(v, tc, at) { // −1 … 1: low-pass down to 300Hz … open … high-pass up to 1.5kHz   (at: start time on the audio clock)
+    const lp = window._djLP, hp = window._djHP; if (!lp || !hp || !ctx) return; const t = Math.max(ctx.currentTime, at || 0);
     const lf = v < 0 ? 20000 * Math.pow(300 / 20000, -v) : 20000, hf = v > 0 ? 20 * Math.pow(1500 / 20, v) : 20;
     lp.frequency.setTargetAtTime(lf, t, tc || 0.03); hp.frequency.setTargetAtTime(hf, t, tc || 0.03); }
   // SWEEP's vertical drag drives the same FILTER, per direct request (down = low-pass closing); letting go hands it back to the graph
@@ -8521,15 +8547,15 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     if (ar !== null || pad._rs) { pad._rs = ar !== null; // (REVERB SIZE / DELAY TIME are only touched when on an axis — or just taken off one, to put them back — per direct report: DELAY TIME couldn't be changed in ORBIT)
     let v = ar === null ? rb : ar > 0 ? rb + ar * (1 - rb) : rb + ar * rb; v = Math.round(Math.max(0, Math.min(1, v)) * 20) / 20; if (ar === null || ar === 0) v = rb; // (the centre = exactly as it was)
       if (Math.abs(v - (window._reverbIntensity || 0)) > 0.001 && ctx && window._reverbConv) { const c = (window._irCache = window._irCache && window._irCache.ctx === ctx ? window._irCache : { ctx }); const key = Math.round(v * 1000);
-        if (!c[key]) c[key] = _buildReverbIRBuffer(ctx, _reverbSizeFromSlider(v)); window._reverbConv.buffer = c[key]; window._reverbIntensity = v; } }
+        if (!c[key]) c[key] = _buildReverbIRBuffer(ctx, _reverbSizeFromSlider(v)); const _buf = c[key]; padLater(() => { if (window._reverbConv) window._reverbConv.buffer = _buf; window._reverbIntensity = v; }); } } // (built now, switched ON the 1 for a JUMP)
     // DELAY TIME (musical stops)
     const ad = axOf('dtime', X0, Y0), db = B.dtime != null ? B.dtime : echoStop();
-    if (ad !== null || pad._dt) { pad._dt = ad !== null; const v = ad === null ? db : Math.max(-4, Math.min(9, db + Math.round(ad * 5))); if (v !== echoStop()) { try { _setFxEchoExtra(v); } catch (e) {} } }
+    if (ad !== null || pad._dt) { pad._dt = ad !== null; const v = ad === null ? db : Math.max(-4, Math.min(9, db + Math.round(ad * 5))); if (v !== echoStop()) { padLater(() => { try { _setFxEchoExtra(v); } catch (e) {} }); } }
     // FILTER
-    const af = axOf('filter', X0, Y0); if (af !== null || pad._filt) { djFilter(af || 0); pad._filt = af !== null && af !== 0; }
+    const af = axOf('filter', X0, Y0); if (af !== null || pad._filt) { if (padDeferAt) djFilter(af || 0, 0.003, padDeferAt); else djFilter(af || 0); pad._filt = af !== null && af !== 0; } // (JUMP: a near-instant switch ON the 1)
     // BITCRUSH, per direct request: the 8-BIT MIX, from where it was at the centre up to 100% at the graph's edge (either direction)
     const ac = axOf('crush', X0, Y0), cb = B.crush != null ? B.crush : (window._eightBitMix || 0);
-    if (ac !== null || pad._crush) { const v = Math.round((ac ? cb + Math.min(1, Math.abs(ac)) * (1 - cb) : cb) * 100); if (v !== Math.round((window._eightBitMix || 0) * 100)) { try { setEightBitMix(v); } catch (e) {} } pad._crush = ac !== null && ac !== 0; }
+    if (ac !== null || pad._crush) { const v = Math.round((ac ? cb + Math.min(1, Math.abs(ac)) * (1 - cb) : cb) * 100); if (v !== Math.round((window._eightBitMix || 0) * 100)) { padLater(() => { try { setEightBitMix(v); } catch (e) {} }); } pad._crush = ac !== null && ac !== 0; }
   }
   // DRUM PATTERN on the graph, per direct request. Each beat type, once visited, is remembered for this pattern (its drums exactly as
   // they came out), so going back to a place — or to the centre — brings back the SAME drums, not a fresh roll.
@@ -8668,7 +8694,7 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   }
   // DRUMS' own FX in the pad too, per direct request — 0 off, 1 FX1 (CHK), 2 FX2 (BLAST), 3 DELAY (as the DRUMS FX button)
   function drumsFx() { try { return _beatChoke ? 1 : _beatPump ? 2 : _beatFx ? 3 : 0; } catch (e) { return 0; } }
-  function setDrumsFx(st) { if (drumsFx() !== st) { try { _setBeatFxState(st); } catch (e) {} } }
+  function setDrumsFx(st) { if (drumsFx() !== st) { padLater(() => { if (drumsFx() !== st) { try { _setBeatFxState(st); } catch (e) {} } }); } }
   function setFx(tr, f) {
     const c = fxOf(tr); if (c.x === f.x && c.y === f.y && c.pump === f.pump && c.chink === f.chink) return;
     trackPump[tr] = f.pump; trackFx[tr] = { x: f.x, y: f.y };
@@ -8697,10 +8723,10 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   // button) goes into the pattern the cursor works from, so the next move builds on it instead of undoing it.
   function absorbEdits() {
     if (!pad || !pad._lg) return; const B = pad.base;
-    if (pad._ldr !== undefined && drumsFx() !== pad._ldr) B.drums = drumsFx(); // DRUMS FX set by hand (the DRUMS menu) is kept too
-    if (pad._ldt !== undefined && echoStop() !== pad._ldt) B.dtime = echoStop(); // …and DELAY TIME, REVERB SIZE and the 8-BIT MIX changed by hand
-    if (pad._lrs !== undefined && Math.abs((window._reverbIntensity || 0) - pad._lrs) > 0.001) B.rsize = window._reverbIntensity;
-    if (pad._lcr !== undefined && Math.abs((window._eightBitMix || 0) - pad._lcr) > 0.001) B.crush = window._eightBitMix || 0;
+    if (!padDeferPending && pad._ldr !== undefined && drumsFx() !== pad._ldr) B.drums = drumsFx(); // DRUMS FX set by hand (the DRUMS menu) is kept too
+    if (!padDeferPending && pad._ldt !== undefined && echoStop() !== pad._ldt) B.dtime = echoStop(); // …and DELAY TIME, REVERB SIZE and the 8-BIT MIX changed by hand
+    if (!padDeferPending && pad._lrs !== undefined && Math.abs((window._reverbIntensity || 0) - pad._lrs) > 0.001) B.rsize = window._reverbIntensity;
+    if (!padDeferPending && pad._lcr !== undefined && Math.abs((window._eightBitMix || 0) - pad._lcr) > 0.001) B.crush = window._eightBitMix || 0;
     if (pad._lau && B.auto) for (let tr = 0; tr < NUM_TRACKS; tr++) if (autoOn(tr) !== pad._lau[tr]) B.auto[tr] = autoOn(tr); // …and a track's AUTO NOTES switched by hand (it was being switched straight back)
     for (let tr = 0; tr < NUM_TRACKS; tr++) {
       if (!autoOn(tr)) for (let st = 0; st < NUM_STEPS; st++) { const v = grid[tr][st]; if (v === pad._lg[tr][st]) continue;
@@ -8796,9 +8822,11 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
     if (!jumpOn || held || orbiting() || !document.body.classList.contains('modify')) return;
     if (!pad) pad = capture();
     const mx = 0.5 - orbitMaxX(), my = 0.5 - orbitMaxY(); // (kept far enough in that the ring never goes off the graph)
-    let x, y, n = 0; do { x = mx + Math.random() * (1 - 2 * mx); y = my + Math.random() * (1 - 2 * my); } while (++n < 12 && Math.hypot(x - pad.x, y - pad.y) < 0.25); // somewhere properly new
+    const bx0 = Math.max(mx, jumpBox ? jumpBox.x0 : 0), bx1 = Math.min(1 - mx, jumpBox ? jumpBox.x1 : 1), by0 = Math.max(my, jumpBox ? jumpBox.y0 : 0), by1 = Math.min(1 - my, jumpBox ? jumpBox.y1 : 1); // inside the BOUNDING BOX (if one's been pinched)
+    const bw = Math.max(0, bx1 - bx0), bh = Math.max(0, by1 - by0), minD = 0.25 * Math.min(1, Math.max(bw, bh) / (1 - 2 * Math.min(mx, my)));
+    let x, y, n = 0; do { x = bx0 + Math.random() * bw; y = by0 + Math.random() * bh; } while (++n < 12 && Math.hypot(x - pad.x, y - pad.y) < minD); // somewhere properly new ("properly" scaled to the box)
     const x0 = pad.x, y0 = pad.y; try { springStop(); } catch (e) {}
-    apply(x, y);
+    padDeferAt = (at && ctx) ? at : 0; try { apply(x, y); } finally { padDeferAt = 0; } // (the mix settings switch ON the 1 — see padLater)
     cancelAnimationFrame(jumpRaf); const t0 = performance.now(); let D = 220; try { if (at && ctx) D = Math.max(120, Math.min(1500, (at - ctx.currentTime) * 1000)); } catch (e) {} // the ring glides in, landing ON the 1
     const step = now => { if (held || orbiting()) { jumpRaf = 0; return; } const k = Math.min(1, (now - t0) / D), q = 1 - Math.pow(1 - k, 3); showDot([x0 + (x - x0) * q, y0 + (y - y0) * q]); jumpRaf = k < 1 ? requestAnimationFrame(step) : 0; };
     jumpRaf = requestAnimationFrame(step);
@@ -9001,12 +9029,35 @@ window._padLatch = true; // PADLOCK ON by default (locked = the ring stays where
   // TWO-FINGER PINCH, per direct request: the orbit becomes an OVAL — spread the fingers sideways for a wide one, up / down for a
   // tall one; both fingers sit on the path. (Once pinched, lifting one finger doesn't snap it back — it waits for both to lift.)
   let orbitPinched = false;
+  // JUMP BOUNDING BOX, per direct request: in JUMP, a TWO-FINGER PINCH draws the box the teleports stay inside — the two fingers are
+  // its opposite corners, so it can be any shape of rectangle. A DOTTED rectangle shows it while pinching and fades after (a quarter
+  // note), like the orbit's guide. A ONE-finger tap still switches to HOLD where it lands — it waits a moment first, in case a second
+  // finger is on its way. The box goes back to the whole graph with a new pattern.
+  let boxGrab = false, jumpPend = null, jumpPendT = 0;
+  const boxGuide = (show) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; let g = document.getElementById('jumpBoxGuide');
+    if (!show) { if (g) { let q = 0.5; try { q = stepDuration() * 4; } catch (e) {} g.style.transition = `opacity ${Math.max(0.05, q).toFixed(3)}s linear`; g.style.opacity = '0'; } return; }
+    if (!g) { g = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); g.id = 'jumpBoxGuide'; g.setAttribute('aria-hidden', 'true');
+      g.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible;opacity:0;';
+      g.innerHTML = '<rect fill="none" stroke="var(--top-row-highlight-color, #f8ff00)" stroke-width="3.75" stroke-linecap="round" stroke-dasharray="6.25 10.25" style="animation:orbit-guide-dash 0.42s linear infinite;"/>';
+      if (getComputedStyle(m).position === 'static') m.style.position = 'relative'; m.appendChild(g); }
+    const w = m.clientWidth, h = m.clientHeight, B = jumpBox || { x0: 0, y0: 0, x1: 1, y1: 1 }; g.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    const r = g.firstChild; r.setAttribute('x', B.x0 * w); r.setAttribute('y', B.y0 * h); r.setAttribute('width', Math.max(1, (B.x1 - B.x0) * w)); r.setAttribute('height', Math.max(1, (B.y1 - B.y0) * h));
+    g.style.transition = 'none'; g.style.opacity = '0.6'; };
+  const boxPinch = (t0, t1) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); if (!rc.width || !rc.height) return;
+    const cl = v => Math.max(0, Math.min(1, v)), ax = cl((t0.clientX - rc.left) / rc.width), bx = cl((t1.clientX - rc.left) / rc.width), ay = cl((t0.clientY - rc.top) / rc.height), by = cl((t1.clientY - rc.top) / rc.height);
+    let x0 = Math.min(ax, bx), x1 = Math.max(ax, bx), y0 = Math.min(ay, by), y1 = Math.max(ay, by);
+    if (x1 - x0 < 0.06) { const c = (x0 + x1) / 2; x0 = cl(c - 0.03); x1 = cl(c + 0.03); } if (y1 - y0 < 0.06) { const c = (y0 + y1) / 2; y0 = cl(c - 0.03); y1 = cl(c + 0.03); } // (never thinner than a sliver)
+    jumpBox = { x0, y0, x1, y1 }; try { boxGuide(true); } catch (e) {} };
+  const jumpPendFire = () => { clearTimeout(jumpPendT); jumpPendT = 0; const p = jumpPend; jumpPend = null; if (!p || boxGrab) return; try { setPadMode('hold'); } catch (e) {} start(p.x, p.y); };
   const orbitPinch = (t0, t1) => { const m = document.getElementById('modifyPadMarks'); if (!m) return; const rc = m.getBoundingClientRect(); if (!rc.width || !rc.height) return;
     const dx = Math.abs(t0.clientX - t1.clientX) / rc.width, dy = Math.abs(t0.clientY - t1.clientY) / rc.height; orbitPinched = true;
     orbitTargetRX = Math.max(0.04, Math.min(orbitMaxX(), dx / Math.SQRT2)); orbitTargetRY = Math.max(0.04, Math.min(orbitMaxY(), dy / Math.SQRT2)); try { orbitGuide(true); } catch (e) {} }; // (never off the graph) // (graph-height units — the ring never leaves the graph)
-  window.addEventListener('touchstart', e => { if (!inPad(e)) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (jumpOn || (orbitOff && !window._padLatch)) { try { setPadMode('hold'); } catch (er) {} } /* JUMP (teleport) or SPRING (padlock open): a touch on the graph switches to HOLD (padlock) — the cursor locks where it's put, per direct request */ if (orbiting()) { orbitGrab = true; if (e.touches.length >= 2) { orbitPinch(e.touches[0], e.touches[1]); return; } const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (e.touches.length === 1 && isDouble()) { padReset(); return; } const t = e.touches[0]; start(t.clientX, t.clientY); }, { capture: true, passive: false });
-  window.addEventListener('touchmove', e => { if (orbitGrab) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (e.touches.length >= 2) { orbitPinch(e.touches[0], e.touches[1]); return; } if (orbitPinched) return; const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (!held) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; pos(t.clientX, t.clientY); }, { capture: true, passive: false });
-  ['touchend', 'touchcancel'].forEach(t => window.addEventListener(t, e => { if (orbitGrab) { e.stopPropagation(); if (!e.touches || !e.touches.length) { orbitGrab = false; orbitPinched = false; try { orbitGuide(false); } catch (er) {} } return; } if (!held) return; e.stopPropagation(); if (!e.touches || !e.touches.length) end(); }, { capture: true }));
+  window.addEventListener('touchstart', e => { if (!inPad(e)) return; e.stopPropagation(); if (e.cancelable) e.preventDefault();
+    if (jumpOn) { if (e.touches.length >= 2) { boxGrab = true; clearTimeout(jumpPendT); jumpPend = null; boxPinch(e.touches[0], e.touches[1]); return; } // JUMP: two fingers = the BOUNDING BOX
+      const t0 = e.touches[0]; jumpPend = { x: t0.clientX, y: t0.clientY }; clearTimeout(jumpPendT); jumpPendT = setTimeout(jumpPendFire, 130); return; } // one finger: HOLD, once it's clearly not a pinch
+    if ((orbitOff && !window._padLatch)) { try { setPadMode('hold'); } catch (er) {} } /* JUMP (teleport) or SPRING (padlock open): a touch on the graph switches to HOLD (padlock) — the cursor locks where it's put, per direct request */ if (orbiting()) { orbitGrab = true; if (e.touches.length >= 2) { orbitPinch(e.touches[0], e.touches[1]); return; } const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (e.touches.length === 1 && isDouble()) { padReset(); return; } const t = e.touches[0]; start(t.clientX, t.clientY); }, { capture: true, passive: false });
+  window.addEventListener('touchmove', e => { if (boxGrab) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (e.touches.length >= 2) boxPinch(e.touches[0], e.touches[1]); return; } if (jumpPend) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; jumpPend.x = t.clientX; jumpPend.y = t.clientY; return; } if (orbitGrab) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); if (e.touches.length >= 2) { orbitPinch(e.touches[0], e.touches[1]); return; } if (orbitPinched) return; const t = e.touches[0]; orbitSize(t.clientX, t.clientY); return; } if (!held) return; e.stopPropagation(); if (e.cancelable) e.preventDefault(); const t = e.touches[0]; pos(t.clientX, t.clientY); }, { capture: true, passive: false });
+  ['touchend', 'touchcancel'].forEach(t => window.addEventListener(t, e => { if (boxGrab) { e.stopPropagation(); if (!e.touches || !e.touches.length) { boxGrab = false; try { boxGuide(false); } catch (er) {} } return; } if (jumpPend) { e.stopPropagation(); jumpPendFire(); if (!e.touches || !e.touches.length) end(); return; } if (orbitGrab) { e.stopPropagation(); if (!e.touches || !e.touches.length) { orbitGrab = false; orbitPinched = false; try { orbitGuide(false); } catch (er) {} } return; } if (!held) return; e.stopPropagation(); if (!e.touches || !e.touches.length) end(); }, { capture: true }));
   window.addEventListener('mousedown', e => { if (!inPad(e)) return; e.stopPropagation(); e.preventDefault(); if (jumpOn || (orbitOff && !window._padLatch)) { try { setPadMode('hold'); } catch (er) {} } /* (JUMP / SPRING → HOLD, as above) */ if (orbiting()) { orbitGrab = true; orbitSize(e.clientX, e.clientY); return; } if (isDouble()) { padReset(); return; } start(e.clientX, e.clientY); }, true);
   window.addEventListener('mousemove', e => { if (orbitGrab) { orbitSize(e.clientX, e.clientY); return; } if (held) pos(e.clientX, e.clientY); }, true);
   window.addEventListener('mouseup', e => { if (orbitGrab) { e.stopPropagation(); orbitGrab = false; try { orbitGuide(false); } catch (er) {} return; } if (held) { e.stopPropagation(); end(); } }, true);
@@ -27640,6 +27691,13 @@ function _scDepth() {
 // how DEEP each duck goes (−13dB at 50% in the top-right corner → about −30dB at 100%) and how LONG it takes to swell back
 // (an 8th note at 50%, half that at 0, 1.5x at 100%) — together that's what makes a sidechain feel weak or heavy.
 window._glue = 0.5;
+// TAPE GRAPHICS OPACITY (SETTINGS, top), per direct request — remembered
+function setTapeOpacity(which, v) { v = Math.max(0, Math.min(100, Math.round(+v || 0)));
+  document.documentElement.style.setProperty(which === 'play' ? '--tape-op-play' : '--tape-op-stop', (v / 100).toFixed(2));
+  const r = document.getElementById(which === 'play' ? 'tapeOpPlayVal' : 'tapeOpStopVal'); if (r) r.textContent = v + '%';
+  const sl = document.getElementById(which === 'play' ? 'tapeOpPlaySlider' : 'tapeOpStopSlider'); if (sl && +sl.value !== v) sl.value = v;
+  try { localStorage.setItem(which === 'play' ? 'sifiTapeOpPlay' : 'sifiTapeOpStop', String(v)); } catch (e) {} }
+try { ['stop', 'play'].forEach(w => { const v = localStorage.getItem(w === 'play' ? 'sifiTapeOpPlay' : 'sifiTapeOpStop'); if (v !== null && v !== '') { const apply = () => setTapeOpacity(w, v); if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply); else apply(); } }); } catch (e) {}
 function setGlue(v) { v = Math.max(0, Math.min(100, +v || 0)); window._glue = v / 100; const r = document.getElementById('glueReadout'); if (r) r.textContent = Math.round(v) + '%'; const sl = document.getElementById('glueSlider'); if (sl && +sl.value !== v) sl.value = v; }
 function _scDuck(t) {
   const gs = window._scDuckGains; if (!gs || !ctx) return;
